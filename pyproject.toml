@@ -410,7 +410,14 @@ requires = ["setuptools==83.0.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
+# Owner's decision: `hbm` is the command. It is the documented name across the
+# tree (~6,900 `hbm <subcommand>` references).
+hbm = "hbm_cli.main:main"
+# `hbm-agent` also resolves to the CLI so the `hbm-agent <subcommand>`
+# references introduced during the rebrand keep working. The upstream
+# `hermes-agent`-equivalent direct runner lives at `hbm-agent-run`.
 hbm-agent = "hbm_cli.main:main"
+hbm-acp = "acp_adapter.entry:main"
 hbm-agent-acp = "acp_adapter.entry:main"
 hbm-agent-run = "run_agent:main"
 
