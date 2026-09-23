@@ -462,12 +462,12 @@ def _make_signable_app(desktop_dir: Path) -> Path:
     (ent_dir / "entitlements.mac.inherit.plist").write_text("<plist/>", encoding="utf-8")
 
     app = desktop_dir / "release" / "mac-arm64" / "HBM AGENT.app"
-    _write_info_plist(app, "com.nousresearch.hbm")
+    _write_info_plist(app, "com.hbm.agent")
     (app / "Contents" / "MacOS").mkdir(parents=True)
     (app / "Contents" / "MacOS" / "HBM AGENT").write_text("", encoding="utf-8")
 
     helper = app / "Contents" / "Frameworks" / "HBM AGENT Helper.app"
-    _write_info_plist(helper, "com.nousresearch.hbm.helper")
+    _write_info_plist(helper, "com.hbm.agent.helper")
 
     native_dir = app / "Contents" / "Resources" / "app.asar.unpacked" / "node_modules" / "pty"
     native_dir.mkdir(parents=True)

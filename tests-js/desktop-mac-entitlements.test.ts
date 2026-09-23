@@ -101,7 +101,7 @@ test('bootstrap installer carries microphone entitlement for launcher attributio
     'entitlements.plist',
     'the macOS bootstrap installer must sign with its entitlements.plist. ' +
       'When /Applications/HBM AGENT.app is the setup launcher, macOS TCC treats ' +
-      'com.nousresearch.hbm.setup as the responsible process for the desktop ' +
+      'com.hbm.agent.setup as the responsible process for the desktop ' +
       'app it opens; without audio-input on the setup app, microphone access is ' +
       'denied before a permission prompt can appear.'
   )

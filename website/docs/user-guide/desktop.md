@@ -552,7 +552,7 @@ rm "$HOME/.hbm/hbm-agent/.hbm-bootstrap-complete"
 rm -rf "$HOME/.hbm/hbm-agent/venv"
 
 # Reset a stuck macOS microphone prompt
-tccutil reset Microphone com.nousresearch.hbm
+tccutil reset Microphone com.hbm.agent
 ```
 
 ### "The host key has CHANGED since you last connected" (SSH remote)
@@ -648,7 +648,7 @@ button, so it looks like there is nothing to re-check. If that happens, reset
 the stale grant once and re-grant:
 
 ```bash
-tccutil reset ScreenCapture com.nousresearch.hbm   # repeat per service
+tccutil reset ScreenCapture com.hbm.agent   # repeat per service
 ```
 
 then toggle the fresh entry ON in System Settings and fully quit & relaunch
@@ -686,7 +686,7 @@ detected and never re-signed.
 One-time note: changing the signing identity (including the first update after
 this fix) changes the app's identity once, so macOS will re-prompt one final
 time. Grants are stable from then on. If a permission gets stuck, reset it with
-`tccutil reset All com.nousresearch.hbm` and re-grant.
+`tccutil reset All com.hbm.agent` and re-grant.
 
 ## See also
 

@@ -213,7 +213,7 @@ rm "$HOME/.hbm/hbm-agent/.hbm-bootstrap-complete"
 # Rebuild a broken Python venv
 rm -rf "$HOME/.hbm/hbm-agent/venv"
 # Reset a stuck macOS microphone prompt (macOS only)
-tccutil reset Microphone com.nousresearch.hbm
+tccutil reset Microphone com.hbm.agent
 ```
 
 **Windows (PowerShell):**

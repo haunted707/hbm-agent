@@ -36,7 +36,7 @@ _RUNTIME_DIR_NAME = ".hbm-runtime"
 _VENV_NAME = "venv"
 _ALT_VENV_NAME = ".venv"
 _REPAIR_LOCK_NAME = "runtime-repair.lock"
-_MACOS_MANAGED_PYTHON_IDENTIFIER = "com.nousresearch.hbm.managed-python"
+_MACOS_MANAGED_PYTHON_IDENTIFIER = "com.hbm.agent.managed-python"
 
 _Provisioned = tuple[Path, Path, SQLiteRuntimeInfo]
 

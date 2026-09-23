@@ -117,9 +117,9 @@ class TestMacOSManagedPythonSigning:
             "-",
             "--timestamp=none",
             "--identifier",
-            "com.nousresearch.hbm.managed-python",
+            "com.hbm.agent.managed-python",
             "--requirements",
-            '=designated => identifier "com.nousresearch.hbm.managed-python"',
+            '=designated => identifier "com.hbm.agent.managed-python"',
             str(python),
         ]
         assert calls[1][0] == [

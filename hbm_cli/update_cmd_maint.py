@@ -1039,7 +1039,7 @@ def _run_post_update_maintenance(
         print(
             "  ℹ macOS: if HBM AGENT re-prompts for permissions you already "
             "granted (toggle shows ON), the stored grant is stale — run "
-            "`tccutil reset ScreenCapture com.nousresearch.hbm` (repeat "
+            "`tccutil reset ScreenCapture com.hbm.agent` (repeat "
             "per affected service), toggle it ON in System Settings, then "
             "fully quit & relaunch once."
         )
