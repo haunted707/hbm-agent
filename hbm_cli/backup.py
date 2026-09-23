@@ -32,7 +32,7 @@ logger = logging.getLogger(__name__)
 
 # --- Exclusion rules ---
 
-# Where ``hbm-agent backup --quick`` / ``/snapshot`` / the pre-update safety net write state
+# Where ``hbm backup --quick`` / ``/snapshot`` / the pre-update safety net write state
 # snapshots (see ``create_quick_snapshot``); defined here because the exclusion set needs it.
 _QUICK_SNAPSHOTS_DIR = "state-snapshots"
 
@@ -114,7 +114,7 @@ _EXCLUDED_PREFIXES = (
     f"state.db{RETIRED_GENERATION_DIR_SUFFIX}",
 )
 
-# Files ``hbm-agent import`` must never overwrite, matched by basename so root and named profiles are
+# Files ``hbm import`` must never overwrite, matched by basename so root and named profiles are
 # both covered. They hold runtime state namespaced to the SOURCE machine: ``gateway_state.json``
 # drives the container-boot reconciler (a foreign value leaves the gateway stuck "starting" and
 # disconnected from the Nous portal); PID/lock/registry files reference source PIDs. Mirrors
@@ -279,7 +279,7 @@ def _iter_backup_files(hbm_root: Path, out_path: Path, skipped_dirs: Optional[se
 
     The one owner of the walk policy (directory pruning so os.walk never descends a multi-GB
     excluded tree, the root-only ``hbm-agent`` carve-out, root runtime trees, per-file rules),
-    shared by ``hbm-agent backup`` and the pre-update / pre-migration path so they can never drift.
+    shared by ``hbm backup`` and the pre-update / pre-migration path so they can never drift.
     """
     for dirpath, dirnames, filenames in os.walk(hbm_root, followlinks=False):
         rel_dir = Path(dirpath).relative_to(hbm_root)
@@ -404,7 +404,7 @@ def is_zeroed_sqlite_file(path: Path, *, probe_bytes: int = 100, force: bool = F
 _SQLITE_HEADER = b"SQLite format 3\0"
 
 # Above this size ``PRAGMA integrity_check`` (walks every b-tree page — minutes of pegged CPU on a
-# 30 GB state.db, reading as a hung ``hbm-agent update``) is replaced by the O(1) header+schema probe.
+# 30 GB state.db, reading as a hung ``hbm update``) is replaced by the O(1) header+schema probe.
 # Default ceiling above which ``PRAGMA integrity_check`` is skipped in favour of the (O(1)) header +
 # structural probe. Sessions databases in the tens of GB are normal for heavy users, so the size-unbounded
 # check is never an acceptable default on the update path. See #70553.
@@ -738,7 +738,7 @@ def _run_backup_locked(args, hbm_root: Path) -> None:
     if errors:
         _print_capped(f"\n  Warnings ({len(errors)} files skipped):", errors, "  ")
     else:
-        print(f"\nRestore with: hbm-agent import {out_path.name}")
+        print(f"\nRestore with: hbm import {out_path.name}")
     keep = getattr(args, "keep", 0)  # 0 / absent: never prune (non-CLI callers)
     if keep and out_path.name.startswith(_RUN_BACKUP_PREFIX):
         pruned = _prune_prefixed_zips(out_path.parent, _RUN_BACKUP_PREFIX, keep, "backup")
@@ -1019,11 +1019,11 @@ def run_import(args) -> None:
         print()
         if not (hbm_root / "hbm-agent").is_dir():
             print("Note: The hbm-agent codebase was not included in the backup.\n"
-                  "  If this is a fresh install, run: hbm-agent update")
+                  "  If this is a fresh install, run: hbm update")
         if restored_profiles:
             print("\nTo re-enable gateway services for profiles:")
             for pname in restored_profiles:
-                print(f"  hbm-agent -p {pname} gateway install")
+                print(f"  hbm -p {pname} gateway install")
         _revive_gateway_after_import(hbm_root)
         print("Done. Your HBM AGENT configuration has been restored.")
 
@@ -1060,7 +1060,7 @@ def _restore_profile_wrappers(hbm_root: Path) -> List[str]:
     except ImportError:  # hbm_cli.profiles unavailable (fresh install)
         if any(profiles_dir.iterdir()):
             print("\n  Profiles detected but aliases could not be created.\n"
-                  "  Run: hbm-agent profile list  (after installing hbm)")
+                  "  Run: hbm profile list  (after installing hbm)")
     return [n for n, _ in restored_profiles]
 
 
@@ -1077,7 +1077,7 @@ def _revive_gateway_after_import(hbm_root: Path) -> None:
             (native_default / marker).exists() for marker in ("config.yaml", ".env", "state.db")):
         print("\nRestored into a non-default home; leaving the gateway service alone to avoid clashing "
               f"with the install at {native_default}.\n"
-              "To start a gateway for this home, run:  hbm-agent gateway install")
+              "To start a gateway for this home, run:  hbm gateway install")
         return
     try:
         from hbm_cli.gateway import ensure_gateway_service, _is_service_running
@@ -1085,15 +1085,15 @@ def _revive_gateway_after_import(hbm_root: Path) -> None:
             print()
             ensure_gateway_service(context="import")
     except Exception:
-        print("\nStart the gateway to activate cron jobs and messaging:\n  hbm-agent gateway install")
+        print("\nStart the gateway to activate cron jobs and messaging:\n  hbm gateway install")
 
 
-# --- Quick state snapshots (used by /snapshot slash command and hbm-agent backup --quick) ---
+# --- Quick state snapshots (used by /snapshot slash command and hbm backup --quick) ---
 
 # Critical state files (relative to HBM_HOME) for quick snapshots; everything else is
 # regeneratable or managed separately (skills, repo, sessions/). Entries may be files OR
 # directories (recursive); missing entries are skipped. Pairing data lives in platform JSON blobs
-# outside state.db, so it is listed explicitly — ``hbm-agent update`` snapshots this set (#15733).
+# outside state.db, so it is listed explicitly — ``hbm update`` snapshots this set (#15733).
 _QUICK_STATE_FILES = (
     "state.db", "config.yaml", ".env", "auth.json", "cron/jobs.json", "cron/executions.db",
     "gateway_state.json", "channel_directory.json", "channel_aliases.json", "processes.json",
@@ -1215,7 +1215,7 @@ def _create_quick_snapshot_locked(
     """Copy the quick-snapshot set to a timestamped dir under state-snapshots/ and prune old ones.
 
     ``max_file_size`` skips (with a warning) larger files: the pre-update snapshot uses it so a
-    multi-GB ``state.db`` never stalls ``hbm-agent update`` while the small files are always captured.
+    multi-GB ``state.db`` never stalls ``hbm update`` while the small files are always captured.
     """
     root = _quick_snapshot_root(home)
     ts = datetime.now(timezone.utc).strftime("%Y%m%d-%H%M%S")
@@ -1369,7 +1369,7 @@ def _count_cron_jobs(path: Path) -> Optional[int]:
 
 
 def restore_cron_jobs_if_emptied(snapshot_id: str, hbm_home: Optional[Path] = None) -> Optional[Dict[str, Any]]:
-    """Safety net for silent cron-job loss across ``hbm-agent update``.
+    """Safety net for silent cron-job loss across ``hbm update``.
 
     Conservative: restores only when the snapshot had MORE jobs than the live file (a user who
     deleted jobs is never second-guessed); an unreadable live file is left so corruption surfaces.
@@ -1484,7 +1484,7 @@ def _set_config_path_value(data: Dict[str, Any], dotted: Tuple[str, ...], value:
 
 def restore_config_model_settings_if_rewritten(
     snapshot_id: str, hbm_home: Optional[Path] = None) -> Optional[Dict[str, Any]]:
-    """Safety net for silent config.yaml model/MoA loss across ``hbm-agent update``.
+    """Safety net for silent config.yaml model/MoA loss across ``hbm update``.
 
     Mirrors :func:`restore_cron_jobs_if_emptied`: restore only the protected keys — never the
     whole file — whose user-set value in the same-run pre-update snapshot changed or vanished.
@@ -1583,7 +1583,7 @@ def prune_quick_snapshots(keep: int = _QUICK_DEFAULT_KEEP, hbm_home: Optional[Pa
 
 
 def run_quick_backup(args) -> None:
-    """CLI entry point for hbm-agent backup --quick."""
+    """CLI entry point for hbm backup --quick."""
     snap_id = create_quick_snapshot(label=getattr(args, "label", None))
     if snap_id:
         print(f"State snapshot created: {snap_id}\n"
@@ -1684,14 +1684,14 @@ def _create_prefixed_full_backup(
 def create_pre_update_backup(
     hbm_home: Optional[Path] = None, keep: int = _PRE_UPDATE_DEFAULT_KEEP) -> Optional[Path]:
     """Full zip backup to ``backups/pre-update-<timestamp>.zip``, auto-pruned; ``None`` if nothing
-    was found or the backup failed. Never raises — ``hbm-agent update`` continues anyway."""
+    was found or the backup failed. Never raises — ``hbm update`` continues anyway."""
     return _create_prefixed_full_backup(hbm_home, _PRE_UPDATE_PREFIX, max(keep, 1), "pre-update", "backup")
 
 
 def create_pre_migration_backup(
     hbm_home: Optional[Path] = None, keep: int = _PRE_MIGRATION_DEFAULT_KEEP) -> Optional[Path]:
-    """Full zip backup to ``backups/pre-migration-<timestamp>.zip`` before ``hbm-agent claw migrate``
-    (same dir as update backups so listings/``hbm-agent import`` find it); ``None`` if nothing was
+    """Full zip backup to ``backups/pre-migration-<timestamp>.zip`` before ``hbm claw migrate``
+    (same dir as update backups so listings/``hbm import`` find it); ``None`` if nothing was
     found or the write failed. Never raises."""
     return _create_prefixed_full_backup(
         hbm_home, _PRE_MIGRATION_PREFIX, max(keep, 0), "pre-migration", "pre-migration backup")

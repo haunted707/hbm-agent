@@ -512,7 +512,7 @@ def test_dispatch_json_exposes_suppression_reasons(
 def test_dispatch_text_and_daemon_stuck_warning_name_guard_reason(
     monkeypatch: pytest.MonkeyPatch, capsys: pytest.CaptureFixture[str]
 ) -> None:
-    """The plain `hbm-agent kanban dispatch` output and the standalone daemon's
+    """The plain `hbm kanban dispatch` output and the standalone daemon's
     "dispatcher stuck" warning both say WHY a ready card was held (#111910):
     a guarded card must not look like an idle tick with `Spawned: 0`."""
     res = kbd.DispatchResult(respawn_guarded=[("t_held", "active_pr")], memory_pressure="elevated")

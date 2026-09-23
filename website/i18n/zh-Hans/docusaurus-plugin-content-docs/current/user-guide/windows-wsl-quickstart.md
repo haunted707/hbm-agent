@@ -100,7 +100,7 @@ wsl --shutdown
 打开 WSL2 shell 后执行：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 source ~/.bashrc

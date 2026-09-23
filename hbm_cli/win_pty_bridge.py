@@ -1,4 +1,4 @@
-"""Windows ConPTY bridge for the `hbm-agent dashboard` chat tab."""
+"""Windows ConPTY bridge for the `hbm dashboard` chat tab."""
 
 from __future__ import annotations
 

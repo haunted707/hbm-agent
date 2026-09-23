@@ -49,7 +49,7 @@ Use any model you want — [Nous Portal](https://portal.nousresearch.com), OpenR
 ### Linux, macOS, WSL2, Termux
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -61,7 +61,7 @@ cd hbm-agent
 Run this in PowerShell:
 
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 The installer handles everything: uv, Python 3.11, Node.js, ripgrep, ffmpeg, **and a portable Git Bash** (MinGit, unpacked to `%LOCALAPPDATA%\hbm\git` — no admin required, completely isolated from any system Git install). HBM AGENT uses this bundled Git Bash to run shell commands.

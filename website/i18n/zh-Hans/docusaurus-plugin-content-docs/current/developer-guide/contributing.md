@@ -43,7 +43,7 @@ description: "如何为 HBM AGENT 做贡献 — 开发环境配置、代码风�
 对大多数贡献者来说，最好的开发启动方式和用户安装方式相同：运行标准安装器，然后在它克隆出的仓库里开发。安装器会创建 HBM AGENT venv、配置 `hbm` 命令、为 `hbm update` 写入安装方式标记，并把完整 git 项目克隆到 `$HBM_HOME/hbm-agent`（通常是 `~/.hbm/hbm-agent`）。这样你的开发环境会和 CLI、updater、lazy dependency installer、gateway、docs 默认假设的布局一致。
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 cd "${HBM_HOME:-$HOME/.hbm}/hbm-agent"

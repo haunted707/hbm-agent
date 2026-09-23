@@ -95,7 +95,7 @@ def _default_hbm_root_is_opt_data() -> bool:
 
 
 def _dashboard_local_update_managed_externally() -> bool:
-    """True when the dashboard should not offer ``hbm-agent update``.
+    """True when the dashboard should not offer ``hbm update``.
 
     Containerized dashboards are updated by the outer launcher/image — except a
     ``git`` install (bind-mounted checkout, e.g. the hbm-webui image), where

@@ -1,4 +1,4 @@
-"""``hbm-agent logs`` subcommand parser."""
+"""``hbm logs`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -14,18 +14,18 @@ def build_logs_parser(subparsers, *, cmd_logs: Callable) -> None:
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""\
 Examples:
-    hbm-agent logs                    Show last 50 lines of agent.log
-    hbm-agent logs -f                 Follow agent.log in real time
-    hbm-agent logs errors             Show last 50 lines of errors.log
-    hbm-agent logs gateway -n 100     Show last 100 lines of gateway.log
-    hbm-agent logs gui -f             Follow gui.log in real time
-    hbm-agent logs desktop -f         Follow desktop.log (Electron app boot/backend)
-    hbm-agent logs --level WARNING    Only show WARNING and above
-    hbm-agent logs --session abc123   Filter by session ID
-    hbm-agent logs --component tools  Only show tool-related lines
-    hbm-agent logs --since 1h         Lines from the last hour
-    hbm-agent logs --since 30m -f     Follow, starting from 30 min ago
-    hbm-agent logs list               List available log files with sizes
+    hbm logs                    Show last 50 lines of agent.log
+    hbm logs -f                 Follow agent.log in real time
+    hbm logs errors             Show last 50 lines of errors.log
+    hbm logs gateway -n 100     Show last 100 lines of gateway.log
+    hbm logs gui -f             Follow gui.log in real time
+    hbm logs desktop -f         Follow desktop.log (Electron app boot/backend)
+    hbm logs --level WARNING    Only show WARNING and above
+    hbm logs --session abc123   Filter by session ID
+    hbm logs --component tools  Only show tool-related lines
+    hbm logs --since 1h         Lines from the last hour
+    hbm logs --since 30m -f     Follow, starting from 30 min ago
+    hbm logs list               List available log files with sizes
 """)
     logs_parser.add_argument(
         "log_name", nargs="?", default="agent",

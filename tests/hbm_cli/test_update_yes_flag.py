@@ -199,7 +199,7 @@ class TestUnicodeDecodeErrorInUpdatePrompts:
             cmd_update(args)  # must not raise
 
         out = capsys.readouterr().out
-        assert "hbm-agent config migrate" in out
+        assert "hbm config migrate" in out
         mock_migrate.assert_not_called()
 
     def test_stash_restore_unicode_decode_error_falls_through_to_skip(self, tmp_path, capsys):

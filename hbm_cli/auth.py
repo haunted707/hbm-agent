@@ -233,7 +233,7 @@ _REGISTRY_ROWS: Tuple[Any, ...] = (
     ("opencode-go", "OpenCode Go", "https://opencode.ai/zen/go/v1", ("OPENCODE_GO_API_KEY",),
      "OPENCODE_GO_BASE_URL"),
     # Deliberately NO api_key_env_vars: the free tier is served anonymously (any unrecognized bearer
-    # is a 401), so there is no secret to configure. Select via `hbm-agent model` / `/model free`.
+    # is a 401), so there is no secret to configure. Select via `hbm model` / `/model free`.
     ("opencode-free", "OpenCode Free", "https://opencode.ai/zen/v1", ()),
     ("kilocode", "Kilo Code", "https://api.kilo.ai/api/gateway", ("KILOCODE_API_KEY",), "KILOCODE_BASE_URL"),
     ("huggingface", "Hugging Face", "https://router.huggingface.co/v1", ("HF_TOKEN",), "HF_BASE_URL"),
@@ -429,7 +429,7 @@ def _resolve_api_key_provider_secret(provider_id: str, pconfig: ProviderConfig) 
 
 def is_rate_limited_auth_error(error: Exception) -> bool:
     """True when an :class:`AuthError` is upstream rate-limiting / quota: transient, and
-    re-authenticating cannot fix it, so callers should say "retry later", not ``hbm-agent auth``."""
+    re-authenticating cannot fix it, so callers should say "retry later", not ``hbm auth``."""
     return (isinstance(error, AuthError) and not error.relogin_required
             and error.code == CODEX_RATE_LIMITED_CODE)
 
@@ -449,7 +449,7 @@ def format_auth_error(error: Exception) -> str:
         # Rate-limit / quota errors are not credential problems: never append "re-authenticate".
         return str(error)
     if error.relogin_required:
-        return f"{error} Run `hbm-agent model` to re-authenticate."
+        return f"{error} Run `hbm model` to re-authenticate."
     if error.code in _ENTITLEMENT_ERROR_CODES:
         if error.provider == "nous":
             return _format_nous_entitlement_auth_error(error)
@@ -819,7 +819,7 @@ def _save_provider_state_to_source(
 
 
 def mark_provider_active_if_unset(provider_id: str) -> None:
-    """Set ``active_provider`` only when none is set yet: the first ``hbm-agent auth add`` credential must
+    """Set ``active_provider`` only when none is set yet: the first ``hbm auth add`` credential must
     make its provider active (else setup reports "No inference provider configured"); later adds
     leave the user's choice untouched."""
     with _auth_store_lock():
@@ -860,7 +860,7 @@ def read_credential_pool(provider_id: Optional[str] = None) -> Dict[str, Any]:
     """Return the persisted credential pool, or one provider slice.
 
     In profile mode the global-root ``auth.json`` is a read-only fallback applied per provider ONLY
-    when the profile has zero entries for it (``hbm-agent auth add`` in the profile shadows global)."""
+    when the profile has zero entries for it (``hbm auth add`` in the profile shadows global)."""
     pool = _load_auth_store().get("credential_pool")
     pool = pool if isinstance(pool, dict) else {}
     global_pool = _load_global_auth_store().get("credential_pool")
@@ -939,7 +939,7 @@ def write_credential_pool(
     Final disk-boundary sanitizer for borrowed credentials (callers may pass raw dicts). Entries on
     disk but missing from *entries* (added concurrently) are merged back unless in *removed_ids*,
     so a rotation/exhaustion rewrite never drops a concurrent credential. Entries in
-    *status_cleared_ids* were cleared deliberately (``hbm-agent auth reset``) and skip the
+    *status_cleared_ids* were cleared deliberately (``hbm auth reset``) and skip the
     recency merge, which would otherwise read their cleared ``last_status_at`` (None ->
     epoch 0) as a stale snapshot and copy a still-binding cooldown back."""
     removed = {rid for rid in (removed_ids or ()) if rid}
@@ -1177,7 +1177,7 @@ def is_provider_explicitly_configured(provider_id: str) -> bool:
 
 def clear_provider_auth(provider_id: Optional[str] = None) -> bool:
     """Clear auth state for a provider (the active one when *provider_id* is None). Used by
-    ``hbm-agent logout``. Returns True if something was cleared."""
+    ``hbm logout``. Returns True if something was cleared."""
     with _auth_store_lock():
         auth_store = _load_auth_store()
         target = provider_id or auth_store.get("active_provider")
@@ -1216,7 +1216,7 @@ def _get_config_hint_for_unknown_provider(provider_name: str) -> str:
         issues = validate_config_structure()
         if not issues:
             return ""
-        lines = ["Config issue detected — run 'hbm-agent doctor' for full diagnostics:"]
+        lines = ["Config issue detected — run 'hbm doctor' for full diagnostics:"]
         for ci in issues:
             lines.append(f"  [{'ERROR' if ci.severity == 'error' else 'WARNING'}] {ci.message}")
             if ci.hint and ci.hint.splitlines()[0]:
@@ -1244,7 +1244,7 @@ def _refuse_env_adoption_if_config_corrupt() -> None:
     raise AuthError(
         f"config.yaml at {path} is corrupt ({err}) — refusing to auto-select "
         f"an inference provider from environment keys. Fix the YAML (a backup "
-        f"was saved next to it) or run hbm-agent setup.",
+        f"was saved next to it) or run hbm setup.",
         code="corrupt_config")
 
 
@@ -1326,14 +1326,14 @@ def _scoped_key_env_reader() -> Callable[[str], str]:
 
 def _openrouter_auto_detected(scoped_key_env: Callable[[str], str]) -> bool:
     """True when an OpenRouter credential exists via env key or the credential pool (a key added via
-    `hbm-agent auth add openrouter` has no env var; without the pool check it is invisible to
+    `hbm auth add openrouter` has no env var; without the pool check it is invisible to
     auto-detection and requests go out with no Authorization header)."""
     if any(has_usable_secret(scoped_key_env(v)) for v in ("OPENAI_API_KEY", "OPENROUTER_API_KEY")):
         return True
     try:
-        # Auto-detect an OpenRouter credential added via `hbm-agent auth add openrouter` (manual pool entry, no
+        # Auto-detect an OpenRouter credential added via `hbm auth add openrouter` (manual pool entry, no
         # env var). Without this, a key that only lives in the credential pool is invisible to
-        # auto-detection — the user sees `hbm-agent auth list` showing the credential while requests go out
+        # auto-detection — the user sees `hbm auth list` showing the credential while requests go out
         # with no Authorization header ("HTTP 401: Missing Authentication header"). The env-var check above
         # only covers keys exported as OPENROUTER_API_KEY / OPENAI_API_KEY. See issue #42130.
         from agent.credential_pool import load_pool as _load_pool
@@ -1366,7 +1366,7 @@ def _config_model_provider() -> Tuple[Any, Optional[str]]:
     this is the safety net for the direct ``resolve_provider("auto")`` callers. A configured custom
     endpoint is explicit intent like any registry pin: without this rung the boot inventory
     (``free_tier_bootstrap``) read a llama.cpp/vLLM install as "nothing configured" and the
-    dashboard's Ink chat parked every session on Setup Required while ``hbm-agent chat`` worked
+    dashboard's Ink chat parked every session on Setup Required while ``hbm chat`` worked
     (#108383)."""
     try:
         from hbm_cli.config import load_config
@@ -1449,8 +1449,8 @@ def resolve_provider(
         return normalized
     if normalized != "auto":
         hint = _get_config_hint_for_unknown_provider(normalized)
-        tail = (f"\n\n{hint}" if hint else " Check 'hbm-agent model' for available providers, "
-                "or run 'hbm-agent doctor' to diagnose config issues.")
+        tail = (f"\n\n{hint}" if hint else " Check 'hbm model' for available providers, "
+                "or run 'hbm doctor' to diagnose config issues.")
         raise AuthError(f"Unknown provider '{normalized}'." + tail, code="invalid_provider")
 
     if explicit_api_key or explicit_base_url:  # one-off CLI creds always mean openrouter/custom
@@ -1508,9 +1508,9 @@ def resolve_provider(
         pass  # boto3 not installed
     from hbm_constants import display_hbm_home
     raise AuthError(
-        "HBM AGENT is not connected to any AI provider yet. Run `hbm-agent model` to pick one (the free "
+        "HBM AGENT is not connected to any AI provider yet. Run `hbm model` to pick one (the free "
         "Nous tier needs no API key), type `/login` in chat, or add a key with "
-        f"`hbm-agent auth add <provider>`. (Advanced: put an API key such as OPENROUTER_API_KEY in "
+        f"`hbm auth add <provider>`. (Advanced: put an API key such as OPENROUTER_API_KEY in "
         f"{display_hbm_home()}/.env.)",
         code="no_provider_configured")
 
@@ -1751,7 +1751,7 @@ class OAuthProviderFlow:
     resolve_fn: str
     status_fn: str
     terminal_refresh_codes: FrozenSet[str] = frozenset()  # retrying the same refresh token cannot succeed
-    # ``hbm-agent logout`` with no active provider falls back to config.yaml ``model.provider`` only
+    # ``hbm logout`` with no active provider falls back to config.yaml ``model.provider`` only
     # for providers whose credentials live in auth.json.
     logout_from_config: bool = False
 
@@ -2001,7 +2001,7 @@ def _get_azure_foundry_auth_status() -> Dict[str, Any]:
     """Structural auth status for Azure Foundry.
 
     ``entra_id``: ``azure-identity`` importable — never invokes the Entra credential chain (keeps
-    CLI startup flat; ``hbm-agent doctor`` runs the live probe). ``api_key`` (default): usable
+    CLI startup flat; ``hbm doctor`` runs the live probe). ``api_key`` (default): usable
     ``AZURE_FOUNDRY_API_KEY``."""
     info: Dict[str, Any] = {"provider": "azure-foundry"}
     try:
@@ -2028,7 +2028,7 @@ def _get_azure_foundry_auth_status() -> Dict[str, Any]:
                 credential_verified=False, logged_in=bool(installed),
                 hint=(
                     "azure-identity is installed; live credential validation "
-                    "is skipped here. Run `hbm-agent doctor` to verify token acquisition."
+                    "is skipped here. Run `hbm doctor` to verify token acquisition."
                 ) if installed else (
                     "azure-identity not installed. Install with: "
                     "pip install azure-identity  (or rely on HBM AGENT' "
@@ -2227,9 +2227,9 @@ def _reset_config_provider() -> Path:
 
 
 def login_command(args) -> None:
-    """Deprecated: use 'hbm-agent model' or 'hbm-agent setup' instead."""
-    print("The 'hbm-agent login' command has been removed.\nUse 'hbm-agent auth' to manage credentials,\n"
-          "'hbm-agent model' to select a provider, or 'hbm-agent setup' for full setup.")
+    """Deprecated: use 'hbm model' or 'hbm setup' instead."""
+    print("The 'hbm-agent login' command has been removed.\nUse 'hbm auth' to manage credentials,\n"
+          "'hbm model' to select a provider, or 'hbm setup' for full setup.")
     raise SystemExit(0)
 
 
@@ -2280,7 +2280,7 @@ def logout_command(args) -> None:
     elif os.getenv("OPENROUTER_API_KEY"):
         print("HBM AGENT will use OpenRouter for inference.")
     else:
-        print("Run `hbm-agent model` or configure an API key to use HBM AGENT.")
+        print("Run `hbm model` or configure an API key to use HBM AGENT.")
 
 
 # ---- BEGIN PLUGIN-COMPAT (revert-scheduled; see COMPAT_MANIFEST.md) ----

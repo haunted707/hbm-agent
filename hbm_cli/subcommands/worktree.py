@@ -1,4 +1,4 @@
-"""``hbm-agent worktree`` subcommand parser."""
+"""``hbm worktree`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -7,7 +7,7 @@ def build_worktree_parser(subparsers) -> None:
     """Attach the ``worktree`` subcommand to ``subparsers``."""
     worktree_parser = subparsers.add_parser(
         "worktree", help="Audit and reclaim accumulated git worktrees and merged branches",
-        description="Attended reclaim for the .worktrees/ directory hbm-agent -w sessions "
+        description="Attended reclaim for the .worktrees/ directory hbm -w sessions "
             "accumulate. Never deletes uncommitted tracked changes, unique "
             "unpushed commits, or in-use trees; untracked-only scratch is "
             "archived to ~/.hbm/archive/worktree-prune/ before removal. See: "

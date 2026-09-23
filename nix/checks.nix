@@ -232,10 +232,10 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
                 "hbm-backend"
               ]) "expected hbm-agent + hbm-backend processes, got: ${toString names}"
               ++ lib.optional (
-                !lib.hasInfix "bin/hbm-agent gateway" (argvOf "hbm-agent")
+                !lib.hasInfix "bin/hbm gateway" (argvOf "hbm-agent")
               ) "gateway process does not run `hbm gateway`: ${argvOf "hbm-agent"}"
               ++ lib.optional (
-                !lib.hasInfix "bin/hbm-agent serve" (argvOf "hbm-backend")
+                !lib.hasInfix "bin/hbm serve" (argvOf "hbm-backend")
               ) "backend process does not run `hbm serve`: ${argvOf "hbm-backend"}"
               ++ lib.optional (
                 !lib.hasInfix "--no-open" (argvOf "hbm-backend")
@@ -669,10 +669,10 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
                 "hbm-backend"
               ]) "expected hbm-agent + hbm-backend units, got: ${toString names}"
               ++ lib.optional (
-                !lib.hasInfix "bin/hbm-agent gateway" (execOf "hbm-agent")
+                !lib.hasInfix "bin/hbm gateway" (execOf "hbm-agent")
               ) "gateway unit does not run `hbm gateway`: ${execOf "hbm-agent"}"
               ++ lib.optional (
-                !lib.hasInfix "bin/hbm-agent dashboard" (execOf "hbm-backend")
+                !lib.hasInfix "bin/hbm dashboard" (execOf "hbm-backend")
               ) "backend unit does not run `hbm dashboard`: ${execOf "hbm-backend"}"
               ++ lib.optional (
                 units.hbm-agent.environment.HBM_HOME != units.hbm-backend.environment.HBM_HOME
@@ -754,7 +754,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
 
             failures =
               # The default must not change.
-              lib.optional (!lib.hasInfix "bin/hbm-agent serve --host 127.0.0.1" direct)
+              lib.optional (!lib.hasInfix "bin/hbm serve --host 127.0.0.1" direct)
                 "without waitFor the backend must exec hbm directly, got: ${direct}"
               ++ lib.optional (lib.hasInfix "hbm-backend-launch" direct)
                 "without waitFor the backend must not use the launcher"
@@ -776,7 +776,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
                 "the interface launcher must poll backend.interfaceName"
               ++ lib.optional (!lib.hasInfix "_timeout=30" interfaceScript)
                 "the launcher must use backend.waitTimeout"
-              ++ lib.optional (!lib.hasInfix "bin/hbm-agent dashboard" interfaceScript)
+              ++ lib.optional (!lib.hasInfix "bin/hbm dashboard" interfaceScript)
                 "the launcher must keep backend.mode"
 
               # The assertions reject what cannot work.
@@ -1008,7 +1008,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
         entry-points-sync = pkgs.runCommand "hbm-entry-points-sync" { } ''
           set -e
           echo "=== Checking entry points match pyproject.toml [project.scripts] ==="
-          for bin in hbm hbm-agent hbm-acp; do
+          for bin in hbm hbm hbm-acp; do
             test -x ${hbm-agent}/bin/$bin || (echo "FAIL: $bin binary missing from Nix package"; exit 1)
             echo "PASS: $bin present"
           done
@@ -1137,7 +1137,7 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
           echo "PASS: HBM_OPTIONAL_MCPS set in wrapper"
 
           export HOME=$(mktemp -d)
-          CATALOG=$(cd "$HOME" && ${hbm-agent}/bin/hbm-agent mcp catalog 2>/dev/null || true)
+          CATALOG=$(cd "$HOME" && ${hbm-agent}/bin/hbm mcp catalog 2>/dev/null || true)
           echo "catalog output: $CATALOG"
           test -n "$CATALOG" || (echo "FAIL: hbm mcp catalog returned empty"; exit 1)
           echo "PASS: mcp catalog resolves entries"
@@ -1208,8 +1208,8 @@ json.dump(sorted(leaf_paths(DEFAULT_CONFIG)), sys.stdout, indent=2)
           }
 
           echo "=== Checking HBM_MANAGED guards ==="
-          check_blocked "config set" ${hbm-agent}/bin/hbm-agent config set model foo
-          check_blocked "config edit" ${hbm-agent}/bin/hbm-agent config edit
+          check_blocked "config set" ${hbm-agent}/bin/hbm config set model foo
+          check_blocked "config edit" ${hbm-agent}/bin/hbm config edit
 
           echo "=== All guard checks passed ==="
           mkdir -p $out

@@ -164,7 +164,7 @@ def _desktop_packaged_executable_in(release_dir: Path) -> Optional[Path]:
 # ─── Desktop stage-and-swap pack (#86443) ─────────────────────────────────── electron-builder packs IN
 # PLACE: before-pack.mjs wipes ``release/<platform>- unpacked`` (or the mac ``HBM AGENT.app``) and the Electron
 # unpack + asar + rename then rebuild it. Any failure after that wipe — corrupt cached zip, blocked
-# download, missing dep, disk full — leaves the user with NO app, and ``hbm-agent update`` used to report
+# download, missing dep, disk full — leaves the user with NO app, and ``hbm update`` used to report
 # "partially complete" over an empty release/. Fix the class, not the predicate: build into a STAGING output
 # dir next to release/, verify the staged result, and only then swap it over the live tree with renames. On
 # any failure the live app is untouched.
@@ -233,7 +233,7 @@ def _discard_desktop_staging(staging_dir: Path) -> None:
 
 
 # ─── Desktop exe integrity gate (#69179) ──────────────────────────────────── The desktop self-update chain
-# (Desktop → hbm-setup --update → `hbm-agent update` → `hbm-agent desktop --build-only` → relaunch) rebuilds
+# (Desktop → hbm-setup --update → `hbm update` → `hbm-agent desktop --build-only` → relaunch) rebuilds
 # HBM AGENT.exe on the end user's machine and used to verify only that the file EXISTS before declaring
 # success. A corrupt cached Electron zip whose extraction produced a truncated electron.exe, an interrupted
 # rcedit resource rewrite, a disk-full pack, or a wrong-arch unpacked tree therefore shipped a broken binary
@@ -1231,7 +1231,7 @@ def _register_linux_desktop_entry(defer: bool = False):
     """Install the XDG desktop entry for HBM AGENT Desktop (Linux only, best-effort).
 
     ``Exec`` and ``Icon`` are absolute so the entry works outside a login shell.
-    ``hbm-agent uninstall --gui`` removes it.
+    ``hbm uninstall --gui`` removes it.
 
     ``defer=True`` (app-grid launch) returns a ``DeferredDesktopEntryInstall`` that writes the
     entry only once the Electron window is on screen (#111906); ``None`` when nothing is

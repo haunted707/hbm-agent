@@ -306,7 +306,7 @@ def _resolve_chat_argv(
     in-memory gateway but is SKIPPED for profile-scoped chats (that gateway runs
     under the dashboard's own profile, so a scoped chat spawns its own);
     ``profile`` scopes the ENTIRE chat by pointing ``HBM_HOME`` at the profile
-    dir, the same propagation ``hbm-agent -p <name>`` performs.
+    dir, the same propagation ``hbm -p <name>`` performs.
     """
     from hbm_cli.web_server_profiles import _config_profile_scope, _resolve_profile_dir
     from hbm_cli.web_server_sessions import _open_session_db_for_profile, _session_latest_descendant

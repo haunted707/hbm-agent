@@ -5,7 +5,7 @@ JSON-RPC), and starts the ACP agent server.
 
 Usage::
 
-    python -m acp_adapter.entry   # or: hbm-agent acp / hbm-agent-acp
+    python -m acp_adapter.entry   # or: hbm acp / hbm-agent-acp
 """
 
 # IMPORTANT: hbm_bootstrap must be the very first import — UTF-8 stdio
@@ -13,7 +13,7 @@ Usage::
 try:
     import hbm_bootstrap  # noqa: F401
 except ModuleNotFoundError:
-    # Partial ``hbm-agent update`` (git-reset landed, ``uv pip install -e .`` did not):
+    # Partial ``hbm update`` (git-reset landed, ``uv pip install -e .`` did not):
     # UTF-8 stdio setup is skipped on Windows; POSIX is unaffected.
     pass
 else:

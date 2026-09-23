@@ -138,7 +138,7 @@ def _profile_role(profile_dir: Path) -> str:
 
 
 def _peers(root: Path) -> list[str]:
-    """Registered peer gateway names (``hbm-agent peer``) from config.yaml, read
+    """Registered peer gateway names (``hbm peer``) from config.yaml, read
     directly (no config-loader import; the section is absent on most installs). Never raises."""
     def _names() -> list[str]:
         peers = (_read_yaml_dict(root / "config.yaml", "bot_peers") or {}).get("bot_peers")
@@ -186,7 +186,7 @@ def _peer_paragraph(root: Path) -> str:
         "\n\nTeammates on OTHER machines: this install also has peer gateways "
         f"registered ({listed}). Message an agent on a peer the same way — "
         'message_agent with target "<peer>/<agent-name>" (or "<peer>" alone '
-        "for the peer's main agent). Run `hbm-agent peer list` for the live "
+        "for the peer's main agent). Run `hbm peer list` for the live "
         "peer list."
     )
 

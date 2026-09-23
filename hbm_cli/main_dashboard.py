@@ -210,7 +210,7 @@ def _try_restart_systemd_service(svc_name: str, cgroup_path: str | None = None) 
     return False
 
 
-# launchd plist directories that can supervise a ``hbm-agent dashboard`` / ``hbm-agent serve`` backend on
+# launchd plist directories that can supervise a ``hbm dashboard`` / ``hbm serve`` backend on
 # macOS, with the launchctl domain their jobs load into (LaunchAgents: ``gui/<uid>`` or ``user/<uid>``,
 # probed per label like the gateway helpers; LaunchDaemons: ``system``). Both LaunchAgents dirs are
 # per-user domains, so they share the ``agent`` kind.
@@ -226,7 +226,7 @@ def _loaded_launchd_backend_jobs(
     plist_dirs: list[tuple[str, Path]] | None = None,
 ) -> list[tuple[str, str, list[str], int | None]]:
     """``(domain, label, program_arguments, live_pid)`` for every LOADED launchd job whose
-    ``ProgramArguments`` is a ``hbm-agent dashboard`` / ``hbm-agent serve`` backend. macOS only (empty
+    ``ProgramArguments`` is a ``hbm dashboard`` / ``hbm serve`` backend. macOS only (empty
     elsewhere). Reads the plists (unreadable/malformed ones are skipped) and asks ``launchctl print``
     per candidate label — a job that is not loaded in any domain is not returned, so an operator's
     stale plist never claims a process."""
@@ -333,7 +333,7 @@ def _dashboard_cmdline_for_pid(pid: int) -> list[str] | None:
 
 
 def _respawn_dashboard_processes(commands: list[list[str]]) -> list[list[str]]:
-    """Respawn manually-started dashboards after ``hbm-agent update``, detached, logging to
+    """Respawn manually-started dashboards after ``hbm update``, detached, logging to
     ``logs/dashboard-restart.log``; returns the argvs that failed to spawn. Callers pre-filter via
     ``_filter_dashboard_respawn_candidates`` (no Desktop ``--port 0`` backends, capped per profile).
 
@@ -368,7 +368,7 @@ def _respawn_dashboard_processes(commands: list[list[str]]) -> list[list[str]]:
 
 
 class _UpdateOutputStream:
-    """stdout/stderr wrapper for ``hbm-agent update``: mirrors to ``logs/update.log`` and, once the
+    """stdout/stderr wrapper for ``hbm update``: mirrors to ``logs/update.log`` and, once the
     terminal vanishes (BrokenPipe/OSError/ValueError), drops screen output instead of the update."""
 
     _BROKEN = (BrokenPipeError, OSError, ValueError)
@@ -443,7 +443,7 @@ def _install_hangup_protection(gateway_mode: bool = False):
 
         import datetime as _dt
 
-        log_file.write(f"\n=== hbm-agent update started {_dt.datetime.now().isoformat(timespec='seconds')} ===\n")
+        log_file.write(f"\n=== hbm update started {_dt.datetime.now().isoformat(timespec='seconds')} ===\n")
 
         state["log_file"] = log_file
         sys.stdout = _UpdateOutputStream(state["prev_stdout"], log_file)
@@ -493,10 +493,10 @@ def _report_dashboard_status() -> int:
         live.append((pid, command, mode))
 
     if not live:
-        print("No hbm-agent dashboard or serve processes running.")
+        print("No hbm dashboard or serve processes running.")
         return 0
 
-    print(f"{len(live)} hbm-agent dashboard/serve process(es) running:")
+    print(f"{len(live)} hbm dashboard/serve process(es) running:")
     for pid, command, mode in live:
         print(f"    PID {pid} [{mode}]: {command}")
     return len(live)
@@ -552,7 +552,7 @@ def _maybe_setup_dashboard_auth_interactively(args) -> None:
     print()
     print("  How do you want to authenticate the dashboard?")
     print("    [1] Username & password (quickest; for a trusted LAN / VPN)")
-    print("    [2] OAuth via Nous Portal (run `hbm-agent dashboard register`)\n    [3] Cancel\n")
+    print("    [2] OAuth via Nous Portal (run `hbm dashboard register`)\n    [3] Cancel\n")
 
     try:
         choice = input("  Choice [1]: ").strip() or "1"
@@ -564,7 +564,7 @@ def _maybe_setup_dashboard_auth_interactively(args) -> None:
         print(
             "  Run this on the host where the dashboard lives, then start "
             "the dashboard again:\n"
-            "    hbm-agent dashboard register\n"
+            "    hbm dashboard register\n"
             "  It provisions a Nous Portal OAuth client and writes "
             "HBM_DASHBOARD_OAUTH_CLIENT_ID into ~/.hbm/.env for you.\n"
             "  Docs: https://hermes-agent.nousresearch.com/docs/"
@@ -719,7 +719,7 @@ def _read_ssh_session_token_file(path: str) -> str:
 def _is_electron_packaged_web_dist(path: str) -> bool:
     """True when *path* is an Electron-packaged renderer dist (``app.asar[.unpacked]/dist``).
 
-    A standalone ``hbm-agent dashboard`` inheriting that ``HBM_WEB_DIST`` would
+    A standalone ``hbm dashboard`` inheriting that ``HBM_WEB_DIST`` would
     serve the desktop frontend in the browser ("Desktop IPC bridge is unavailable").
     """
     if not path:

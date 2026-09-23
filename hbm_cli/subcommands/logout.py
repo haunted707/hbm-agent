@@ -1,4 +1,4 @@
-"""``hbm-agent logout`` subcommand parser."""
+"""``hbm logout`` subcommand parser."""
 
 from __future__ import annotations
 

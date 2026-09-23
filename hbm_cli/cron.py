@@ -80,9 +80,9 @@ def _warn_if_gateway_not_running() -> None:
     if _builtin_gateway_liveness() is not False:
         return
     print(color("  ⚠  Gateway is not running — jobs won't fire automatically.", Colors.YELLOW))
-    print(color("     Start it with: hbm-agent gateway install\n"
-                "                    sudo hbm-agent gateway install --system  # Linux servers\n"
-                "     Check status:  hbm-agent cron status", Colors.DIM))
+    print(color("     Start it with: hbm gateway install\n"
+                "                    sudo hbm gateway install --system  # Linux servers\n"
+                "     Check status:  hbm cron status", Colors.DIM))
 
 
 def _format_lateness(seconds: float) -> str:
@@ -143,7 +143,7 @@ def cron_list(show_all: bool = False):
     jobs = list_jobs(include_disabled=show_all)
 
     if not jobs:
-        print(color("No scheduled jobs.\nCreate one with 'hbm-agent cron create ...' "
+        print(color("No scheduled jobs.\nCreate one with 'hbm cron create ...' "
                     "or the /cron command in chat.", Colors.DIM))
         return
 
@@ -224,8 +224,8 @@ def _short_reason(text: Any, limit: int = 120) -> str:
 
 
 def _delivery_fix_hint(job: Dict[str, Any]) -> str:
-    return (f"Check the target with `hbm-agent cron status` or change it with "
-            f"`hbm-agent cron edit {job.get('id', '<id>')} --deliver <target>`.")
+    return (f"Check the target with `hbm cron status` or change it with "
+            f"`hbm cron edit {job.get('id', '<id>')} --deliver <target>`.")
 
 
 def _missed_fire_line(job: Dict[str, Any], fire_err: Dict[str, Any]) -> str:
@@ -234,7 +234,7 @@ def _missed_fire_line(job: Dict[str, Any], fire_err: Dict[str, Any]) -> str:
     The stored ``detail`` is operator text (loopback / api_server adapter); keep it as a dim
     second sentence and lead with the human cause (the gateway was unreachable)."""
     return (f"{color('⚠ A scheduled run was skipped', Colors.RED)} at {fire_err.get('at', '?')}: the messaging "
-            f"gateway was unreachable. Run `hbm-agent gateway restart`, then `hbm-agent cron run {job.get('id', '<id>')}` "
+            f"gateway was unreachable. Run `hbm gateway restart`, then `hbm cron run {job.get('id', '<id>')}` "
             f"to run it now. {color('Details: ' + _short_reason(fire_err.get('detail')), Colors.DIM)}")
 
 
@@ -273,7 +273,7 @@ def cron_tick():
         # For the one-shot CLI surface, report cleanly instead of dumping a traceback; the gateway ticker
         # loop handles its own retry. See #87644.
         print(color(f"✗ Cron tick failed: {exc}", Colors.RED))
-        print("  Check `hbm-agent cron status` and the gateway log for details.")
+        print("  Check `hbm cron status` and the gateway log for details.")
         return 1
     return 0
 
@@ -307,7 +307,7 @@ def cron_incidents(args) -> int:
     if action == "ack":
         incident_id = getattr(args, "incident_id", None)
         if not incident_id:
-            print(color("✗ Incident ID required: hbm-agent cron incidents ack <incident_id>", Colors.RED))
+            print(color("✗ Incident ID required: hbm cron incidents ack <incident_id>", Colors.RED))
             return 1
         if ack_incident(incident_id):
             print(color(f"✓ Incident {incident_id} acknowledged (closed).", Colors.GREEN))
@@ -338,13 +338,13 @@ def cron_incidents(args) -> int:
             if label != "Output" or value:
                 print(f"    {label + ':':<12}{value}")
         print()
-    print(color(f"  {len(incidents)} incident(s)  |  ack one with: hbm-agent cron incidents ack <id>",
+    print(color(f"  {len(incidents)} incident(s)  |  ack one with: hbm cron incidents ack <id>",
                 Colors.DIM))
     return 0
 
 
 _PERMISSION_HINT = ("  Hint: jobs.json may be owned by another user (e.g. rewritten by a root "
-                    "`docker exec hbm hbm-agent cron ...`). Fix ownership to match the gateway "
+                    "`docker exec hbm hbm cron ...`). Fix ownership to match the gateway "
                     "user, and prefer `docker exec -u <uid>:<gid>`.")
 _FD_EXHAUSTION_HINT = ("  Hint: the ticker hit file-descriptor exhaustion (EMFILE). The scheduler "
                        "now retries with backoff and attempts fd reclamation, but if the leak "
@@ -376,12 +376,12 @@ def _print_ticker_health(pids: list) -> None:
         # Ticker never started (non-cron profile, gateway just started, or a config issue).
         _warn("⚠ Gateway is running but the cron ticker has not reported a heartbeat.")
         print("  Cron jobs will NOT fire until the ticker writes its first heartbeat.\n"
-              "  If the gateway just started, wait ~60s and re-run `hbm-agent cron status`.\n"
-              "  If heartbeat never appears, restart: hbm-agent gateway restart")
+              "  If the gateway just started, wait ~60s and re-run `hbm cron status`.\n"
+              "  If heartbeat never appears, restart: hbm gateway restart")
     elif hb_age > STALE_AFTER:  # ticker thread is gone
         _warn("⚠ Gateway is running but the cron ticker looks STALLED — "
               f"no heartbeat for {int(hb_age)}s (expected every ~60s).")
-        print("  Cron jobs may NOT be firing. Restart: hbm-agent gateway restart")
+        print("  Cron jobs may NOT be firing. Restart: hbm gateway restart")
     elif ok_age is not None and ok_age > STALE_AFTER:  # loop alive but every tick fails
         _warn("⚠ Gateway and cron ticker are running, but no tick has "
               f"succeeded in {int(ok_age)}s — ticks may be failing.")
@@ -424,7 +424,7 @@ def cron_status():
         # `_builtin_gateway_liveness`, which `cron list` uses -- the two must not disagree).
         print(color("✓ Gateway is running via the default-profile multiplexer — it ticks this profile's jobs.",
                     Colors.GREEN))
-        print(color("  Ticker health is reported by `hbm-agent cron status` on the default profile.", Colors.DIM))
+        print(color("  Ticker health is reported by `hbm cron status` on the default profile.", Colors.DIM))
     else:
         pids = find_gateway_pids()
         gateway_alive_via_lock = False
@@ -444,10 +444,10 @@ def cron_status():
         else:
             print(color("✗ Gateway is not running — cron jobs will NOT fire", Colors.RED))
             print("\n  To enable automatic execution:\n"
-                  "    hbm-agent gateway install    # Install as a user service\n"
-                  "    sudo hbm-agent gateway install --system  "
+                  "    hbm gateway install    # Install as a user service\n"
+                  "    sudo hbm gateway install --system  "
                   "# Linux servers: boot-time system service\n"
-                  "    hbm-agent gateway            # Or run in foreground")
+                  "    hbm gateway            # Or run in foreground")
 
     print()
     _print_active_jobs_summary(list_jobs(include_disabled=False))
@@ -567,7 +567,7 @@ def cron_doctor() -> int:
         for issue in issues:
             print(f"    - {issue}")
     print()
-    print(color("Next: fix the listed job config, then run `hbm-agent cron doctor` again.", Colors.DIM))
+    print(color("Next: fix the listed job config, then run `hbm cron doctor` again.", Colors.DIM))
     return 1
 
 
@@ -737,7 +737,7 @@ def cron_resume(args) -> int:
 
 
 def cron_notepad(args) -> int:
-    """Handle ``hbm-agent cron notepad <job_id> [get|set|delete|list]`` (per-job durable KV).
+    """Handle ``hbm cron notepad <job_id> [get|set|delete|list]`` (per-job durable KV).
 
     A running cron agent updates its own notepad via its terminal tool; the scheduler injects
     non-empty notepads into the job prompt on each run.
@@ -761,7 +761,7 @@ def cron_notepad(args) -> int:
             return 0
         usage_args = "set <key> <value>" if action == "set" else f"{action} <key>"
         if key is None or (action == "set" and value is None):
-            print(color(f"Usage: hbm-agent cron notepad <job_id> {usage_args}", Colors.RED))
+            print(color(f"Usage: hbm cron notepad <job_id> {usage_args}", Colors.RED))
             return 1
         if action == "set":
             notepad.set_note(job_id, key, value)
@@ -810,12 +810,12 @@ def cron_command(args):
     if handler is not None:
         return handler(args)
     print(f"Unknown cron command: {subcmd}\n"
-          "Usage: hbm-agent cron [list|create|edit|pause|resume|run|remove|resnap|status|runs|doctor|tick]")
+          "Usage: hbm cron [list|create|edit|pause|resume|run|remove|resnap|status|runs|doctor|tick]")
     sys.exit(1)
 
 
 def _cron_resnap(args) -> int:
-    """Handle `hbm-agent cron resnap [job_id] [--all]`."""
+    """Handle `hbm cron resnap [job_id] [--all]`."""
     if bool(getattr(args, "all", False)):
         result = _cron_api(action="resnap", all=True)
         if not result.get("success"):
@@ -832,7 +832,7 @@ def _cron_resnap(args) -> int:
     job_id = getattr(args, "job_id", None)
     if not job_id:
         print(color("resnap requires either a <job_id> or --all.", Colors.RED))
-        print("Usage: hbm-agent cron resnap <job_id> | hbm-agent cron resnap --all")
+        print("Usage: hbm cron resnap <job_id> | hbm cron resnap --all")
         return 1
     result = _cron_api(action="resnap", job_id=job_id)
     if not result.get("success"):

@@ -337,7 +337,7 @@ def run_whatsapp_cloud_setup() -> int:
         "         cloudflared tunnel --url http://localhost:8090",
         "       Note the printed https://<random>.trycloudflare.com URL.", "",
         "    3. Start the HBM AGENT gateway in another terminal:",
-        "         hbm-agent gateway", "",
+        "         hbm gateway", "",
         "    4. Verify your local config is reachable. From a third",
         "       terminal, with the tunnel URL substituted:", "",
         "         curl 'https://YOUR-TUNNEL.trycloudflare.com/whatsapp/webhook?\\",

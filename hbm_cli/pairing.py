@@ -1,7 +1,7 @@
 """CLI commands for the DM pairing system."""
 
 def pairing_command(args):
-    """Handle hbm-agent pairing subcommands."""
+    """Handle hbm pairing subcommands."""
     from gateway.pairing import PairingStore
 
     store = PairingStore()
@@ -13,8 +13,8 @@ def pairing_command(args):
     }
     handler = handlers.get(getattr(args, "pairing_action", None))
     if handler is None:
-        print("Usage: hbm-agent pairing {list|approve|revoke|clear-pending}")
-        print("Run 'hbm-agent pairing --help' for details.")
+        print("Usage: hbm pairing {list|approve|revoke|clear-pending}")
+        print("Run 'hbm pairing --help' for details.")
     else:
         handler()
 
@@ -36,7 +36,7 @@ def _cmd_list(store):
                 f"  {p['platform']:<12} {(p.get('request_id') or '-'):<18} {p['user_id']:<20} "
                 f"{(p.get('user_name') or ''):<20} {p['age_minutes']}m ago"
             )
-        print("\n  Approve with: hbm-agent pairing approve <platform> <request-id>")
+        print("\n  Approve with: hbm pairing approve <platform> <request-id>")
         print("  The code the bot DM'd the user also works if they relay it.")
     else:
         print("\n  No pending pairing requests.")
@@ -78,7 +78,7 @@ def _cmd_approve(store, platform: str, code: str):
         print(f"  To reset sooner, delete the '_lockout:{platform}' entry from ~/.hbm/platforms/pairing/_rate_limits.json\n")
     else:
         print(f"\n  Pairing request or code '{code}' not found or expired for platform '{platform}'.")
-        print("  Run 'hbm-agent pairing list' to see pending requests.\n")
+        print("  Run 'hbm pairing list' to see pending requests.\n")
 
 
 def _cmd_revoke(store, platform: str, user_id: str):

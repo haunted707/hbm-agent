@@ -46,7 +46,7 @@ python -m pip install -e '.[termux]' -c constraints-termux.txt
 HBM AGENT 现已内置 Termux 感知的安装路径：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```

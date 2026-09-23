@@ -1,4 +1,4 @@
-"""MCP tool checklists and the non-interactive ``hbm-agent tools enable|disable|list`` command."""
+"""MCP tool checklists and the non-interactive ``hbm tools enable|disable|list`` command."""
 
 from __future__ import annotations
 

@@ -25,7 +25,7 @@ logger = logging.getLogger("tools.mcp_tool")
 _MISSING = object()
 
 _NEEDS_REAUTH_MSG = (
-    "MCP server '{s}' requires re-authentication. Run `hbm-agent mcp login {s}` (or delete the tokens file under "
+    "MCP server '{s}' requires re-authentication. Run `hbm mcp login {s}` (or delete the tokens file under "
     "~/.hbm/mcp-tokens/ and restart). Do NOT retry this tool — ask the user to re-authenticate.")
 _STDIO_NO_RESPAWN_MSG = (
     "MCP server '{s}' stdio subprocess had exited (this is not a timeout — the call never reached the server). A "

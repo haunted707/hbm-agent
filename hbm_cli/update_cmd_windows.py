@@ -1,4 +1,4 @@
-"""Windows gateway lifecycle for ``hbm-agent update``: pause/resume/cold-start the service, sweep venv holders, reap orphaned backends.
+"""Windows gateway lifecycle for ``hbm update``: pause/resume/cold-start the service, sweep venv holders, reap orphaned backends.
 
 Split out of ``update_cmd.py``; names are re-imported there so ``hbm_cli.update_cmd.<name>`` still resolves/monkeypatches.
 Origin helpers are imported lazily per function (no cycle; test patches on the origin stay effective).
@@ -87,7 +87,7 @@ def _self_and_non_gateway_ancestor_pids(psutil) -> set[int]:
     gracefully; a detached child survives on Windows); interactive ancestry is never a blocker."""
     _is_gw = None
     with suppress(Exception):
-        # Never return ourselves or our own ancestry: a CLI ``hbm-agent update`` runs from the venv python and
+        # Never return ourselves or our own ancestry: a CLI ``hbm update`` runs from the venv python and
         # would otherwise nominate itself. Same #87594 carve-out as _detect_venv_python_processes: a GATEWAY
         # ancestor is not "our own ancestry" in the interactive sense — it is the process the pause
         # machinery must see (the /update-from-gateway topology makes the updater the gateway's child).
@@ -263,14 +263,14 @@ def _hbm_holder_subcommand(cmdline: str) -> str | None:
 def _format_venv_python_holders_message(matches: list[tuple[int, str, str]]) -> str:
     """Explain which venv processes block the update and how to clear them.
 
-    Labels come from the parsed SUBCOMMAND, never substring: a standalone ``hbm-agent dashboard`` must not be
+    Labels come from the parsed SUBCOMMAND, never substring: a standalone ``hbm dashboard`` must not be
     called the Desktop backend, ``--preserve-cache`` must not match "serve". Unknown argv gets no hint.
 
     See #90778.
     """
     hint_by_subcommand = {
         "serve": "  ← HBM AGENT backend (if the Desktop app is open, close it)",
-        "dashboard": "  ← hbm-agent dashboard (stop it: hbm-agent dashboard stop, or close that terminal)",
+        "dashboard": "  ← hbm dashboard (stop it: hbm dashboard stop, or close that terminal)",
         "gateway": "  ← gateway",
     }
     lines = ["✗ Other HBM AGENT processes are running from this install's venv:"]
@@ -282,8 +282,8 @@ def _format_venv_python_holders_message(matches: list[tuple[int, str, str]]) -> 
     lines.append(
         "\n  On Windows these keep native extension files (.pyd) locked, so the\n"
         "  dependency update would fail partway and leave a broken install.\n"
-        "  Close the HBM AGENT desktop app / other HBM AGENT terminals, then re-run:\n    hbm-agent update\n"
-        "  (or use `hbm-agent update --force-venv` to proceed anyway at your own risk)"
+        "  Close the HBM AGENT desktop app / other HBM AGENT terminals, then re-run:\n    hbm update\n"
+        "  (or use `hbm update --force-venv` to proceed anyway at your own risk)"
     )
     return "\n".join(lines)
 
@@ -333,7 +333,7 @@ def _leftover_pausable_gateway_pids(matches: list[tuple[int, str, str]]) -> list
 
 
 def _refuse_gateway_ancestor_tree_kill(pids: list[int], *, gateway_mode: bool) -> bool:
-    """Refuse a plain Windows update that would tree-kill its own ancestry (a chat agent's ``hbm-agent update`` is
+    """Refuse a plain Windows update that would tree-kill its own ancestry (a chat agent's ``hbm update`` is
     a gateway child; ``taskkill /T /F`` kills the updater first). ``--gateway`` is exempt (detached delivery).
     Refuse only when a nominated gateway is positively an ancestor; unknown ancestry keeps existing recovery.
 
@@ -353,7 +353,7 @@ def _refuse_gateway_ancestor_tree_kill(pids: list[int], *, gateway_mode: bool) -
         "✗ Refusing to stop the gateway process tree because this updater "
         f"is running inside it (gateway PID(s): {', '.join(str(pid) for pid in ancestors)}).\n"
         "  On Windows, taskkill /T would terminate the updater before the update can run.\n"
-        "  From a chat platform, use `/update` instead.\n  Otherwise, run `hbm-agent update` from a separate terminal."
+        "  From a chat platform, use `/update` instead.\n  Otherwise, run `hbm update` from a separate terminal."
     )
     return True
 
@@ -416,7 +416,7 @@ def _relaunch_stopped_serves(token: dict) -> None:
         print("  ⟲ Relaunching stopped serve/dashboard backend(s)")
         failed = _m()._respawn_dashboard_processes(commands)
     if skipped or failed:
-        print("  ⚠ Some stopped backends could not be relaunched automatically; restart them manually (hbm-agent serve --host <ip> --port <port>).")
+        print("  ⚠ Some stopped backends could not be relaunched automatically; restart them manually (hbm serve --host <ip> --port <port>).")
     _record_update_step(
         "serve_relaunch", not failed and not skipped,
         f"relaunched={len(commands) - len(failed)} failed={len(failed)} skipped={skipped}",
@@ -428,7 +428,7 @@ def _is_backend_argv(argv_low: str) -> bool:
 
     Same predicate as ``_looks_like_desktop_control_plane``: ``-m hbm_cli.main`` entry shape (the
     Desktop's only spawn shape, ``apps/desktop/electron/main.ts``) AND the canonical holder classifier says
-    ``serve``/``dashboard``. A user-launched ``hbm.exe serve`` / ``hbm-agent dashboard`` is NOT the
+    ``serve``/``dashboard``. A user-launched ``hbm.exe serve`` / ``hbm dashboard`` is NOT the
     Desktop's: the guard refuses on it, never reaps it.
     """
     return _looks_like_desktop_control_plane(argv_low)
@@ -586,7 +586,7 @@ def _stop_process_trees(pids: list[int] | list[tuple[int, int]]) -> None:
 
 
 def _looks_like_desktop_control_plane(cmdline: str) -> bool:
-    """True for this-install ``hbm-agent serve`` / ``hbm-agent dashboard`` argv (Desktop control plane).
+    """True for this-install ``hbm serve`` / ``hbm dashboard`` argv (Desktop control plane).
 
     Not the messaging gateway — don't feed into ``looks_like_gateway_command_line``. Token-based via the
     parser-derived classifier, never substring (``kanban --preserve-cache``, ``-m dashboard chat``).
@@ -752,7 +752,7 @@ def _windows_cold_start_plan() -> dict | None:
     (#109538) — the dead attestation is the only surviving "a gateway was up" evidence, and the Desktop
     does not restart the messaging gateway itself. Keep the plan, and record the attestation
     *generation* that authorized it on the token: the marker is a mutable one-shot that any concurrent
-    ``hbm-agent gateway status``/``start`` consumes, so execution authorizes the spawn from the token and
+    ``hbm gateway status``/``start`` consumes, so execution authorizes the spawn from the token and
     consumes only that generation (#110020 review)."""
     from hbm_cli.update_cmd import _desktop_owns_gateway_lifecycle
     from hbm_cli import gateway_windows
@@ -921,7 +921,7 @@ def _pause_windows_gateways_for_update() -> dict | None:
     if unmapped_pids:
         print(f"  → Stopped {len(unmapped_pids)} gateway process(es) without profile mapping")
         if any(not u.get("argv") for u in unmapped):  # no recoverable cmdline (psutil missing, denied, gone)
-            print("    Restart manually after update: hbm-agent gateway run")
+            print("    Restart manually after update: hbm gateway run")
     token = {"resume_needed": True, "profiles": profiles, "unmapped_pids": unmapped_pids, "unmapped": unmapped}
     # Every profile with ANY live gateway at discovery counts as running: service-supervised ones skip the
     # socket pause (absent from ``profiles``) but the SCM restart brings them back, not a cold-start.
@@ -1004,7 +1004,7 @@ def _cold_start_windows_gateway_after_update(token: dict | None = None) -> bool:
     attested gateway that died without a clean exit is restored even then (#109538) — the Desktop does
     not restart the messaging gateway itself. That authority is the ``attested_generation`` the plan
     recorded on ``token``, not the marker on disk: the marker is a mutable one-shot a concurrent
-    ``hbm-agent gateway status``/``start`` consumes, which would otherwise skip this spawn and clear the
+    ``hbm gateway status``/``start`` consumes, which would otherwise skip this spawn and clear the
     token (#110020 review). Only that generation is consumed afterwards — never a newer marker.
     """
     from hbm_cli.update_cmd import _desktop_owns_gateway_lifecycle, _m
@@ -1052,7 +1052,7 @@ def _refresh_windows_gateway_launchers() -> None:
     None`` death). The task's /TR points at a stable path, so rewriting in place retargets it without UAC.
 
     The Scheduled Task / Startup-folder launchers (``gateway.cmd`` + ``gateway.vbs``) are persistence
-    artifacts written once at install time — ``hbm-agent update`` never touched them, so installs created
+    artifacts written once at install time — ``hbm update`` never touched them, so installs created
     before the hidden-console rework (aa2ae36c3f) kept launching the gateway through ``pythonw.exe``
     forever: every descendant spawn flashed a conhost (#54220/#56747) and, since #70344, the console-less
     gateway died at startup with ``RuntimeError: sys.stderr is None`` (#71671).
@@ -1078,7 +1078,7 @@ def _refresh_bootstrap_cache_scripts(branch: str = "main") -> None:
     cached branch-ref script — ``install-main.ps1`` cached at install time is reused forever, executing
     months-stale code with long-fixed bugs (the 2026-08-09 incident: a June 4 cached script's venv stage
     lacked the 81327 process-tree sweep and died on ``Access denied``). The binary has no self-update path,
-    so the poisoned cache outlives every ``hbm-agent update``.
+    so the poisoned cache outlives every ``hbm update``.
     Overwriting the cached script for *branch* with the freshly pulled ``scripts/install.ps1`` /
     ``scripts/install.sh`` on every update turns the stale binary's unconditional reuse into a feature: it
     "reuses" a file this function keeps permanently current. Post-#67193 installers re-download on each run
@@ -1196,7 +1196,7 @@ def _verify_relaunched_gateways_alive(token: dict, profiles: dict, unmapped: lis
         print(
             "\n  ⚠ Windows gateway restart could not be verified — no stable gateway process appeared after relaunch.\n"
             "    (The respawned gateway may have been killed by a parent Job Object during updater teardown, #48820.)\n"
-            "    Recover with: hbm-agent gateway restart"
+            "    Recover with: hbm gateway restart"
         )
         raise RuntimeError("Windows gateway relaunch after update was not verified alive")
     with suppress(Exception):
@@ -1339,7 +1339,7 @@ def _clear_windows_venv_holders_or_exit(args, gateway_mode: bool, _windows_gatew
     ):
         if holders and (backends := classifier(holders)):
             holders = _reap_and_rescan(f"  ⚠ {len(backends)} {message}; stopping their trees", backends)
-    # Manual serve/dashboard rung (e.g. `hbm-agent serve --host <ip>` for a REMOTE Desktop): ledger identity
+    # Manual serve/dashboard rung (e.g. `hbm serve --host <ip>` for a REMOTE Desktop): ledger identity
     # only (spawner dead; Desktop-owned keep the refusal). Stop and register an idempotent atexit relaunch
     # on the SAME host/port/profile — success or failure.
     if holders and (serve_entries := _m()._ledger_manual_serve_holders(holders)):

@@ -523,7 +523,7 @@ def _get_session_db() -> Optional[Any]:
 
     cached = _DB_CACHE.get(home)
     if cached is not None and _registry_tore_down(cached):
-        # ``hbm-agent profile delete`` force-closes every handle under the profile home
+        # ``hbm profile delete`` force-closes every handle under the profile home
         # (``hbm_state_registry.close_all_under``) before rmtree; a same-name recreate in this
         # process must acquire a fresh handle, not keep writing into the torn-down one.
         with _DB_BOOTSTRAP_LOCK:

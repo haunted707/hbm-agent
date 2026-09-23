@@ -126,7 +126,7 @@ def _durable_completed_update_action_id(lines: List[str]) -> Optional[str]:
     last_start = last_completed = -1
     completed_action_id: Optional[str] = None
     for index, line in enumerate(lines):
-        if line.startswith("=== hbm-agent update started "):
+        if line.startswith("=== hbm update started "):
             last_start = index
         match = _UPDATE_ACTION_COMPLETED_RE.fullmatch(line.strip())
         if match:
@@ -137,7 +137,7 @@ def _durable_completed_update_action_id(lines: List[str]) -> Optional[str]:
 
 @router.post("/api/gateway/restart")
 async def restart_gateway(profile: Optional[str] = None):
-    """Kick off a ``hbm-agent gateway restart`` in the background."""
+    """Kick off a ``hbm gateway restart`` in the background."""
     with http_failure("Failed to spawn gateway restart", 500, "Failed to restart gateway"):
         proc, _reused = _spawn_gateway_restart(profile)
     return {"ok": True, "pid": proc.pid, "name": "gateway-restart"}
@@ -153,7 +153,7 @@ async def gateway_migrate_plan():
 
 @router.post("/api/gateway/migrate")
 async def gateway_migrate():
-    """Run ``hbm-agent gateway migrate --multiplex --yes`` detached; the CLI re-runs the preflight and
+    """Run ``hbm gateway migrate --multiplex --yes`` detached; the CLI re-runs the preflight and
     refuses (exit 1 into the action log) when blocked, so the UI should gate on the plan first."""
     from hbm_cli.web_server_gateway import _spawn_hbm_action
     with http_failure("Failed to spawn gateway migrate", 500, "Failed to start gateway migration"):
@@ -217,7 +217,7 @@ def _update_refused(error: str, message: str, update_command: str) -> Dict[str, 
 
 @router.post("/api/hbm/update")
 async def update_hbm():
-    """Kick off ``hbm-agent update`` in the background."""
+    """Kick off ``hbm update`` in the background."""
     if _dashboard_local_update_managed_externally():
         message = _MANAGED_EXTERNALLY_MESSAGE + " The built-in local updater is disabled here."
         return _update_refused("dashboard_update_managed_externally", message, "managed outside dashboard")
@@ -243,7 +243,7 @@ async def update_hbm():
         return response
 
     action_id = secrets.token_hex(16)
-    with http_failure("Failed to spawn hbm-agent update", 500, "Failed to start update"):
+    with http_failure("Failed to spawn hbm update", 500, "Failed to start update"):
         proc = _spawn_hbm_action(["update"], "hbm-update", env_overrides={"HBM_ACTION_ID": action_id})
     return {"ok": True, "pid": proc.pid, "name": "hbm-update", "action_id": action_id}
 
@@ -384,10 +384,10 @@ def _read_latest_receipt() -> Optional[Dict[str, Any]]:
 
 
 def _latest_update_receipt_summary() -> Optional[Dict[str, Any]]:
-    """Compact summary of the latest receipt (written by EVERY ``hbm-agent update`` run,
+    """Compact summary of the latest receipt (written by EVERY ``hbm update`` run,
     incl. refused/failed), or None; never raises. Steps/skips stay in the full endpoint.
 
-    Phase-1 bullet 3 (#91277): the receipt (written by EVERY ``hbm-agent update`` run since #91283, including
+    Phase-1 bullet 3 (#91277): the receipt (written by EVERY ``hbm update`` run since #91283, including
     refused and failed ones, with a ``latest.json`` pointer) is the durable success signal the Desktop and
     dashboard should read instead of inferring outcomes from liveness probes across the update's stop/start
     gap (#81193, #87359).
@@ -418,5 +418,5 @@ async def get_update_receipt():
     """
     receipt = _read_latest_receipt()
     if not receipt:
-        raise HTTPException(status_code=404, detail="No update receipt found (no `hbm-agent update` run recorded).")
+        raise HTTPException(status_code=404, detail="No update receipt found (no `hbm update` run recorded).")
     return {"receipt": receipt, "summary": _latest_update_receipt_summary()}

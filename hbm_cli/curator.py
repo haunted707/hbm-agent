@@ -1,4 +1,4 @@
-"""CLI subcommand: `hbm-agent curator <subcommand>`."""
+"""CLI subcommand: `hbm curator <subcommand>`."""
 
 from __future__ import annotations
 
@@ -70,7 +70,7 @@ def _print_unmanaged_summary() -> None:
     print(f"\nunmanaged (no provenance marker): {len(unmanaged)} total")
     print(f"  pre-dates marker    {legacy}")
     print(f"  foreground-created  {foreground}")
-    print("  never auto-staled or archived — `hbm-agent curator adopt <name>` hands one over")
+    print("  never auto-staled or archived — `hbm curator adopt <name>` hands one over")
 
 
 def _print_curator_config(curator) -> None:
@@ -175,14 +175,14 @@ def _cmd_run(args) -> int:
             f"archived={auto.get('archived', 0)} "
             f"reactivated={auto.get('reactivated', 0)}")
     if not synchronous:
-        print("llm pass running in background — check `hbm-agent curator status` later")
+        print("llm pass running in background — check `hbm curator status` later")
     if dry:
         print(
             "dry-run: no changes applied. Read the report with "
-            "`hbm-agent curator status` and run `hbm-agent curator run` (no flag) to apply."
+            "`hbm curator status` and run `hbm curator run` (no flag) to apply."
             if synchronous else
             "dry-run: no changes applied. When the report lands, read it with "
-            "`hbm-agent curator status` and run `hbm-agent curator run` (no flag) to apply.")
+            "`hbm curator status` and run `hbm curator run` (no flag) to apply.")
     return 0
 
 
@@ -201,11 +201,11 @@ _PIN_MESSAGES = {
     True: (
         "cannot pin (only agent-created skills participate in curation)",
         "could not pin '{skill}' — the skill is not curation-eligible (protected built-in or "
-        "external). `hbm-agent curator list-unmanaged` shows which skills the curator tracks.",
+        "external). `hbm curator list-unmanaged` shows which skills the curator tracks.",
         # Unmanaged skills are never auto-transitioned, so the pin is recorded but only
         # becomes protective once the skill is adopted — say so and point at `adopt`.
         "pinned '{skill}' (recorded; this skill is unmanaged — auto-transitions never consider "
-        "it. Run `hbm-agent curator adopt {skill}` to put it under curator management)",
+        "it. Run `hbm curator adopt {skill}` to put it under curator management)",
         "pinned '{skill}' (will bypass auto-transitions)"),
     False: (
         "there's nothing to unpin (curator only tracks agent-created skills)",
@@ -250,8 +250,8 @@ def _cmd_list_unmanaged(args) -> int:
         print(
             f"  {r['name']:44s} activity={r.get('activity_count', 0):4d}  "
             f"last_activity={_fmt_ts(r.get('last_activity_at')):14s}  ({why})")
-    print("\nadopt one with `hbm-agent curator adopt <name>`, "
-          "or all with `hbm-agent curator adopt --all-unmanaged`")
+    print("\nadopt one with `hbm curator adopt <name>`, "
+          "or all with `hbm curator adopt --all-unmanaged`")
     return 0
 
 
@@ -317,7 +317,7 @@ def _cmd_archive(args) -> int:
     if skill_usage.get_record(args.skill).get("pinned"):
         print(
             f"curator: '{args.skill}' is pinned — unpin first with "
-            f"`hbm-agent curator unpin {args.skill}`")
+            f"`hbm curator unpin {args.skill}`")
         return 1
     return _as_user(skill_usage.archive_skill, args.skill)
 
@@ -405,8 +405,8 @@ def _cmd_ledger(args) -> int:
             f"{r.get('actor', '?'):<8} {r.get('action', '?'):<12} "
             f"{r.get('skill', '?')}{extra}")
     print(
-        "\nRoll back a single mutation with `hbm-agent curator rollback <id>`; "
-        "whole-tree snapshots remain available via `hbm-agent curator rollback --list`.")
+        "\nRoll back a single mutation with `hbm curator rollback <id>`; "
+        "whole-tree snapshots remain available via `hbm curator rollback --list`.")
     return 0
 
 
@@ -475,7 +475,7 @@ def _rollback_ledger_entry(args, entry_id: str) -> int:
     if entry is None:
         print(
             f"curator: no ledger entry '{entry_id}'. "
-            "See `hbm-agent curator ledger` for entry ids, or use "
+            "See `hbm curator ledger` for entry ids, or use "
             "`--id <snapshot>` for whole-tree snapshot rollback.")
         return 1
     print(f"Rollback target: ledger entry {entry_id}")
@@ -506,7 +506,7 @@ def _cmd_rollback(args) -> int:
         if not curator_backup.list_backups():
             print(
                 "curator: no snapshots exist yet. Take one with "
-                "`hbm-agent curator backup` or wait for the next curator run.")
+                "`hbm curator backup` or wait for the next curator run.")
         else:
             print(
                 f"curator: no snapshot matching "
@@ -661,11 +661,11 @@ _SUBCOMMANDS = (
     (
         "rollback",
         "Restore ~/.hbm/skills/ from a curator snapshot, or a single "
-        "mutation by ledger entry id (see `hbm-agent curator ledger`)",
+        "mutation by ledger entry id (see `hbm curator ledger`)",
         _cmd_rollback,
         _arg("entry_id", nargs="?", default=None,
              help="Ledger entry id for single-mutation rollback (from "
-                  "`hbm-agent curator ledger`). Omit for whole-tree snapshot rollback."),
+                  "`hbm curator ledger`). Omit for whole-tree snapshot rollback."),
         _arg("--list", **_STORE_TRUE, help="List available snapshots and exit without restoring"),
         _arg("--id", dest="backup_id", default=None,
              help="Snapshot id to restore (see `--list`); default: newest"),
@@ -700,7 +700,7 @@ def register_cli(parent: argparse.ArgumentParser) -> None:
 
 def cli_main(argv=None) -> int:
     """Standalone entry (also usable by hbm_cli.main fallthrough)."""
-    parser = argparse.ArgumentParser(prog="hbm-agent curator")
+    parser = argparse.ArgumentParser(prog="hbm curator")
     register_cli(parser)
     args = parser.parse_args(argv)
     return int(args.func(args) or 0)

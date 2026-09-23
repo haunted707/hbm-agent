@@ -1350,7 +1350,7 @@ class TestWebServerEndpoints:
             encoding="utf-8",
         )
         (tmp_path / "update.log").write_text(
-            "=== hbm-agent update started 2026-08-17T11:19:35 ===\n"
+            "=== hbm update started 2026-08-17T11:19:35 ===\n"
             "✓ Update complete!\n"
             f"=== hbm-update completed {action_id} ===\n",
             encoding="utf-8",

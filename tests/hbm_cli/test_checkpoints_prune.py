@@ -1,4 +1,4 @@
-"""Tests for `hbm-agent checkpoints prune`'s orphan confirmation flow.
+"""Tests for `hbm checkpoints prune`'s orphan confirmation flow.
 
 Covers the P1 raised on PR #69141: the confirmation preview must cover
 BOTH v2 projects (`store_status()["projects"]`) and pre-v2 shadow repos

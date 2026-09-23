@@ -1,4 +1,4 @@
-"""Shared time/filter parsing for `hbm-agent sessions prune` / `archive`."""
+"""Shared time/filter parsing for `hbm sessions prune` / `archive`."""
 
 from __future__ import annotations
 

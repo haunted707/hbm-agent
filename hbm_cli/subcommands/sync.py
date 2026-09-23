@@ -1,4 +1,4 @@
-"""``hbm-agent sync`` subcommand parser — Skill Sync.
+"""``hbm sync`` subcommand parser — Skill Sync.
 
 Personal sync (status/pull/push/now/enable/disable/device) moves your own skills across
 your devices; ``propose`` shares a skill with your organisation. Sync is INERT unless the
@@ -21,10 +21,10 @@ def build_sync_parser(subparsers, *, cmd_sync: Callable) -> None:
             "organisation, you also get its shared skills and can propose "
             "your own back to the team.",
         epilog="Examples:\n"
-            "  hbm-agent sync status            what is synced, and from where\n"
-            "  hbm-agent sync enable my-skill   include a skill in your sync\n"
-            "  hbm-agent sync now               pull, then push\n"
-            "  hbm-agent sync propose my-skill  share a skill with your team\n",
+            "  hbm sync status            what is synced, and from where\n"
+            "  hbm sync enable my-skill   include a skill in your sync\n"
+            "  hbm sync now               pull, then push\n"
+            "  hbm sync propose my-skill  share a skill with your team\n",
         formatter_class=argparse.RawDescriptionHelpFormatter)
     sync_sub = sync_parser.add_subparsers(dest="sync_command")
 

@@ -30,5 +30,5 @@ else
 fi
 
 echo ""
-echo "Current hbm-agent status:"
+echo "Current hbm status:"
 modal app list 2>/dev/null | grep -E 'State|hbm-agent' || echo "  (none)"

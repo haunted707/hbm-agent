@@ -312,8 +312,8 @@ fi
 
 # Always reset ownership of pairing data on every boot, same docker-exec/
 # root-write reason as profiles/ and cron/. `docker exec <container>
-# hbm-agent pairing approve …` defaults to uid=0 and writes 0600 root-owned
-# approval files that the unprivileged hbm-agent gateway cannot read,
+# hbm pairing approve …` defaults to uid=0 and writes 0600 root-owned
+# approval files that the unprivileged hbm gateway cannot read,
 # silently leaving the approved user unauthorized (#10270). The targeted
 # data-volume chown above only runs when the top-level $HBM_HOME is
 # mis-owned, so warm boots skip it — this block makes a container restart
@@ -404,7 +404,7 @@ as_hbm mkdir -p \
 # bind-mounted from the host (~/.hbm:/opt/data) and sometimes shared with a
 # host-side Desktop/CLI install. Stamping 'docker' here clobbered that host
 # install's marker, so its in-app updater read 'docker' and refused to run
-# 'hbm-agent update'. To heal homes already poisoned by older images, remove a
+# 'hbm update'. To heal homes already poisoned by older images, remove a
 # stale 'docker' stamp from $HBM_HOME if one is present (the host install's
 # own installer re-creates its code-scoped stamp; a genuine container relies on
 # the baked /opt/hbm stamp, so deleting the data-dir copy is safe).
@@ -552,7 +552,7 @@ fi
 # --- Migrate persisted config schema ---
 # Docker image upgrades replace the code under $INSTALL_DIR but preserve
 # $HBM_HOME on the mounted volume. Run the same safe, non-interactive
-# config-schema migrations that `hbm-agent update` runs for non-Docker installs,
+# config-schema migrations that `hbm update` runs for non-Docker installs,
 # after first-boot seeding and before supervised gateway services start.
 # Set HBM_SKIP_CONFIG_MIGRATION=1 for controlled/manual migrations.
 if [ -f "$HBM_HOME/config.yaml" ]; then

@@ -469,7 +469,7 @@ class TestContextVarInterpolation:
 class TestProbeEnvResolution:
     """The probe path must resolve ``${ENV}`` before connecting, so the
     discovery probe behaves like runtime tool loading. Regression for #37792
-    where `hbm-agent mcp add --auth header` sent a literal
+    where `hbm mcp add --auth header` sent a literal
     ``Authorization: Bearer ${MCP_X_API_KEY}`` and got 401."""
 
     def test_resolve_interpolates_header(self, monkeypatch):

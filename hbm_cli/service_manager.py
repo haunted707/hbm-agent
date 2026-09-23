@@ -56,14 +56,14 @@ def detect_service_manager() -> ServiceManagerKind:
     """Return "s6" (s6-svscan is PID 1), "windows", "launchd", "systemd" (working bus) or "none".
 
     Does NOT replace ``supports_systemd_services()`` for host call sites; it exists for
-    backend-agnostic code (profile hooks, the s6 dispatch in ``hbm-agent gateway``).
+    backend-agnostic code (profile hooks, the s6 dispatch in ``hbm gateway``).
     """
     # Deferred so importing this module (Protocol type, validate_profile_name) doesn't drag in
     # the whole gateway dependency graph.
     from hbm_cli.gateway import is_macos, is_windows, supports_systemd_services
     # Gate on _s6_running() alone, NOT is_container(): the latter only detects Docker/Podman/lxc
     # and is False on Fly's Firecracker microVMs even though s6-overlay is PID 1 there — that
-    # made the s6 dispatch inert on Fly, so `hbm-agent gateway start` spawned a foreground gateway
+    # made the s6 dispatch inert on Fly, so `hbm gateway start` spawned a foreground gateway
     # competing with the supervised one.
     if _s6_running():
         return "s6"
@@ -100,7 +100,7 @@ def _s6_running() -> bool:
 # ---------------------------------------------------------------------------
 # Host backends: thin facades over ``hbm_cli.gateway`` (systemd/launchd) and
 # ``hbm_cli.gateway_windows``. The protocol's ``name`` parameter is unused here — host backends
-# operate on the currently active profile (``hbm-agent -p <profile>``); the shape exists for s6 where
+# operate on the currently active profile (``hbm -p <profile>``); the shape exists for s6 where
 # each profile maps to a distinct service directory.
 # ---------------------------------------------------------------------------
 
@@ -216,7 +216,7 @@ def get_service_manager() -> ServiceManager:
 
 # ---------------------------------------------------------------------------
 # S6ServiceManager (container-only). Per-profile gateways are registered dynamically by
-# `hbm-agent profile create` inside the container. Static services (main-hbm, dashboard) live in
+# `hbm profile create` inside the container. Static services (main-hbm, dashboard) live in
 # /etc/s6-overlay/s6-rc.d/ as part of the image and are NOT managed here.
 # ---------------------------------------------------------------------------
 
@@ -273,7 +273,7 @@ def _write_gateway_desired_state(name: str, desired_state: str) -> None:
 def register_unregistered_profile_gateway(mgr: ServiceManager, profile: str) -> bool:
     """Register a ``down`` s6 slot for a profile whose directory exists but was never registered.
 
-    `hbm-agent profile create` can only register a slot when it runs inside the container; created
+    `hbm profile create` can only register a slot when it runs inside the container; created
     from the host against a bind-mounted home, the directory lands where the container reads it
     but no ``/run/service/gateway-<name>`` exists, and the boot reconciler only notices on the
     next container restart. Returns False without touching anything unless the directory carries
@@ -383,7 +383,7 @@ class GatewayNotRegisteredError(S6Error):
         self.profile = profile
         super().__init__(
             f"no such gateway {profile!r}: register it with "
-            f"`hbm-agent profile create {profile}` first, or pass "
+            f"`hbm profile create {profile}` first, or pass "
             "an existing profile name via `-p <name>`",
             service=f"gateway-{profile}",
         )
@@ -456,7 +456,7 @@ class S6ServiceManager:
         # hbm_cli.main._apply_profile_override; kept alongside the s6 one for back-compat.
         lines.append("export HBM_SUPERVISED_CHILD=1")
         # ``--replace`` makes the supervised gateway authoritative for its HBM_HOME. Without it
-        # a gateway started OUTSIDE s6 (stray ``hbm-agent gateway run``, an agent action, the Open
+        # a gateway started OUTSIDE s6 (stray ``hbm gateway run``, an agent action, the Open
         # WebUI helper) grabs the PID lock first; the slot then hits "Another gateway instance is
         # already running", exits non-zero, and s6 restarts it forever — a log-flooding loop that
         # never binds. ``--replace`` reaps the stale holder (marker + SIGTERM→SIGKILL-with-
@@ -464,9 +464,9 @@ class S6ServiceManager:
         # above prevents the run→start→run recursion. s6 guarantees one supervised instance per
         # slot, so there is no legitimate sibling for ``--replace`` to clobber.
         if profile == "default":
-            gateway_cmd = "hbm-agent gateway run --replace"
+            gateway_cmd = "hbm gateway run --replace"
         else:
-            gateway_cmd = f"hbm-agent -p {shlex.quote(profile)} gateway run --replace"
+            gateway_cmd = f"hbm -p {shlex.quote(profile)} gateway run --replace"
         # Skip the drop when already non-root (setgroups() lacks CAP_SETGID → s6 boot-loop).
         lines.append(f'[ "$(id -u)" = 0 ] || exec {gateway_cmd}')
         lines.append(f"exec s6-setuidgid hbm {gateway_cmd}")

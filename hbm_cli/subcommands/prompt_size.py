@@ -1,4 +1,4 @@
-"""``hbm-agent prompt-size`` subcommand parser."""
+"""``hbm prompt-size`` subcommand parser."""
 
 from __future__ import annotations
 

@@ -188,7 +188,7 @@ After `nixos-rebuild switch`, check that the service is running:
 systemctl status hbm-agent
 
 # Watch logs (Ctrl+C to stop)
-journalctl -u hbm-agent -f
+journalctl -u hbm -f
 
 # If addToSystemPackages is true, test the CLI
 hbm --version
@@ -587,7 +587,7 @@ When hbm runs via the NixOS module, the following CLI commands are **blocked** w
 This prevents drift between what Nix declares and what's on disk. Detection uses two signals:
 
 1. **The `HBM_MANAGED` environment variable.** The service sets it, and the gateway process reads it.
-2. **The `.managed` marker file** in `HBM_HOME`. The activation script writes it, and an interactive shell reads it. Thus the CLI also blocks a command such as `docker exec -it hbm-agent hbm config set ...`.
+2. **The `.managed` marker file** in `HBM_HOME`. The activation script writes it, and an interactive shell reads it. Thus the CLI also blocks a command such as `docker exec -it hbm hbm config set ...`.
 
 Both signals hold the name of the system that manages the install. Thus the refusal names the correct rebuild command. The NixOS module gives `sudo nixos-rebuild switch`. The Home Manager module gives `home-manager switch`.
 
@@ -680,7 +680,7 @@ The default address is `127.0.0.1`. Each other address starts the authentication
 ```bash
 # Linux
 systemctl --user status hbm-agent
-journalctl --user -u hbm-agent -f
+journalctl --user -u hbm -f
 
 # macOS
 launchctl list | grep hbm
@@ -1173,7 +1173,7 @@ All `docker` commands below work the same with `podman`. Substitute accordingly 
 
 ```bash
 # Both modes use the same systemd unit
-journalctl -u hbm-agent -f
+journalctl -u hbm -f
 
 # Container mode: also available directly
 docker logs -f hbm-agent

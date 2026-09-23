@@ -61,7 +61,7 @@ Rules for tool code:
   `INLINE_TOOL_EXECUTORS` table (`agent/inline_tool_executors.py`; `agent/AGENTS.md`).
 - **`_last_resolved_tool_names`** is a process-global in `model_tools.py`; `_run_single_child()` in
   `delegate_tool.py` saves/restores it around child runs — readers may see it stale mid-delegation.
-- New tools integrate with existing setup UX (`hbm-agent tools`, `hbm-agent setup`, auto-install) rather
+- New tools integrate with existing setup UX (`hbm tools`, `hbm setup`, auto-install) rather
   than a raw env var; secrets go in `OPTIONAL_ENV_VARS` (`hbm_cli/AGENTS.md`).
 
 ## Toolsets (`toolsets.py`)
@@ -70,7 +70,7 @@ Single `TOOLSETS` dict. Keys today: `browser, clarify, code_execution, cronjob, 
 delegation, discord, discord_admin, feishu_doc, feishu_drive, file, homeassistant, image_gen,
 kanban, memory, messaging, moa, rl, safe, search, session_search, skills, spotify, terminal, todo,
 tts, video, vision, web, yuanbao` (don't assert the list in tests). Per-platform enable/disable via
-`hbm-agent tools` (curses) or `tools.<platform>.enabled/disabled` in config.yaml. `browser_exec`
+`hbm tools` (curses) or `tools.<platform>.enabled/disabled` in config.yaml. `browser_exec`
 replaces the other browser tools when `browser.backend` is `browser-use`.
 
 ## Backends and providers inside tools/
@@ -87,7 +87,7 @@ fixed at the mount, not by adding a tool.
 **Every spawn goes through one env builder.** `environments/local.py::build_subprocess_env` (+
 `hbm_constants.apply_subprocess_home_env`, `env_passthrough.py::resolve_passthrough_value`) is
 how a terminal, `execute_code`, background process, delegation child, ACP or MCP stdio child gets
-its environment; a child that acts FOR the served profile (`hbm-agent -p X` workers, `key_cmd`
+its environment; a child that acts FOR the served profile (`hbm -p X` workers, `key_cmd`
 helpers, browser drivers, Bot Chat relay turns) uses `environments/local.py::
 served_profile_child_env(target_home=, inherit_credentials=)`: launch-profile `.env` /
 `TERMINAL_*` residue dropped (`strip_launch_profile_env`), the target home pinned, only the

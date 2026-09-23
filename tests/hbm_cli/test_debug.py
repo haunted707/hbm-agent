@@ -1,4 +1,4 @@
-"""Tests for ``hbm-agent debug`` CLI command and debug utilities."""
+"""Tests for ``hbm debug`` CLI command and debug utilities."""
 
 import os
 import urllib.error
@@ -149,7 +149,7 @@ class TestCaptureLogSnapshot:
 class TestMissingLogNote:
     """A missing log explains itself when the writer isn't this backend.
 
-    `hbm-agent debug share` runs on the backend, so a desktop connected to a
+    `hbm debug share` runs on the backend, so a desktop connected to a
     remote/docker/SSH backend can never contribute desktop.log. Reporting a
     bare absence sends triage after a client-side bug it cannot see.
     """
@@ -577,7 +577,7 @@ class TestRunDebug:
         run_debug(args)
 
         out = capsys.readouterr().out
-        assert "hbm-agent debug" in out
+        assert "hbm debug" in out
         assert "share" in out
         assert "delete" in out
 
@@ -649,7 +649,7 @@ class TestScheduleAutoDelete:
 
     The new implementation is stateless: it records pending deletions to
     ``~/.hbm/pastes/pending.json`` and lets ``_sweep_expired_pastes``
-    handle the DELETE requests synchronously on the next ``hbm-agent debug``
+    handle the DELETE requests synchronously on the next ``hbm debug``
     invocation.
     """
 
@@ -824,7 +824,7 @@ class TestShareIncludesAutoDelete:
 
     def test_share_output_warns_on_dpaste_fallback(self, hbm_home, capsys):
         """With dpaste.com URLs the output must not promise 6-hour auto-delete
-        or a working `hbm-agent debug delete` (#106164)."""
+        or a working `hbm debug delete` (#106164)."""
         from hbm_cli.debug import run_debug_share
 
         args = MagicMock()
@@ -854,7 +854,7 @@ class TestShareIncludesAutoDelete:
 class TestBuildDebugShare:
     """The shared core that returns structured paste URLs (not printed text).
 
-    Backs both ``hbm-agent debug share`` (CLI) and ``POST /api/ops/debug-share``
+    Backs both ``hbm debug share`` (CLI) and ``POST /api/ops/debug-share``
     (dashboard). The dashboard renders ``urls`` as real, copyable links, so the
     contract here is the return value, not stdout.
     """
@@ -1077,7 +1077,7 @@ class TestDebugSlashCommand:
 
 
 class TestShareConsentGate:
-    """`hbm-agent debug share` requires explicit consent before uploading.
+    """`hbm debug share` requires explicit consent before uploading.
 
     Uses SimpleNamespace rather than MagicMock so ``args.yes`` is a real
     ``False`` — a MagicMock auto-provides a truthy ``.yes`` and would silently

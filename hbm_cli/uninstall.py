@@ -387,7 +387,7 @@ def _discover_named_profiles():
 
 def _uninstall_profile(profile) -> None:
     """Fully uninstall a named profile: stop its gateway, remove its alias, wipe its home. Shells
-    out to ``hbm-agent -p <name> gateway stop|uninstall`` because service names / unit paths derive
+    out to ``hbm -p <name> gateway stop|uninstall`` because service names / unit paths derive
     from the current HBM_HOME and can't be switched in-process."""
     name = profile.name
     log_info(f"Uninstalling profile '{name}'...")
@@ -417,7 +417,7 @@ def _uninstall_profile(profile) -> None:
 
 
 def run_gui_uninstall(args):
-    """``hbm-agent uninstall --gui``: remove the desktop app's built artifacts, packaged bundle
+    """``hbm uninstall --gui``: remove the desktop app's built artifacts, packaged bundle
     (best-effort) and Electron userData — never config/sessions/.env, the agent or its venv."""
     from hbm_cli.gui_uninstall import agent_is_installed, gui_install_summary, uninstall_gui
     hbm_home = get_hbm_home()
@@ -459,7 +459,7 @@ def run_gui_uninstall(args):
     _print_box("│            ✓ Chat GUI Uninstalled!                      │", Colors.GREEN)
     print()
     print("The HBM AGENT is still installed. Run 'hbm-agent' to use the CLI,")
-    print("or 'hbm-agent uninstall' to remove the agent too.")
+    print("or 'hbm uninstall' to remove the agent too.")
     print()
 
 

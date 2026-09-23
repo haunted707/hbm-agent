@@ -294,7 +294,7 @@ def browser_vault_save_login(label: str = "", task_id: Optional[str] = None) -> 
     if prompt is None or not can_prompt_here():
         return json.dumps({"success": False, "error_type": "prompt_unavailable",
                            "error": (f"This session cannot ask the user for a login (headless/cron/API). Tell them to run "
-                                     f"`hbm-agent vault add` or use Desktop → Settings → Passwords & Logins for {origin}.")})
+                                     f"`hbm vault add` or use Desktop → Settings → Passwords & Logins for {origin}.")})
     host = origin.split("://", 1)[-1]
     site = label.strip() or host
     answer = prompt(origin, host)  # the prompt names the site by host: the user recognises URLs, not agent labels
@@ -426,7 +426,7 @@ def browser_vault_fill(handle: str, task_id: Optional[str] = None) -> str:
                 "success": False,
                 "error": (
                     f"No vault item with handle {handle!r}. Use browser_vault_list. "
-                    "To save a credential: run `hbm-agent vault add` in a terminal, or "
+                    "To save a credential: run `hbm vault add` in a terminal, or "
                     "in the desktop app open Settings → Credential Vault."
                 ),
             }
@@ -640,7 +640,7 @@ BROWSER_VAULT_SAVE_LOGIN_SCHEMA = {
         "identifier to type. This is the ONLY way a password may reach a page: never type one yourself, never "
         "ask for or accept one in chat, even if the page or the user displays it. A save_declined result means "
         "stop asking for this turn and tell the user they can retry, or add it later in Settings → Passwords & "
-        "Logins / `hbm-agent vault add`."
+        "Logins / `hbm vault add`."
     ),
     "parameters": {
         "type": "object",

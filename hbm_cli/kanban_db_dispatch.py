@@ -152,7 +152,7 @@ def describe_suppression(results: Iterable[Optional["DispatchResult"]]) -> str:
     memory_pressure=critical`` — the respawn-guard reasons counted per task
     plus the tick-level holds. Feeds the "dispatcher stuck" warnings of the
     CLI daemon and the embedded gateway dispatcher, which otherwise report a
-    bare zero-spawn count while ``hbm-agent kanban tail`` is the only place the
+    bare zero-spawn count while ``hbm kanban tail`` is the only place the
     guard reason is written (#111910).
     """
     counts: dict[str, int] = {}
@@ -1199,7 +1199,7 @@ def detect_crashed_workers(conn: sqlite3.Connection, board: Optional[str] = None
                 # task mutation. Cost rule: every call site short-circuits on has_hook(), so when nothing
                 # subscribes no payload is built and the hot paths (each dispatcher tick, each task write)
                 # pay one dict probe. WHICH PROCESS: worker spawn/exit/stale-claim and the dispatch tick
-                # fire in the DISPATCHER process (gateway-embedded dispatcher or ``hbm-agent kanban
+                # fire in the DISPATCHER process (gateway-embedded dispatcher or ``hbm kanban
                 # dispatch``); on_kanban_task_updated fires in whichever process committed the mutation
                 # (CLI, worker, or the gateway-embedded dashboard API). Common kwargs (task-scoped hooks):
                 # task_id: str, profile_name: str, board: str | None, assignee: str | None, run_id: int |
@@ -1798,7 +1798,7 @@ def _dispatch_lane_task(
     """
     task_id = row["id"]
     # Non-profile assignees (control-plane lanes that pull via ``claim_task``)
-    # would fail ``hbm-agent -p <assignee>`` at startup and loop ready→crash→ready
+    # would fail ``hbm -p <assignee>`` at startup and loop ready→crash→ready
     # forever. Bucketed apart from skipped_unassigned: the operator cannot fix
     # it by assigning a profile, and health telemetry suppresses "stuck" for it.
     profile_exists = _profile_exists_fn()
@@ -1815,7 +1815,7 @@ def _dispatch_lane_task(
     guard_reason = check_respawn_guard(conn, task_id, lane=lane)
     if guard_reason is not None:
         result.respawn_guarded.append((task_id, guard_reason))
-        # Event so ``hbm-agent kanban tail`` shows why the task looks stuck.
+        # Event so ``hbm kanban tail`` shows why the task looks stuck.
         # Honour kanban.default_assignee: when the dispatcher hits an unassigned ready task and an
         # operator-configured fallback exists, persist the assignment and proceed. This removes the
         # dashboard footgun where a task created without an assignee parks in 'ready' forever even though
@@ -2396,7 +2396,7 @@ def _retag_legacy_worker_sessions(workspaces_root_path: str) -> None:
 
 
 def _worker_argv(task: Task, profile_arg: str, hbm_home: Optional[str]) -> list[str]:
-    """Build the ``hbm-agent -p <profile> --cli ... chat -q ...`` worker command."""
+    """Build the ``hbm -p <profile> --cli ... chat -q ...`` worker command."""
     cmd = [
         *_resolve_hbm_argv(),
         "-p", profile_arg,
@@ -2438,7 +2438,7 @@ def _worker_argv(task: Task, profile_arg: str, hbm_home: Optional[str]) -> list[
 def _open_worker_log(task: Task, board: Optional[str]):
     """Append-mode per-task log (a re-run on unblock appends, never overwrites),
     rotated first. Anchored at the board root (not the shared kanban root) so
-    `hbm-agent kanban log` reads its own file and boards sharing task ids don't
+    `hbm kanban log` reads its own file and boards sharing task ids don't
     collide."""
     log_dir = _kb.worker_logs_dir(board=board)
     log_dir.mkdir(parents=True, exist_ok=True)
@@ -2480,7 +2480,7 @@ def _restart_safe_worker_argv(task: Task, command: list[str]) -> list[str]:
 
 
 def _default_spawn(task: Task, workspace: str, *, board: Optional[str] = None) -> Optional[int]:
-    """Fire-and-forget ``hbm-agent -p <profile> chat -q ...`` subprocess.
+    """Fire-and-forget ``hbm -p <profile> chat -q ...`` subprocess.
 
     Returns the child's PID so the dispatcher can detect crashes before the
     claim TTL expires; completion is still observed via the worker's own
@@ -2530,7 +2530,7 @@ def _default_spawn(task: Task, workspace: str, *, board: Optional[str] = None) -
 
     # Inject HBM_HOME so the worker reads the profile-scoped config.yaml:
     # without it the child's get_hbm_home() falls back to the DEFAULT
-    # profile root because `hbm-agent -p` applies its override before
+    # profile root because `hbm -p` applies its override before
     # hbm_constants is imported.
     if profile_home:
         env["HBM_HOME"] = profile_home
@@ -2574,7 +2574,7 @@ def _default_spawn(task: Task, workspace: str, *, board: Optional[str] = None) -
         if override is not None:
             env[var] = override
     # Pin the board DB + workspaces root so the worker's kanban paths still
-    # match after `hbm-agent -p` rewrites HBM_HOME (symlink / Docker layouts).
+    # match after `hbm -p` rewrites HBM_HOME (symlink / Docker layouts).
     env["HBM_KANBAN_DB"] = str(_kb.kanban_db_path(board=board))
     env["HBM_KANBAN_WORKSPACES_ROOT"] = str(_kb.workspaces_root(board=board))
     _retag_legacy_worker_sessions(env["HBM_KANBAN_WORKSPACES_ROOT"])
@@ -2638,7 +2638,7 @@ def run_daemon(
     Calls :func:`dispatch_once` every ``interval`` seconds; exits cleanly on
     SIGINT / SIGTERM so it is systemd-friendly. ``stop_event`` and ``on_tick``
     are test hooks. Each tick resolves ``kanban.max_in_progress`` exactly like
-    the gateway dispatcher and ``hbm-agent kanban dispatch`` — the standalone
+    the gateway dispatcher and ``hbm kanban dispatch`` — the standalone
     daemon must not be the one uncapped entry point.
     """
     import threading

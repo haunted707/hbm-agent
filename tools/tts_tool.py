@@ -165,18 +165,18 @@ _BUILTIN_DISPATCH: Dict[str, tuple] = {
     "xai": (None, "xAI TTS", "_generate_xai_tts", None),
     "mistral": (lambda: _importable(_import_mistral_client), "Mistral Voxtral TTS", "_generate_mistral_tts",
                 "Mistral provider selected but 'mistralai' package not installed. "
-                "Run `hbm-agent setup` to install Mistral support."),
+                "Run `hbm setup` to install Mistral support."),
     "gemini": (None, "Google Gemini TTS", "_generate_gemini_tts", None),
     "neutts": (lambda: _check_neutts_available(), "NeuTTS (local)", "_generate_neutts",
                "NeuTTS provider selected but neutts is not installed. "
-               "Run hbm-agent setup and choose NeuTTS, or install espeak-ng and run python -m pip install -U neutts[all]."),
+               "Run hbm setup and choose NeuTTS, or install espeak-ng and run python -m pip install -U neutts[all]."),
     "kittentts": (lambda: _importable(_import_kittentts), "KittenTTS (local, ~25MB)", "_generate_kittentts",
                   "KittenTTS provider selected but 'kittentts' package not installed. "
-                  "Run 'hbm-agent setup tts' and choose KittenTTS, or install manually: "
+                  "Run 'hbm setup tts' and choose KittenTTS, or install manually: "
                   "pip install https://github.com/KittenML/KittenTTS/releases/download/0.8.1/kittentts-0.8.1-py3-none-any.whl"),
     "piper": (lambda: _importable(_import_piper), "Piper (local)", "_generate_piper_tts",
               "Piper provider selected but 'piper-tts' package not installed. "
-              "Run 'hbm-agent tools' and select Piper under TTS, or install manually: "
+              "Run 'hbm tools' and select Piper under TTS, or install manually: "
               "pip install piper-tts")}
 
 

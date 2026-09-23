@@ -219,7 +219,7 @@ def gate_manifest(
             return ManifestGate("defer")
     if enabled is None or not names & enabled:
         return _placeholder(
-            f"not enabled in config (run `hbm-agent plugins enable {lookup_key}` to activate)", logging.DEBUG,
+            f"not enabled in config (run `hbm plugins enable {lookup_key}` to activate)", logging.DEBUG,
             "Skipping '%s' (not in plugins.enabled)",
         )
     return ManifestGate("load")

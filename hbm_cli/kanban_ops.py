@@ -1,4 +1,4 @@
-"""Dispatcher and maintenance verbs for ``hbm-agent kanban``: ``dispatch``,
+"""Dispatcher and maintenance verbs for ``hbm kanban``: ``dispatch``,
 ``daemon`` (deprecated standalone loop), ``tail``/``watch`` event streaming,
 ``gc`` and ``repair``.
 """
@@ -158,8 +158,8 @@ def _cmd_dispatch(args: argparse.Namespace) -> int:
 
 
 _DAEMON_DEPRECATED = (
-    "hbm-agent kanban daemon: DEPRECATED — the dispatcher now runs\ninside the gateway. To use "
-    "kanban:\n\n    hbm-agent gateway start       # starts the gateway + embedded dispatcher\n\nReady "
+    "hbm kanban daemon: DEPRECATED — the dispatcher now runs\ninside the gateway. To use "
+    "kanban:\n\n    hbm gateway start       # starts the gateway + embedded dispatcher\n\nReady "
     "tasks will be picked up on the next dispatcher tick\n(default: every 60 seconds). Configure "
     "via config.yaml:\n\n    kanban:\n      dispatch_in_gateway: true      # default\n      "
     "dispatch_interval_seconds: 60\n      failure_limit: 2              # consecutive non-success "
@@ -229,7 +229,7 @@ def _cmd_daemon(args: argparse.Namespace) -> int:
                     f"[{_fmt_ts(now)}] WARN dispatcher stuck: ready queue non-empty for "
                     f"{health_state['bad_ticks']} consecutive ticks but 0 workers spawned "
                     f"successfully.{held} Check profile health (venv, PATH, credentials) and `hbm "
-                    f"kanban list --status ready` / `hbm-agent kanban list --status blocked` for "
+                    f"kanban list --status ready` / `hbm kanban list --status blocked` for "
                     f"recent spawn_failed tasks.",
                     file=sys.stderr, flush=True,
                 )

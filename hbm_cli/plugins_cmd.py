@@ -1,4 +1,4 @@
-"""``hbm-agent plugins`` CLI subcommand — install, update, remove, and list plugins."""
+"""``hbm plugins`` CLI subcommand — install, update, remove, and list plugins."""
 
 from __future__ import annotations
 
@@ -411,7 +411,7 @@ def _clone_failure_message(git_url: str, git_error: str) -> str:
     not parsed as markup."""
     from rich.markup import escape
     return (f"Could not download the plugin from {git_url}. Check the address (browse the catalog "
-            "with `hbm-agent plugins search`), check your internet connection, or, if the repository "
+            "with `hbm plugins search`), check your internet connection, or, if the repository "
             "is private, sign in first with `gh auth login` (or set GITHUB_TOKEN in your .env).\n"
             f"Details: {escape(git_error.strip())}")
 
@@ -431,9 +431,9 @@ def _unknown_plugin_message(name: str, *, downloaded_only: bool = False) -> str:
     """``No plugin named ...`` with the exact-name rule and the two commands that resolve it."""
     scope = (" This command only works on downloaded plugins; bundled ones can only be enabled or disabled."
              if downloaded_only else " Bundled plugins can only be enabled or disabled.")
-    return (f"[red]No plugin named '{name}'.[/red] Run `hbm-agent plugins list` to see the exact names "
+    return (f"[red]No plugin named '{name}'.[/red] Run `hbm plugins list` to see the exact names "
             f"(nested plugins use their full key, e.g. web/firecrawl).{scope} "
-            "To add one: `hbm-agent plugins install <owner/repo>`.")
+            "To add one: `hbm plugins install <owner/repo>`.")
 
 
 # ── Install metadata + git plumbing ─────────────────────────────────────────────────────────
@@ -713,7 +713,7 @@ def _install_plugin_core(
         if target.exists() and not force:
             raise PluginOperationError(
                 f"Plugin '{plugin_name}' already exists. Use force reinstall "
-                f"or run `hbm-agent plugins update {plugin_name}`.")
+                f"or run `hbm plugins update {plugin_name}`.")
         prior = old_metadata.get(plugin_name)
         if target.exists() and requested_revision is None and isinstance(prior, dict) and prior.get("pinned") is True:
             raise PluginOperationError(
@@ -808,14 +808,14 @@ def cmd_install(
     else:
         console.print(
             f"[dim]Plugin installed but not enabled. "
-            f"Run `hbm-agent plugins enable {installed_name}` to activate.[/dim]")
+            f"Run `hbm plugins enable {installed_name}` to activate.[/dim]")
 
     # Non-interactive installs and declines leave declared capabilities ungranted (fail closed).
     declared_caps = _declared_capabilities_from_manifest(installed_manifest, installed_name)
     if declared_caps:
         _run_capability_consent(console, installed_name, declared_caps, context="install")
     console.print("[dim]Restart the gateway for the plugin to take effect:[/dim]")
-    console.print("[dim]  hbm-agent gateway restart[/dim]")
+    console.print("[dim]  hbm gateway restart[/dim]")
     console.print()
 
 
@@ -858,7 +858,7 @@ def cmd_update(name: str) -> None:
             target,
             lambda rec: (
                 f"Plugin '{name}' is pinned to {rec.get('revision')}. To move it, run "
-                f"`hbm-agent plugins install {escape(str(rec.get('source', '<source>')))} --force "
+                f"`hbm plugins install {escape(str(rec.get('source', '<source>')))} --force "
                 "--ref <40-character commit SHA>`."),
             lambda: f"Plugin '{name}' was not installed from git (no .git directory). Cannot update.",
             before_pull=lambda: console.print(f"[dim]Updating {name}...[/dim]"))
@@ -904,7 +904,7 @@ def _rescan_after_update(target: Path, name: str, console) -> None:
             _set_plugin_enabled(name, enable=False)
         console.print(
             f"[red]Plugin '{name}' has been disabled.[/red] Review the "
-            f"findings, then re-enable with `hbm-agent plugins enable {name}` "
+            f"findings, then re-enable with `hbm plugins enable {name}` "
             f"if you trust them.")
 
 
@@ -979,7 +979,7 @@ _BASIC_AUTH_PLUGIN_KEYS = frozenset({"basic", "dashboard_auth/basic"})
 def ensure_basic_auth_plugin_enabled_in_config(cfg: dict) -> bool:
     """Drop the bundled basic dashboard-auth plugin from ``plugins.disabled`` in *cfg*.
 
-    ``hbm-agent setup`` / ``hbm-agent plugins disable basic`` can park it there while
+    ``hbm setup`` / ``hbm plugins disable basic`` can park it there while
     ``dashboard.basic_auth`` is configured, and password auth then silently fails.
     Returns True when modified.
     """
@@ -1150,8 +1150,8 @@ def _run_capability_consent(console, plugin_id: str, declared: list, *, context:
         console.print(
             "  [yellow]Non-interactive session: capabilities NOT granted "
             "(fail closed).[/yellow] Run "
-            f"`hbm-agent plugins capabilities {plugin_id}` to review and "
-            f"`hbm-agent plugins enable {plugin_id}` to grant interactively.")
+            f"`hbm plugins capabilities {plugin_id}` to review and "
+            f"`hbm plugins enable {plugin_id}` to grant interactively.")
         return False
 
     if _ask_yes("  Grant these capabilities? [y/N] ", console.input):
@@ -1164,12 +1164,12 @@ def _run_capability_consent(console, plugin_id: str, declared: list, *, context:
     console.print(
         f"  [dim]Declined. {plugin_id} stays enabled with these capabilities "
         "off; it should degrade gracefully (ctx.has_capability()). Re-run "
-        f"`hbm-agent plugins enable {plugin_id}` to grant later.[/dim]")
+        f"`hbm plugins enable {plugin_id}` to grant later.[/dim]")
     return False
 
 
 def cmd_capabilities(name: Optional[str] = None) -> None:
-    """``hbm-agent plugins capabilities [<id>]`` — declared vs granted."""
+    """``hbm plugins capabilities [<id>]`` — declared vs granted."""
     from hbm_cli.plugin_capabilities import (
         CAPABILITY_REGISTRY,
         granted_capabilities,
@@ -1232,7 +1232,7 @@ def _resolve_tool_override_grant(console, key: str, allow_tool_override: Optiona
     else:
         console.print(
             f"[dim]{key} may not override built-in tools. Re-run "
-            f"`hbm-agent plugins enable {key} --allow-tool-override` to grant "
+            f"`hbm plugins enable {key} --allow-tool-override` to grant "
             "this later.[/dim]")
 
 
@@ -1356,7 +1356,7 @@ def _plugin_status(name: str, enabled: set, disabled: set, key: str = "") -> str
 
 
 def _filter_plugin_entries(entries: list, args: Any, enabled: set, disabled: set) -> list:
-    """Apply ``hbm-agent plugins list`` CLI filters."""
+    """Apply ``hbm plugins list`` CLI filters."""
     filtered = entries
     if getattr(args, "no_bundled", False) or getattr(args, "user", False):
         filtered = [entry for entry in filtered if entry[3] != "bundled"]
@@ -1377,7 +1377,7 @@ def cmd_list(args: Any | None = None) -> None:
     entries = _discover_all_plugins()
     if not entries:
         console.print("[dim]No plugins installed.[/dim]")
-        console.print("[dim]Install with:[/dim] hbm-agent plugins install owner/repo")
+        console.print("[dim]Install with:[/dim] hbm plugins install owner/repo")
         return
 
     enabled = _get_enabled_set()
@@ -1423,9 +1423,9 @@ def cmd_list(args: Any | None = None) -> None:
     for line in removed_lines:
         console.print(line)
     console.print()
-    console.print("[dim]Compact view:[/dim] hbm-agent plugins list --plain --no-bundled")
-    console.print("[dim]Interactive toggle:[/dim] hbm-agent plugins")
-    console.print("[dim]Enable/disable:[/dim] hbm-agent plugins enable/disable <name>")
+    console.print("[dim]Compact view:[/dim] hbm plugins list --plain --no-bundled")
+    console.print("[dim]Interactive toggle:[/dim] hbm plugins")
+    console.print("[dim]Enable/disable:[/dim] hbm plugins enable/disable <name>")
     console.print("[dim]Plugins are opt-in by default — only 'enabled' plugins load.[/dim]")
 
 
@@ -1514,7 +1514,7 @@ def cmd_show(name: str) -> None:
     match = _find_plugin_entry(name)
     if match is None:
         console.print(f"[red]Plugin '{name}' not found.[/red]")
-        _fail(console, "[dim]List installed plugins:[/dim] hbm-agent plugins list")
+        _fail(console, "[dim]List installed plugins:[/dim] hbm plugins list")
 
     pname, version, description, source, dir_path, key = match
     manifest = _read_manifest(Path(dir_path)) if dir_path else {}
@@ -1909,7 +1909,7 @@ def dashboard_update_user_plugin(name: str) -> dict[str, Any]:
             target,
             lambda rec: (
                 f"Plugin '{name}' is pinned to {rec.get('revision')}; "
-                f"run `hbm-agent plugins install {rec.get('source', '<source>')} --force "
+                f"run `hbm plugins install {rec.get('source', '<source>')} --force "
                 "--ref <40-character commit SHA>` to move it."),
             lambda: f"Plugin '{name}' is not a git checkout; cannot pull updates.")
     except PluginOperationError as exc:
@@ -2080,7 +2080,7 @@ def _action_pack(args):
 
 
 def cmd_compat(args: Any | None = None) -> None:
-    """``hbm-agent plugins compat`` — which installed plugins import paths scheduled for removal, and where."""
+    """``hbm plugins compat`` — which installed plugins import paths scheduled for removal, and where."""
     import sys
     from pathlib import Path
     from hbm_cli.plugin_compat import (
@@ -2148,7 +2148,7 @@ _PLUGIN_ACTIONS = {
 
 
 def plugins_command(args) -> None:
-    """Dispatch hbm-agent plugins subcommands."""
+    """Dispatch hbm plugins subcommands."""
     action = getattr(args, "plugins_action", None)
     handler = _PLUGIN_ACTIONS.get(action)
     if handler is None:

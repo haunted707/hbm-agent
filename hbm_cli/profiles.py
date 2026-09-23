@@ -54,7 +54,7 @@ _CLONE_ALL_DEFAULT_EXCLUDE_ROOT: frozenset[str] = frozenset({
 }) | LOCAL_RUNTIME_ROOT_DIRS
 
 # Per-profile history excluded from --clone-all for ANY source: SQLite session store
-# (+wal/shm, can reach many GB), session dirs, `hbm-agent backup` archives, quick-backup
+# (+wal/shm, can reach many GB), session dirs, `hbm backup` archives, quick-backup
 # snapshots, checkpoints. Inheriting them is never useful (restoring one inside the
 # clone would resurrect the SOURCE profile's state) and can balloon the copy by tens of GB.
 # ``cron`` is scheduled work bound to the source profile and its origin channel: a clone
@@ -65,8 +65,8 @@ _CLONE_ALL_HISTORY_EXCLUDE_ROOT: frozenset[str] = frozenset({
     "cron",
 })
 
-# Marker written by `hbm-agent profile create --no-skills`. When present at a profile root,
-# seed_profile_skills() callers (fresh-create, `hbm-agent update` all-profile sync, the
+# Marker written by `hbm profile create --no-skills`. When present at a profile root,
+# seed_profile_skills() callers (fresh-create, `hbm update` all-profile sync, the
 # dashboard) skip bundled-skill seeding. Delete the file to opt back in.
 NO_BUNDLED_SKILLS_MARKER = ".no-bundled-skills"
 
@@ -181,26 +181,26 @@ def _wrapper_path(alias: str) -> Path:
 
 
 def _is_our_wrapper(path: Path) -> bool:
-    """True when *path* reads as a HBM AGENT-generated wrapper (contains ``hbm-agent -p``)."""
+    """True when *path* reads as a HBM AGENT-generated wrapper (contains ``hbm -p``)."""
     try:
-        return "hbm-agent -p" in path.read_text(encoding="utf-8")
+        return "hbm -p" in path.read_text(encoding="utf-8")
     except Exception:
         return False
 
 
 def _missing_profile_error(canon: str) -> FileNotFoundError:
-    return FileNotFoundError(f"Profile '{canon}' does not exist. Create it with: hbm-agent profile create {canon}")
+    return FileNotFoundError(f"Profile '{canon}' does not exist. Create it with: hbm profile create {canon}")
 
 
 def _unknown_profile_error(canon: str) -> FileNotFoundError:
     """For delete/rename/export of a name that matches no profile (likely a typo)."""
-    return FileNotFoundError(f"No profile named '{canon}'. See your profiles with: hbm-agent profile list")
+    return FileNotFoundError(f"No profile named '{canon}'. See your profiles with: hbm profile list")
 
 
 def _profile_exists_error(canon: str) -> FileExistsError:
     return FileExistsError(
-        f"A profile named '{canon}' already exists. Switch to it with `hbm-agent profile use {canon}`, "
-        "see all profiles with `hbm-agent profile list`, or choose a different name."
+        f"A profile named '{canon}' already exists. Switch to it with `hbm profile use {canon}`, "
+        "see all profiles with `hbm profile list`, or choose a different name."
     )
 
 
@@ -220,7 +220,7 @@ def _invalid_profile_name_error(name: str) -> ValueError:
     suggestion = _suggest_profile_name(name)
     return ValueError(
         f"{name!r} is not a valid profile name. {_PROFILE_NAME_RULE} (for example: {suggestion}). "
-        f"Then run `hbm-agent profile create {suggestion}`."
+        f"Then run `hbm profile create {suggestion}`."
     )
 
 
@@ -437,7 +437,7 @@ def _migrate_profile_config_if_outdated(profile_dir: Path) -> None:
     profile); otherwise the first desktop/doctor view shows a scary ``v0 -> latest`` warning."""
     if not (profile_dir / "config.yaml").exists():
         return
-    # Creation must not fail over an unmigratable old config; `hbm-agent doctor --fix` surfaces
+    # Creation must not fail over an unmigratable old config; `hbm doctor --fix` surfaces
     # the detailed error in the target profile.
     with contextlib.suppress(Exception):
         from hbm_constants import reset_hbm_home_override, set_hbm_home_override
@@ -459,7 +459,7 @@ def find_alias_for_profile(profile_name: str) -> Optional[str]:
 
 
 # Cap on how much of a wrapper file is read when reverse-looking-up its profile. Real
-# wrappers are a few hundred bytes with the ``hbm-agent -p X`` needle near the top; the wrapper
+# wrappers are a few hundred bytes with the ``hbm -p X`` needle near the top; the wrapper
 # dir commonly also holds large binaries (ffmpeg, node, …) whose whole-file reads, N times,
 # dominated ``list_profiles`` (~4.5s).
 _WRAPPER_READ_LIMIT = 8192
@@ -476,7 +476,7 @@ def build_alias_map() -> dict[str, str]:
     if not wrapper_dir.is_dir():
         return result
     is_windows = sys.platform == "win32"
-    prefix = "hbm-agent -p "
+    prefix = "hbm -p "
     for entry in sorted(wrapper_dir.iterdir()):
         if not entry.is_file():
             continue
@@ -582,7 +582,7 @@ def _seed_model_config(profile_dir: Path) -> None:
     config_path = profile_dir / "config.yaml"
     if config_path.exists():
         return
-    with contextlib.suppress(Exception):  # creation must not fail over this; `hbm-agent model` sets it later
+    with contextlib.suppress(Exception):  # creation must not fail over this; `hbm model` sets it later
         import yaml
         from hbm_constants import get_hbm_home
         from hbm_cli.config import read_user_config_raw
@@ -673,7 +673,7 @@ def _count_skills(profile_dir: Path) -> int:
 def read_profile_meta(profile_dir: Path) -> dict:
     """Read ``profile.yaml`` -> ``{description, description_auto, display_name}`` (empty
     defaults when missing/unreadable). Never raises — a corrupt file on one profile must not
-    break ``hbm-agent profile list``."""
+    break ``hbm profile list``."""
     data = _load_yaml_dict(profile_dir / "profile.yaml") or {}
     return {
         "description": str(data.get("description") or "").strip(),
@@ -871,9 +871,9 @@ def _bootstrap_profile_dir(profile_dir: Path, source_dir: Optional[Path],
     config files, installed skills (the dashboard's "clone from default" must keep bundled
     AND user-installed skills), and memory/identity files from *source_dir*.
 
-    ``sync_imports`` also copies the source's ``import-sync.json`` (the ``hbm-agent import-agent``
+    ``sync_imports`` also copies the source's ``import-sync.json`` (the ``hbm import-agent``
     manifest) so the clone stays registered against the same external Claude Code / Codex trees
-    and ``hbm-agent -p <clone> import-agent --sync`` keeps pulling from them. The link is to the
+    and ``hbm -p <clone> import-agent --sync`` keeps pulling from them. The link is to the
     external tree, never to the source profile: both profiles stay independent islands."""
     profile_dir.mkdir(parents=True, exist_ok=True)
     for subdir in _PROFILE_DIRS:
@@ -909,7 +909,7 @@ def create_profile(
     sections, pairing/session state — unless ``clone_channels`` opts in: a copied bot credential
     makes two gateways fight over one bot (``hbm_cli.profile_channels``; callers list what
     was left behind with ``channel_platforms_configured(source_dir)``).
-    ``no_skills`` creates an empty profile and writes a marker so ``hbm-agent update`` skips
+    ``no_skills`` creates an empty profile and writes a marker so ``hbm update`` skips
     re-seeding its skills; it is mutually exclusive with the clone options, which copy skills.
     ``sync_imports`` (``--clone`` only; ``--clone-all`` copies the file anyway) also copies the
     ``import-agent`` sync manifest so the clone can keep pulling the same external agent trees."""
@@ -965,7 +965,7 @@ def create_profile(
         raise
 
     # Inside a container under s6, register the gateway as a runtime s6 service so
-    # `hbm-agent -p <profile> gateway start` supervises via `s6-svc -u` instead of a bare
+    # `hbm -p <profile> gateway start` supervises via `s6-svc -u` instead of a bare
     # process. No-op on host (systemd/launchd/windows unit generation handles lifecycle).
     _maybe_register_gateway_service(canon)
     # A running multiplexer enumerates profiles/ at boot: ask it to serve this one now (it also
@@ -990,7 +990,7 @@ def _finish_profile_layout(profile_dir: Path, *, no_skills: bool, clone_all: boo
                            description: Optional[str]) -> None:
     """Seed files a fresh profile owns from day one; runs on the staging tree before publish."""
     # Seed an empty .env so the profile owns a credentials file from day one. Without it,
-    # profile-scoped env writes (dashboard Channels/Keys pages, `hbm-agent -p <name> auth add`)
+    # profile-scoped env writes (dashboard Channels/Keys pages, `hbm -p <name> auth add`)
     # had no file until first write and the profile silently inherited shell API keys —
     # read by users as "the new profile reads the root .env". Skipped when a clone copied one.
     _seed_file_if_missing(profile_dir / ".env", _PLACEHOLDER_ENV, 0o600)
@@ -1000,13 +1000,13 @@ def _finish_profile_layout(profile_dir: Path, *, no_skills: bool, clone_all: boo
         from hbm_cli.default_soul import DEFAULT_SOUL_MD
         _seed_file_if_missing(profile_dir / "SOUL.md", DEFAULT_SOUL_MD)
 
-    # Opt-out marker read by seed_profile_skills() and `hbm-agent update`'s all-profile sync
+    # Opt-out marker read by seed_profile_skills() and `hbm update`'s all-profile sync
     # (the feature still works via the empty skills/ dir if this fails).
     if no_skills:
         _seed_file_if_missing(
             profile_dir / NO_BUNDLED_SKILLS_MARKER,
-            "This profile opted out of bundled-skill seeding (`hbm-agent profile create --no-skills`).\n"
-            "Delete this file to re-enable sync on the next `hbm-agent update`.\n",
+            "This profile opted out of bundled-skill seeding (`hbm profile create --no-skills`).\n"
+            "Delete this file to re-enable sync on the next `hbm update`.\n",
         )
 
     # Migrate config-only clones now so desktop/status don't warn that a just-created
@@ -1017,7 +1017,7 @@ def _finish_profile_layout(profile_dir: Path, *, no_skills: bool, clone_all: boo
 
     # Description last, so a partial-create failure doesn't strand a description file.
     if description and description.strip():
-        with contextlib.suppress(Exception):  # non-fatal — `hbm-agent profile describe` works later
+        with contextlib.suppress(Exception):  # non-fatal — `hbm profile describe` works later
             write_profile_meta(profile_dir, description=description.strip(), description_auto=False)
 
 
@@ -1146,7 +1146,7 @@ def _profile_bound_backend_pids(canon: str, profile_dir: Path) -> list[int]:
     except OSError:
         resolved_dir = profile_dir
 
-    # Never terminate ourselves or a parent (`hbm-agent -p <canon> profile delete` runs under
+    # Never terminate ourselves or a parent (`hbm -p <canon> profile delete` runs under
     # the very profile it's deleting).
     skip: set[int] = {os.getpid()}
     with contextlib.suppress(Exception):
@@ -1288,7 +1288,7 @@ def delete_profile(name: str, yes: bool = False) -> Path:
     to prevent auto-restart, gateway stopped if running)."""
     canon = normalize_profile_name(name)
     if canon == "default":
-        raise ValueError("Cannot delete the default profile (~/.hbm).\nTo remove everything, use: hbm-agent uninstall")
+        raise ValueError("Cannot delete the default profile (~/.hbm).\nTo remove everything, use: hbm uninstall")
     canon, profile_dir = _existing_profile_dir(canon)
     gw_running = _check_gateway_running(profile_dir)
     wrapper_path = _get_wrapper_dir() / canon
@@ -1709,7 +1709,7 @@ def import_profile(archive_path: str, name: Optional[str] = None) -> Path:
     if not inferred_name:
         raise ValueError(
             "Cannot determine profile name from archive. "
-            "Specify it explicitly: hbm-agent profile import <archive> --name <name>"
+            "Specify it explicitly: hbm profile import <archive> --name <name>"
         )
     if archive_root is None:
         raise ValueError("Profile archive must contain exactly one top-level directory.")
@@ -1720,7 +1720,7 @@ def import_profile(archive_path: str, name: Optional[str] = None) -> Path:
     if canon == "default":
         raise ValueError(
             "Cannot import as 'default' — that is the built-in root profile (~/.hbm). "
-            "Specify a different name: hbm-agent profile import <archive> --name <name>"
+            "Specify a different name: hbm profile import <archive> --name <name>"
         )
     profile_dir = get_profile_dir(canon)
     if profile_dir.exists():

@@ -237,7 +237,7 @@ class CLILoopsMixin:
     def _cmd_plugins(self, cmd_original: str):
         from hbm_constants import display_hbm_home
         try:
-            # Discover from disk (bundled + user) like `hbm-agent plugins list`, so
+            # Discover from disk (bundled + user) like `hbm plugins list`, so
             # installed-but-not-enabled plugins show up; the plugin manager only knows
             # *loaded* plugins and made fresh installs look like "nothing installed".
             from hbm_cli.plugins_cmd import (
@@ -247,15 +247,15 @@ class CLILoopsMixin:
             disabled = _get_disabled_set()
 
             # `/plugins` is a quick glance: user plugins only, bundled ones summarized
-            # on one line (full catalog behind `hbm-agent plugins list`).
+            # on one line (full catalog behind `hbm plugins list`).
             user_entries = [e for e in entries if e[3] != "bundled"]
             bundled_count = len(entries) - len(user_entries)
             if not user_entries:
                 print("No user plugins installed.")
-                print("  Install one: hbm-agent plugins install owner/repo")
+                print("  Install one: hbm plugins install owner/repo")
                 print(f"  Or drop a plugin directory into {display_hbm_home()}/plugins/")
                 if bundled_count:
-                    print(f"  ({bundled_count} bundled plugins available — see: hbm-agent plugins list)")
+                    print(f"  ({bundled_count} bundled plugins available — see: hbm plugins list)")
                 return
             try:  # loaded-plugin details (tools/hooks/commands counts, errors) by name
                 from hbm_cli.plugins import get_plugin_manager
@@ -274,8 +274,8 @@ class CLILoopsMixin:
                 error = f" — {info['error']}" if info.get("error") else ""
                 print(f"  {glyph} {name}{ver}{label}{detail}{error}")
             if bundled_count:
-                print(f"  (+{bundled_count} bundled — see: hbm-agent plugins list)")
-            print("  Enable/disable: hbm-agent plugins enable/disable <name>")
+                print(f"  (+{bundled_count} bundled — see: hbm plugins list)")
+            print("  Enable/disable: hbm plugins enable/disable <name>")
         except Exception as e:
             print(f"Plugin system error: {e}")
 

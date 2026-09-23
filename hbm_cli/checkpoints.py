@@ -1,4 +1,4 @@
-"""`hbm-agent checkpoints` CLI subcommand.
+"""`hbm checkpoints` CLI subcommand.
 
 None of these require the agent to be running. Safe to call any time.
 """
@@ -54,7 +54,7 @@ def cmd_status(args: argparse.Namespace) -> int:
         print(f"Legacy archives ({len(legacy)}):")
         _print_archives(sorted(legacy, key=lambda a: a.get("mtime", 0), reverse=True))
         print()
-        print("Clear with: hbm-agent checkpoints clear-legacy")
+        print("Clear with: hbm checkpoints clear-legacy")
     return 0
 
 
@@ -187,8 +187,8 @@ def cmd_clear_legacy(args: argparse.Namespace) -> int:
 
 
 def register_cli(parser: argparse.ArgumentParser) -> None:
-    """Wire subcommands onto the ``hbm-agent checkpoints`` parser."""
-    parser.set_defaults(func=cmd_status)  # bare `hbm-agent checkpoints` → status
+    """Wire subcommands onto the ``hbm checkpoints`` parser."""
+    parser.set_defaults(func=cmd_status)  # bare `hbm checkpoints` → status
     subs = parser.add_subparsers(dest="checkpoints_command", metavar="COMMAND")
 
     p_status = subs.add_parser("status", help="Show total size, project count, and per-project breakdown")

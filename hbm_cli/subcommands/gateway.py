@@ -1,4 +1,4 @@
-"""``hbm-agent gateway`` and ``hbm-agent proxy`` subcommand parsers."""
+"""``hbm gateway`` and ``hbm proxy`` subcommand parsers."""
 
 from __future__ import annotations
 
@@ -151,7 +151,7 @@ def build_gateway_parser(
             "authoritative tenant from it), mints this gateway's per-gateway secret "
             "and per-tenant delivery key, and writes GATEWAY_RELAY_ID / "
             "GATEWAY_RELAY_SECRET / GATEWAY_RELAY_DELIVERY_KEY into ~/.hbm/.env. "
-            "Requires being logged in (hbm-agent setup). Not available in managed installs.")
+            "Requires being logged in (hbm setup). Not available in managed installs.")
     gateway_enroll.add_argument("--token", default=None,
         help="The single-use enrollment token from the connector (delivered with "
             "your gateway config). Also settable via GATEWAY_RELAY_ENROLL_TOKEN.")
@@ -183,7 +183,7 @@ def build_gateway_parser(
 
     proxy_start = proxy_subparsers.add_parser("start", help="Run the proxy in the foreground")
     proxy_start.add_argument("--provider", default="nous",
-        help="Upstream provider: nous or xai (default: nous). See `hbm-agent proxy providers`.")
+        help="Upstream provider: nous or xai (default: nous). See `hbm proxy providers`.")
     proxy_start.add_argument("--host", default=None,
         help="Bind address (default: 127.0.0.1). Use 0.0.0.0 to expose on LAN.")
     proxy_start.add_argument("--port", type=int, default=None, help="Bind port (default: 8645)")

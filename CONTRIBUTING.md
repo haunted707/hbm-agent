@@ -124,7 +124,7 @@ development environment on the same layout the CLI, updater, lazy dependency
 installer, gateway, and docs assume.
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 cd "${HBM_HOME:-$HOME/.hbm}/hbm-agent"

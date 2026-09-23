@@ -687,7 +687,7 @@
                     --env HOME=${containerHomeDir} \
                     ${lib.concatStringsSep " " cfg.container.extraOptions} \
                     ${cfg.container.image} \
-                    ${containerDataDir}/current-package/bin/hbm-agent gateway run --replace ${lib.concatStringsSep " " cfg.extraArgs}
+                    ${containerDataDir}/current-package/bin/hbm gateway run --replace ${lib.concatStringsSep " " cfg.extraArgs}
 
                   echo "${containerIdentity}" > ${identityFile}
                 fi

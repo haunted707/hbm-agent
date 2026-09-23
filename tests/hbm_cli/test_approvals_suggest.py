@@ -1,4 +1,4 @@
-"""Tests for ``hbm-agent approvals suggest`` (hbm_cli/approvals_suggest.py).
+"""Tests for ``hbm approvals suggest`` (hbm_cli/approvals_suggest.py).
 
 Approval history in HBM AGENT is implied, not ledgered: the session DB
 (state.db) stores every assistant ``terminal`` tool call plus its paired

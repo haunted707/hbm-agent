@@ -74,7 +74,7 @@ def test_pin_multiple_ids_one_missing(monkeypatch, capsys):
     code, out = _run(monkeypatch, capsys, ["pin", "aaa", "nope", "bbb"], db)
     assert ("aaa111", True) in db.pin_calls
     assert ("bbb222", True) in db.pin_calls
-    assert "No session 'nope'" in out and "hbm-agent sessions list" in out
+    assert "No session 'nope'" in out and "hbm sessions list" in out
     assert code == 1
 
 
@@ -135,4 +135,4 @@ def test_pinned_empty_hint(monkeypatch, capsys):
     db = _FakeDB(rows=[])
     _code, out = _run(monkeypatch, capsys, ["pinned"], db)
     assert "No pinned sessions" in out
-    assert "hbm-agent sessions pin" in out
+    assert "hbm sessions pin" in out

@@ -16,7 +16,7 @@ UPGRADE_ALREADY_SIGNED_IN = "Already signed in."
 UPGRADE_DO_NOT_SHARE = "Do not share this code."
 UPGRADE_TIMED_OUT = "That sign-in link has expired. Start again whenever you're ready."
 UPGRADE_NOT_COMPLETED = "Sign-in didn't finish. Try again whenever you're ready."
-UPGRADE_UNAVAILABLE = "The free tier is not available right now; run `hbm-agent auth add nous` to sign in."
+UPGRADE_UNAVAILABLE = "The free tier is not available right now; run `hbm auth add nous` to sign in."
 UPGRADE_REASON_COPY = {
     "user_declined": "No problem, you're still on the free Nous service. Sign in whenever you're ready.",
     "superseded": "A newer sign-in code replaced this one. Use the newest one, or start again.",
@@ -36,7 +36,7 @@ UPGRADE_SERVICE_BUSY = ("Signing in couldn't finish because the Nous service is 
 UPGRADE_SERVICE_UNREACHABLE = ("The Nous service couldn't be reached to finish signing you in. "
                                "Check your internet connection and try again. Your session is still here.")
 
-UPGRADE_NO_DEFAULT_TERMINAL = "No default model is set yet; run `hbm-agent model` to pick one."
+UPGRADE_NO_DEFAULT_TERMINAL = "No default model is set yet; run `hbm model` to pick one."
 UPGRADE_NO_DEFAULT_CHAT = "No default model is set yet; run /model to pick one."
 UPGRADE_WAITING = "Waiting for sign-in..."
 UPGRADE_WAITING_UP_TO = "Waiting for sign-in, up to {minutes}."

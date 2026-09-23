@@ -3,15 +3,15 @@
 
 Usage:
     hbm                     # Interactive chat (default)
-    hbm-agent chat / gateway / setup / status / cron / doctor / update / ...
+    hbm chat / gateway / setup / status / cron / doctor / update / ...
     hbm-agent --version           # Show version and update status
     hbm <cmd> --help        # Per-command help
 """
 
 # hbm_bootstrap must be the very first import — it sets up UTF-8 stdio on
 # Windows (no-op on POSIX). Guarded: after a ``git pull`` / interrupted
-# ``hbm-agent update`` the editable install's ``.pth`` may not list it yet; crashing
-# here would block ``hbm-agent update``.
+# ``hbm update`` the editable install's ``.pth`` may not list it yet; crashing
+# here would block ``hbm update``.
 try:
     import hbm_bootstrap  # noqa: F401
 except ModuleNotFoundError:
@@ -36,7 +36,7 @@ if _bootstrap_root not in sys.path:
 from hbm_cli import _startup_fast  # noqa: E402
 
 # Early venv self-heal — MUST run before any third-party import below. A prior
-# ``hbm-agent update`` may have left a recovery marker with a core package wiped;
+# ``hbm update`` may have left a recovery marker with a core package wiped;
 # the hbm_cli.config/env_loader imports further down would then crash before
 # main() reaches _recover_from_interrupted_install(). ``_early_recovery`` is
 # stdlib-only (safe on a corrupted venv) and repairs just enough to finish this
@@ -424,7 +424,7 @@ _PROFILE_NAME_RE = r"^[a-z0-9][a-z0-9_-]{0,63}$"  # mirrors hbm_cli.profiles._PR
 
 
 def _inside_mcp_add_args(argv: list, index: int) -> bool:
-    """True once argv reaches `hbm-agent mcp add ... --args <command argv>`.
+    """True once argv reaches `hbm mcp add ... --args <command argv>`.
 
     ``mcp add --args`` is command-argv passthrough. Flags after that point
     belong to the child MCP command (for example Docker MCP Toolkit's
@@ -442,7 +442,7 @@ def _looks_like_hbm_invocation() -> bool:
     """False when ``sys.argv`` belongs to a test runner rather than a ``hbm-agent`` run.
 
     pytest's own ``-p no:xdist`` reaches ``_scan_profile_flag`` through ``sys.argv`` at import
-    time; it must stay a silent skip, while a real ``hbm-agent -p 'Work Bot'`` must fail loudly.
+    time; it must stay a silent skip, while a real ``hbm -p 'Work Bot'`` must fail loudly.
     """
     return "pytest" not in (sys.argv[0] or "")
 
@@ -451,7 +451,7 @@ def _exit_invalid_profile_name(value: str) -> None:
     from hbm_cli.profiles import _invalid_profile_name_error
 
     print(f"Error: {_invalid_profile_name_error(value)}", file=sys.stderr)
-    print("Run `hbm-agent profile list` to see your profiles.", file=sys.stderr)
+    print("Run `hbm profile list` to see your profiles.", file=sys.stderr)
     sys.exit(2)
 
 
@@ -464,7 +464,7 @@ def _looks_like_option_value(value: str) -> bool:
 def _scan_profile_flag(argv: list) -> tuple:
     """Find -p/--profile/--profile= in argv -> (name, tokens_consumed, index).
 
-    Historically the flag worked even after the subcommand (`hbm-agent chat -p
+    Historically the flag worked even after the subcommand (`hbm chat -p
     coder`), so scan broadly; stop at ``--`` and at the `mcp add --args`
     passthrough region. The value is normalised (strip + casefold, matching
     ``profiles.normalize_profile_name``) before validation so ``-p Work`` selects
@@ -472,7 +472,7 @@ def _scan_profile_flag(argv: list) -> tuple:
     resolve_profile_env never sys.exits on it; the rejection is explained (exit 2)
     only when the flag comes BEFORE the first subcommand token under a real
     ``hbm-agent`` run — after a subcommand, ``-p`` may belong to that subcommand or a
-    plugin (`hbm-agent kanban ... -p 8080`), and option-looking values (``no:xdist``,
+    plugin (`hbm kanban ... -p 8080`), and option-looking values (``no:xdist``,
     ``--flag``) are always a silent skip.
     """
     from hbm_cli._parser import top_level_value_flag_sets
@@ -505,7 +505,7 @@ def _scan_profile_flag(argv: list) -> tuple:
 
 
 def _resolve_sudo_user_profile_env(name: str) -> str | None:
-    """Resolve `sudo hbm-agent -p <name>` against the invoking user's home.
+    """Resolve `sudo hbm -p <name>` against the invoking user's home.
 
     This runs before argparse, so `--run-as-user` is not available yet. For
     sudo invocations the best signal is SUDO_USER: root is only doing the
@@ -529,7 +529,7 @@ def _under_gateway_supervisor(argv: list) -> bool:
     ``-p <name>`` or pin HBM_HOME to the profile dir; a bare invocation
     means "the root HBM_HOME profile". If a supervised default-profile
     child read active_profile, switching the active profile (dashboard,
-    ``hbm-agent profile use``) would silently redirect the default gateway into
+    ``hbm profile use``) would silently redirect the default gateway into
     that profile — adopting its credentials and double-polling a Telegram
     token already owned by that profile's own gateway (#74872).
 
@@ -572,7 +572,7 @@ def _apply_profile_override() -> None:
     # points at a specific profile dir ("profiles" as immediate parent). If it
     # points at the hbm-agent root (systemd hardcodes HBM_HOME=/root/.hbm)
     # we must still read active_profile — the user may have run
-    # `hbm-agent profile use` and the gateway should honour it (#22502).
+    # `hbm profile use` and the gateway should honour it (#22502).
     hbm_home_env = os.environ.get("HBM_HOME", "")
     if profile_name is None and hbm_home_env and Path(hbm_home_env).parent.name == "profiles":
         return
@@ -618,7 +618,7 @@ _apply_profile_override()
 
 # Windows launcher self-heal — the ``hbm-agent`` command is a COPY of the venv
 # console script staged into the managed bin dir (outside the checkout, since
-# ``hbm-agent update``'s autostash once swept ``<checkout>\bin`` copies off disk;
+# ``hbm update``'s autostash once swept ``<checkout>\bin`` copies off disk;
 # venv\Scripts must stay off PATH as it shadows the user's ``python``).
 # Re-staging at process start reaches already-broken installs via the desktop
 # app's ``python -m hbm_cli.main`` spawn. Gates fail toward inaction. Sits
@@ -626,7 +626,7 @@ _apply_profile_override()
 # profiles resolve; the helper anchors on the DEFAULT root, so profile
 # sessions heal the same shared dir.
 # That dir lives OUTSIDE the git checkout precisely because an earlier layout staged the copies at
-# ``<checkout>\bin``, where ``hbm-agent update``'s autostash (``git stash push --include-untracked``) swept
+# ``<checkout>\bin``, where ``hbm update``'s autostash (``git stash push --include-untracked``) swept
 # them off disk; with the desktop updater's ``--keep-stash`` nothing restored them and ``hbm-agent`` stopped
 # resolving in every new terminal (venv\Scripts itself must stay off PATH — it shadows the user's
 # ``python``, #83797). Costs a few stat calls when healthy; gates fail toward inaction so source checkouts
@@ -891,7 +891,7 @@ def _read_git_revision_fingerprint(repo_root: Path) -> str | None:
                 return f"git:{ref}:{packed_sha}"
             # Ref name is known but unresolved — still stable across launches,
             # and the version/release fallback in the caller will invalidate
-            # after `hbm-agent update`.
+            # after `hbm update`.
             return f"git:{ref}:unresolved"
         return f"git:HEAD:{head}"
     except OSError:
@@ -1244,7 +1244,7 @@ def _resolve_last_session(source: str = "cli") -> Optional[str]:
     """Look up the most recently-used session ID for a source.
 
     Scoped to the current workspace first (git repo root, else cwd) so
-    ``hbm-agent -c`` from repo A continues repo A's last session rather than the
+    ``hbm -c`` from repo A continues repo A's last session rather than the
     global MRU. Falls back to the unscoped MRU when no session matches the
     current workspace, preserving the old behaviour for fresh directories.
     """
@@ -1448,7 +1448,7 @@ def _resolve_continue_arg(args, *, use_tui: bool) -> None:
             else:
                 print(f"No session found matching '{continue_val}'.", file=sys.stderr)
                 print(
-                    "Use 'hbm-agent sessions list' to see available sessions, or "
+                    "Use 'hbm sessions list' to see available sessions, or "
                     "pass --create-if-missing to start a new session with that title.",
                     file=sys.stderr,
                 )
@@ -1481,7 +1481,7 @@ def _resolve_continue_arg(args, *, use_tui: bool) -> None:
                     kind = "TUI" if use_tui else "CLI"
                     print(
                         f"No previous {kind} session to continue. Start a new one with "
-                        "`hbm-agent`, or list sessions with `hbm-agent sessions list`.",
+                        "`hbm-agent`, or list sessions with `hbm sessions list`.",
                         file=sys.stderr,
                     )
                     sys.exit(1)
@@ -1559,7 +1559,7 @@ def _resolve_chat_session_args(args, use_tui: bool) -> None:
         else:
             kind = "TUI" if use_tui else "CLI"
             print(f"No previous {kind} session found to resume.")
-            print("Use 'hbm-agent sessions list' to see available sessions.")
+            print("Use 'hbm sessions list' to see available sessions.")
             sys.exit(1)
 
     _resolve_continue_arg(args, use_tui=use_tui)
@@ -1607,7 +1607,7 @@ def _warn_retired_xai_models() -> None:
             for _ref in _retired_xai_refs:
                 sys.stderr.write(f"  \033[33m⚠\033[0m {format_issue(_ref)}\n")
             sys.stderr.write(f"  \033[2mMigration guide: {MIGRATION_GUIDE_URL}\033[0m\n")
-            sys.stderr.write("  \033[2mRun 'hbm-agent doctor' for details.\033[0m\n\n")
+            sys.stderr.write("  \033[2mRun 'hbm doctor' for details.\033[0m\n\n")
     except Exception:
         pass
 
@@ -1664,13 +1664,13 @@ def _start_chat_background_prefetch() -> None:
 
 
 def _first_run_setup_guard(args) -> None:
-    """No provider configured: offer `hbm-agent setup` (TTY) or exit 1 with guidance."""
+    """No provider configured: offer `hbm setup` (TTY) or exit 1 with guidance."""
     print()
     print(
         "It looks like HBM AGENT isn't configured yet -- no API keys or providers found."
     )
     print()
-    print("  Run:  hbm-agent setup")
+    print("  Run:  hbm setup")
     print()
 
     from hbm_cli.setup import (
@@ -1692,7 +1692,7 @@ def _first_run_setup_guard(args) -> None:
         cmd_setup(args)
         return
     print()
-    print("You can run 'hbm-agent setup' at any time to configure.")
+    print("You can run 'hbm setup' at any time to configure.")
     sys.exit(1)
 
 
@@ -1816,7 +1816,7 @@ def cmd_chat(args):
         # here — e.g. missing resolve_turn_limit / split_model_config_default
         # (#96900). The agent-setup mixin prints this hint too late: HbmCLI
         # construction already failed. Fast-chat launch also goes through
-        # cmd_chat, so this one catch covers `hbm-agent` / `hbm-agent chat`.
+        # cmd_chat, so this one catch covers `hbm-agent` / `hbm chat`.
         from hbm_constants import emit_partial_update_hint
 
         if emit_partial_update_hint(e):
@@ -1973,8 +1973,8 @@ def _resolve_active_provider(config, model_cfg, effective_provider, custom_provi
                 )
         else:
             print(
-                f"Warning: Unknown provider '{effective_provider}'. Check 'hbm-agent model' for "
-                "available providers, or run 'hbm-agent doctor' to diagnose config "
+                f"Warning: Unknown provider '{effective_provider}'. Check 'hbm model' for "
+                "available providers, or run 'hbm doctor' to diagnose config "
                 "issues. Falling back to auto provider detection."
             )
     if not active:
@@ -1983,7 +1983,7 @@ def _resolve_active_provider(config, model_cfg, effective_provider, custom_provi
         except AuthError as exc:
             if exc.code == "no_provider_configured":
                 # The picker that is about to open IS the fix; a warning that says
-                # "run `hbm-agent model`" from inside `hbm-agent model` is circular.
+                # "run `hbm model`" from inside `hbm model` is circular.
                 print("No provider is set up yet — pick one below. (Nous Portal works without an API key.)")
             elif effective_provider == "auto":
                 print(f"Warning: {format_auth_error(exc)} Falling back to auto provider detection.")
@@ -2024,7 +2024,7 @@ def _pick_provider(config, active, provider_labels, custom_provider_map):
 def select_provider_and_model(args=None):
     """Core provider selection + model picking logic.
 
-    Shared by ``cmd_model`` (``hbm-agent model``) and the setup wizard
+    Shared by ``cmd_model`` (``hbm model``) and the setup wizard
     (``setup_model_provider`` in setup.py).  Handles the full flow:
     provider picker, credential prompting, model selection, and config
     persistence.
@@ -2168,7 +2168,7 @@ def cmd_verify(args):
 
 
 def cmd_security(args):
-    """Dispatch `hbm-agent security <subcmd>`."""
+    """Dispatch `hbm security <subcmd>`."""
     sub = getattr(args, "security_command", None)
     if sub in ("audit", None):
         from hbm_cli.security_audit import cmd_security_audit
@@ -2181,7 +2181,7 @@ def cmd_security(args):
 
 
 def cmd_approvals(args):
-    """Dispatch `hbm-agent approvals <subcmd>`."""
+    """Dispatch `hbm approvals <subcmd>`."""
     from hbm_cli.approvals_suggest import approvals_command
 
     status = approvals_command(args)
@@ -2410,7 +2410,7 @@ def cmd_update(args):
 def _coalesce_session_name_args(argv: list) -> list:
     """Join unquoted multi-word session names after -c/--continue and -r/--resume.
 
-    ``hbm-agent -c Pokemon Agent Dev`` → ``['-c', 'Pokemon Agent Dev']``; tokens
+    ``hbm -c Pokemon Agent Dev`` → ``['-c', 'Pokemon Agent Dev']``; tokens
     are collected until the next flag (``-*``) or known top-level subcommand.
     """
     _SUBCOMMANDS = {
@@ -2458,9 +2458,9 @@ def _dashboard_lifecycle_flags(args, token_file) -> None:
         sys.exit(0)  # status is informational, always 0
     if getattr(args, "stop", False):
         if not _find_stale_dashboard_pids():
-            print("No hbm-agent dashboard processes running.")
+            print("No hbm dashboard processes running.")
             sys.exit(0)
-        # Reuse the same SIGTERM-grace-SIGKILL path used after `hbm-agent update`;
+        # Reuse the same SIGTERM-grace-SIGKILL path used after `hbm update`;
         # it prints outcomes itself. Exit 1 only if a pid was unkillable — judged
         # from the kill result, not a re-scan: a launchd KeepAlive job respawns
         # its backend on a fresh PID, which is not a failed stop.
@@ -2472,7 +2472,7 @@ def _dashboard_lifecycle_flags(args, token_file) -> None:
 
 def _dashboard_validate_serve_args(args, headless_backend, token_file):
     """Headless-serve argument checks -> ssh_owner_nonce (or None)."""
-    # `hbm-agent serve` is headless/non-interactive: fail closed on a corrupt
+    # `hbm serve` is headless/non-interactive: fail closed on a corrupt
     # config.yaml instead of silently starting on defaults where provider
     # auto-detection can adopt unnamed .env credentials (issue #81952).
     # Same policy + escape hatch as _guard_noninteractive_user_config.
@@ -2493,7 +2493,7 @@ def _dashboard_validate_serve_args(args, headless_backend, token_file):
     if ssh_owner_nonce and not re.fullmatch(r"[0-9a-f]{16}", ssh_owner_nonce):
         raise SystemExit("--ssh-owner-nonce must be 16 lowercase hex characters")
     if token_file and not headless_backend:
-        raise SystemExit("--ssh-session-token-file is only valid with hbm-agent serve")
+        raise SystemExit("--ssh-session-token-file is only valid with hbm serve")
     return ssh_owner_nonce
 
 
@@ -2503,7 +2503,7 @@ def _dashboard_sanitize_desktop_env(headless_backend) -> None:
     Desktop Electron spawns its backend with HBM_DESKTOP=1 plus
     HBM_WEB_DIST=<packaged app.asar[/unpacked]/dist> (and often
     HBM_SERVE_HEADLESS=1). A shell inheriting those then running
-    `hbm-agent dashboard` would serve the desktop renderer ("Desktop IPC bridge
+    `hbm dashboard` would serve the desktop renderer ("Desktop IPC bridge
     is unavailable", #52945) or disable the SPA. Only Electron-packaged
     WEB_DIST contamination is stripped — caller-managed overrides (dev /
     custom builds) must still work, and the desktop-spawned backend itself
@@ -2791,7 +2791,7 @@ def _is_tui_chat_launch(args) -> bool:
         return True
     # The chat path decides TUI-vs-classic via _resolve_use_tui (--cli/--tui
     # flags, TTY gate, HBM_TUI env, display.interface config). Bare
-    # `hbm-agent`/`hbm-agent chat` with a TUI display config was previously missed
+    # `hbm-agent`/`hbm chat` with a TUI display config was previously missed
     # here, so the wrapper pre-warmed its own MCP discovery while the TUI
     # gateway (spawned moments later) ran a second one — an idle stdio MCP
     # server copy held dead for the whole session. Only chat commands can
@@ -3252,7 +3252,7 @@ def _register_plugin_cli_commands(subparsers) -> None:
 
 
 def _cmd_sessions_lazy(args, **kwargs):
-    """``hbm-agent sessions`` handler; sessions_cmd imports only when the subcommand runs."""
+    """``hbm sessions`` handler; sessions_cmd imports only when the subcommand runs."""
     from hbm_cli.sessions_cmd import cmd_sessions
 
     return cmd_sessions(args, **kwargs)
@@ -3276,7 +3276,7 @@ def _build_cli_parser():
     build_worktree_parser(subparsers)
     build_browser_parser(subparsers)
     build_secrets_parser(subparsers)
-    # OUTBOUND egress firewall; ``hbm-agent proxy`` (gateway group) is the INBOUND one.
+    # OUTBOUND egress firewall; ``hbm proxy`` (gateway group) is the INBOUND one.
     build_egress_parser(subparsers)
     build_migrate_parser(subparsers)
     build_gateway_parser(
@@ -3376,7 +3376,7 @@ def _parse_cli_args(parser, subparsers, argv):
     On Python <3.11 argparse fails to route subcommand tokens when the parent
     has nargs='?' optionals (--continue): "unrecognized arguments: model". When
     argv holds a known subcommand token, set subparsers.required=True to force
-    routing; if that fails (``hbm-agent -c model`` — 'model' is the session name)
+    routing; if that fails (``hbm -c model`` — 'model' is the session name)
     fall back to the default behaviour.
     """
     import io as _io
@@ -3439,13 +3439,13 @@ def main():
     # process resolves fresh source against old bytecode. Never raises.
     _sweep_stale_bytecode_if_checkout_changed()
 
-    # Self-heal a venv left half-built by an interrupted ``hbm-agent update``, and
+    # Self-heal a venv left half-built by an interrupted ``hbm update``, and
     # hint (never restart) about a fleet the interrupted update never
     # restarted. Both skipped while the user is *running* update — that flow
     # owns its marker and a recovery install must not race the real one. The
-    # substring match is deliberately loose: over-matching (``hbm-agent skills
+    # substring match is deliberately loose: over-matching (``hbm skills
     # install update``) only defers recovery one launch; under-matching
-    # (``hbm-agent -p work update``) would race. Never raises.
+    # (``hbm -p work update``) would race. Never raises.
     # See #95294.
     if "update" not in sys.argv[1:]:
         try:

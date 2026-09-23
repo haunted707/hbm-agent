@@ -651,7 +651,7 @@ def test_session_resume_rejects_runaway_transcript_before_history_load(
 
     assert response["error"]["code"] == 4130
     assert "limit 20000" in response["error"]["message"]
-    assert "hbm-agent sessions export" in response["error"]["message"]
+    assert "hbm sessions export" in response["error"]["message"]
 
 
 def test_session_resume_deferred_and_omitted_paths_guard_the_tip_only(server, monkeypatch):

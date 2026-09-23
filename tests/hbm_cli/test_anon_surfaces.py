@@ -1,6 +1,6 @@
 """Nous free tier on the read-only display surfaces and the keepalive.
 
-Contract (R-USR-1): wherever a free-tier identity renders (``hbm-agent auth status nous``,
+Contract (R-USR-1): wherever a free-tier identity renders (``hbm auth status nous``,
 ``hbm auth list``, ``hbm status``, ``hbm portal info``) the user sees the free-tier label
 plus the upgrade hint, and never the internal identity vocabulary. A real account keeps its normal
 rendering. The keepalive has nothing to keep alive for the free tier and must not start a thread.

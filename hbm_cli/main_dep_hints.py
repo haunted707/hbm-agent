@@ -1,8 +1,8 @@
 """Plain-language copy for surfaces that cannot start because an optional dependency group is missing.
 
-``hbm-agent dashboard`` (fastapi + uvicorn) and ``hbm-agent acp`` (agent-client-protocol) are installed by
+``hbm dashboard`` (fastapi + uvicorn) and ``hbm acp`` (agent-client-protocol) are installed by
 the ``[all]`` / ``[acp]`` extras. A partial install, a pip-less uv venv or an interrupted update can
-leave them out; the built-in repair is ``hbm-agent update``, which reinstalls the extras into the same
+leave them out; the built-in repair is ``hbm update``, which reinstalls the extras into the same
 interpreter. The manual fallback names the checkout directory and interpreter explicitly because a bare
 ``pip install -e '.[acp]'`` fails on PEP 668 systems and in venvs without pip.
 """
@@ -16,7 +16,7 @@ def missing_optional_deps_message(surface: str, what: str, extra: str) -> str:
 
     return (
         f"The {surface} can't start: {what} are missing from this install.\n"
-        "Run `hbm-agent update` to reinstall dependencies. If that fails, run manually:\n"
+        "Run `hbm update` to reinstall dependencies. If that fails, run manually:\n"
         f"  cd {PROJECT_ROOT} && {sys.executable} -m pip install -e '.[{extra}]'\n"
         f"  (no pip in this venv: uv pip install -e '.[{extra}]')"
     )

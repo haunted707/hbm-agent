@@ -1,4 +1,4 @@
-"""``hbm-agent dashboard register`` — register a self-hosted dashboard OAuth client.
+"""``hbm dashboard register`` — register a self-hosted dashboard OAuth client.
 
 Automates the Nous Portal ``/local-dashboards`` flow: resolve a fresh Nous access token, POST
 ``{portal}/api/oauth/self-hosted-client`` (the ``agent:`` prefix is applied server-side),
@@ -83,7 +83,7 @@ def _register_self_hosted_client(
             detail = ""
         if exc.code == 401:
             message = ("Nous Portal rejected the access token (401). "
-                       "Try `hbm-agent auth add nous` to re-authenticate.")
+                       "Try `hbm auth add nous` to re-authenticate.")
         elif exc.code == 403:
             message = detail or "Your account is not permitted to register a self-hosted dashboard."
         else:
@@ -108,7 +108,7 @@ def _print_post_register_hint(
         print("    HBM_DASHBOARD_PUBLIC_URL=" + str(public_url))
     print(
         "\n  Heads up — Nous login only *engages* on a non-loopback bind. A plain\n"
-        "  `hbm-agent dashboard` (localhost) leaves the gate off and serves locally\n"
+        "  `hbm dashboard` (localhost) leaves the gate off and serves locally\n"
         "  without auth, which is fine for your own machine.\n")
     if custom_redirect_uri:
         try:  # example host matches the one the user registered
@@ -122,7 +122,7 @@ def _print_post_register_hint(
     else:
         print(
             "  To require Nous login (e.g. exposing on your LAN or a public host):\n"
-            "    hbm-agent dashboard --host 0.0.0.0\n"
+            "    hbm dashboard --host 0.0.0.0\n"
             "  …then log in at the dashboard's /login page.")
     print(
         "\n  If the dashboard is already running, restart it to pick up the new env.\n"
@@ -166,7 +166,7 @@ def cmd_dashboard_register(args) -> None:
     from hbm_cli.config import is_managed, save_env_value
     # Managed installs get the client id stamped in by the orchestrator (save_env_value refuses).
     if is_managed():
-        print("✗ `hbm-agent dashboard register` is not available in a managed/hosted install.\n"
+        print("✗ `hbm dashboard register` is not available in a managed/hosted install.\n"
               "  The dashboard OAuth client is provisioned by the hosting platform.")
         sys.exit(1)
 
@@ -175,7 +175,7 @@ def cmd_dashboard_register(args) -> None:
     except Exception as exc:
         if isinstance(exc, AuthError) and getattr(exc, "relogin_required", False):
             print("✗ You're not logged into Nous Portal.\n"
-                  "  Run `hbm-agent setup` (or `hbm-agent auth add nous`) first, then retry.")
+                  "  Run `hbm setup` (or `hbm auth add nous`) first, then retry.")
         else:
             print(f"✗ Could not resolve a Nous Portal access token: {exc}")
         sys.exit(1)

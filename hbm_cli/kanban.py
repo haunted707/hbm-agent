@@ -1,4 +1,4 @@
-"""``hbm-agent kanban …`` — dispatch (``kanban_command``), task-verb handlers, ``run_slash`` for ``/kanban``.
+"""``hbm kanban …`` — dispatch (``kanban_command``), task-verb handlers, ``run_slash`` for ``/kanban``.
 DB work lives in ``kanban_db``; siblings: ``kanban_parser`` (argparse, re-exported ``build_parser``),
 ``kanban_output`` (text/--json), ``kanban_boards`` (``boards …``), ``kanban_ops`` (dispatch/daemon/
 tail/watch/gc/repair).
@@ -125,9 +125,9 @@ def _check_dispatcher_presence(hbm_home: Optional[Path] = None) -> tuple[bool, s
         return (False, "Gateway is running but kanban.dispatch_in_gateway=false in "
                 "config.yaml — the task will sit in 'ready' until you flip it "
                 "back on and restart the gateway, OR run the legacy "
-                "standalone daemon (`hbm-agent kanban daemon --force`).")
+                "standalone daemon (`hbm kanban daemon --force`).")
     return (False, "No gateway is running — the task will sit in 'ready' until you "
-            "start it. Run:\n    hbm-agent gateway start\n"
+            "start it. Run:\n    hbm gateway start\n"
             "The gateway hosts an embedded dispatcher (tick interval 60s by "
             "default); your task will be picked up on the next tick after "
             "the gateway comes up.")
@@ -136,15 +136,15 @@ def _check_dispatcher_presence(hbm_home: Optional[Path] = None) -> tuple[bool, s
 # --- Command dispatch ---
 
 def kanban_command(args: argparse.Namespace) -> int:
-    """Entry point from ``hbm-agent kanban …``; returns a shell-style exit code."""
+    """Entry point from ``hbm kanban …``; returns a shell-style exit code."""
     action = getattr(args, "kanban_action", None)
     if not action:
         parser = getattr(args, "_kanban_parser", None)
         if parser is not None:
             parser.print_help()
         else:
-            print("usage: hbm-agent kanban <action> [options]\n"
-                  "Run 'hbm-agent kanban --help' for the full list of actions.", file=sys.stderr)
+            print("usage: hbm kanban <action> [options]\n"
+                  "Run 'hbm kanban --help' for the full list of actions.", file=sys.stderr)
         return 0
 
     # Fast-fail for UX only; the durable trust boundary is in kanban_db, since children can
@@ -172,7 +172,7 @@ def kanban_command(args: argparse.Namespace) -> int:
         # create an empty board.
         if normed != kb.DEFAULT_BOARD and not kb.board_exists(normed):
             return _err(f"kanban: board {normed!r} does not exist. "
-                        f"Create it with `hbm-agent kanban boards create {normed}`.")
+                        f"Create it with `hbm kanban boards create {normed}`.")
         board_scope = kb.scoped_current_board(normed)
 
     with board_scope:
@@ -304,10 +304,10 @@ def _cmd_init(args: argparse.Namespace) -> int:
             print(f"  {name}")
     else:
         print("No profiles found under ~/.hbm/profiles/.\n"
-              "Create one with `hbm-agent -p <name> setup` before assigning tasks.")
+              "Create one with `hbm -p <name> setup` before assigning tasks.")
     print(
         "\nNext step: start the gateway so ready tasks actually get picked up.\n"
-        "  hbm-agent gateway start\n\n"
+        "  hbm gateway start\n\n"
         "The gateway hosts an embedded dispatcher that ticks every 60 seconds\n"
         "by default (config: kanban.dispatch_interval_seconds). Without a\n"
         "running gateway, tasks stay in 'ready' forever."
@@ -329,7 +329,7 @@ def _cmd_assignees(args: argparse.Namespace) -> int:
     if _json_out(args, data):
         return 0
     if not data:
-        print("(no assignees — create a profile with `hbm-agent -p <name> setup`)")
+        print("(no assignees — create a profile with `hbm -p <name> setup`)")
         return 0
     print(f"{'NAME':20s}  {'ON DISK':8s}  COUNTS")
     for entry in data:
@@ -434,7 +434,7 @@ def _cmd_list(args: argparse.Namespace) -> int:
     if len(all_boards) > 1:
         other_count = len(all_boards) - 1
         print(f"Board: {kb.get_current_board()} ({other_count} other board{'s' if other_count != 1 else ''} — "
-              f"`hbm-agent kanban boards list`)\n")
+              f"`hbm kanban boards list`)\n")
     if not tasks:
         print("(no matching tasks)")
         return 0
@@ -702,7 +702,7 @@ def _cmd_link(args: argparse.Namespace) -> int:
             f"Note: {args.child_id} was ready and is now todo — parent "
             f"{args.parent_id} is not done yet. The ready -> running claim "
             f"re-checks parents, so the child only runs after the parent "
-            f"completes; use `hbm-agent kanban unlink {args.parent_id} {args.child_id}` "
+            f"completes; use `hbm kanban unlink {args.parent_id} {args.child_id}` "
             f"to run it now."
         )
     return 0
@@ -891,7 +891,7 @@ def _cmd_complete(args: argparse.Namespace) -> int:
                                         force=bool(getattr(args, "force", False)))
             except kb.LiveClaimError:
                 fail_msg[tid] = (f"cannot complete {tid}: a live worker is running it. Wait for the "
-                                 f"worker, `hbm-agent kanban reclaim {tid}` to release it, or re-run with "
+                                 f"worker, `hbm kanban reclaim {tid}` to release it, or re-run with "
                                  f"--force to close its run and complete anyway.")
                 return False
 

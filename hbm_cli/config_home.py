@@ -87,4 +87,4 @@ def config_load_issue(exc: Exception):
             "error", f"HBM AGENT storage is unavailable: {exc}",
             "Check the reported path, link target, mount and permissions; keep config.yaml unchanged.",
         )
-    return ConfigIssue("error", "Could not load config.yaml", "Run 'hbm-agent setup' to create a valid config")
+    return ConfigIssue("error", "Could not load config.yaml", "Run 'hbm setup' to create a valid config")

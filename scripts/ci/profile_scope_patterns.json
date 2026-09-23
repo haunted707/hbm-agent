@@ -82,14 +82,14 @@
       "class": "C8",
       "pattern_regex": "DEFAULT_CONFIG\\[[\"']\\w+[\"']\\]\\[[\"']\\w+[\"']\\]|\\.get\\([\"'](auto_migrate|auto_multiplex_migration|notify_in_gateway|dispatch_in_gateway)[\"']",
       "scope_hint": "For every new DEFAULT_CONFIG key, one test: the effective config exposes exactly the key the reader consumes (grep the reader's .get() spelling). Also: a runtime that requires a key (webhook route 'profile') needs the CLI that writes the file to expose it.",
-      "why": "DEFAULT_CONFIG declared gateway.auto_migrate while the guard read gateway.auto_multiplex_migration, and 'hbm-agent config set' pointed operators at the dead spelling; hbm-agent webhook subscribe never wrote the 'profile' key the runtime required (100% 404 on /p/<profile>/)."
+      "why": "DEFAULT_CONFIG declared gateway.auto_migrate while the guard read gateway.auto_multiplex_migration, and 'hbm config set' pointed operators at the dead spelling; hbm webhook subscribe never wrote the 'profile' key the runtime required (100% 404 on /p/<profile>/)."
     },
     {
       "id": "P18",
       "class": "C9",
       "pattern_regex": "systemd_install\\(|_installed_service\\(|_service_op\\(|launchd_install\\(|User=",
       "scope_hint": "Pass run_as_user read from the unit being replaced; represent every installed unit (user AND system) not a scalar; unresolved User= stays None and blocks the unattended path; wrap install/start after destructive steps in rollback via the manifest; treat flag-on + manifest + no live default as 'interrupted', not 'already multiplexing'.",
-      "why": "Migration passed preflight, uninstalled the secondaries, then raised 'Refusing to install ... as root' with nothing catching it: host left with no gateway and the flag on. Unattended hbm-agent update folded per-UNIX-user system units into one process."
+      "why": "Migration passed preflight, uninstalled the secondaries, then raised 'Refusing to install ... as root' with nothing catching it: host left with no gateway and the flag on. Unattended hbm update folded per-UNIX-user system units into one process."
     },
     {
       "id": "P19",

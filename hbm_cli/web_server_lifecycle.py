@@ -422,7 +422,7 @@ def _report_port_in_use(host: str, port: int) -> None:
     _write_machine_sentinel_line(_PORT_IN_USE_SENTINEL.format(port=port))
     print(
         f"  Port {port} on {host} is already in use — likely another "
-        "'hbm-agent serve' / 'hbm-agent dashboard' backend or the HBM AGENT gateway. "
+        "'hbm serve' / 'hbm dashboard' backend or the HBM AGENT gateway. "
         "Stop the other process, or pass --port <other> "
         "(--port 0 picks a free ephemeral port).",
         flush=True,

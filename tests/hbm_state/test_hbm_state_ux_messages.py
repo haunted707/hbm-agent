@@ -7,7 +7,7 @@ from hbm_state import SessionResumeTooLargeError, format_session_db_unavailable
 def test_resume_too_large_names_export_and_config_commands():
     text = str(SessionResumeTooLargeError(4312, 4000))
     assert "4312" in text and "4000" in text
-    assert "hbm-agent sessions export" in text
+    assert "hbm sessions export" in text
     assert "hbm config set sessions.max_resume_messages 0" in text
     for jargon in ("lineage", "guard", "safe resume limit"):
         assert jargon not in text

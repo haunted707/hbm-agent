@@ -2,7 +2,7 @@
 
 Regression: the old implementation wrote ``hbm_conversation_<ts>.json``
 to the current working directory (CWD). Users who ran /save expected the
-file to be discoverable via ``hbm-agent sessions browse``, but CWD-resident
+file to be discoverable via ``hbm sessions browse``, but CWD-resident
 snapshots are not indexed in the state DB and are generally invisible.
 The fix writes snapshots under ``~/.hbm/sessions/saved/`` and prints
 the absolute path plus the resume hint for the live session.

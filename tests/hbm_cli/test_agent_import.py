@@ -1,4 +1,4 @@
-"""Tests for hbm_cli.agent_import — ``hbm-agent import-agent``.
+"""Tests for hbm_cli.agent_import — ``hbm import-agent``.
 
 Covers: source detection, Claude Code and Codex parsing, mapping into the
 real HBM AGENT stores (memories/MEMORY.md, config.yaml command_allowlist /

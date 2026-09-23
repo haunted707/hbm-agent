@@ -152,7 +152,7 @@ def _claim_recovery_lock(lock_path: Path) -> bool:
 @contextlib.contextmanager
 def _stdout_to_stderr():
     """Route Python prints AND the fd 1 that pip/uv inherit to stderr: launches whose stdout is
-    a protocol stream (``hbm-agent acp`` speaks JSON-RPC on stdout) must never get install noise."""
+    a protocol stream (``hbm acp`` speaks JSON-RPC on stdout) must never get install noise."""
     saved_stdout_fd = None
     saved_sys_stdout = sys.stdout
     try:
@@ -174,7 +174,7 @@ def _stdout_to_stderr():
 
 
 def _recover_from_interrupted_install() -> None:
-    """Finish update work left half-done by a prior ``hbm-agent update``.
+    """Finish update work left half-done by a prior ``hbm update``.
 
     ``.update-incomplete`` recovers via full quarantined reinstall; ``.lazy-refresh-incomplete``
     via package-only import probes (cleared only when probes confirm healthy/repaired). Never
@@ -244,7 +244,7 @@ def _recover_core_update_marker_locked() -> None:
     """
     from hbm_cli.main import PROJECT_ROOT
     print(
-        "⚠ A previous `hbm-agent update` was interrupted mid-install — "
+        "⚠ A previous `hbm update` was interrupted mid-install — "
         "finishing dependency installation now...")
 
     # Windows: a ``hbm.exe`` launch has the launcher as an ancestor; the quarantined full
@@ -368,7 +368,7 @@ def _reexec_dependency_sync_off_windows_shim() -> bool:
     ``Already up to date!`` no-op) and take the prompts along. Waiting on the child deadlocks
     (we hold the handle it needs) and Windows has no exec, so the shell returns; the child keeps
     the console, prints its own result, and ``--gateway`` writes the true exit code to
-    ``.update_exit_code``. The child re-runs ``hbm-agent update`` so the sync and its tail happen
+    ``.update_exit_code``. The child re-runs ``hbm update`` so the sync and its tail happen
     exactly once; ``_UPDATE_REEXEC_ENV`` stops it spawning again and stops the "already up to
     date" early return from swallowing the sync. ``.update-incomplete`` is already written, so
     a child that dies mid-install is finished by the next launch's recovery.
@@ -457,7 +457,7 @@ def _run_install_with_heartbeat(
         # both pipes) only drain the child's stdout, so a full stderr
         # pipe (~64KB) blocks the installer forever. Merged into stdout,
         # the output rides the pipe old hand-offs DO drain. This module
-        # is imported when `hbm-agent update` starts, so an update running
+        # is imported when `hbm update` starts, so an update running
         # from an old base executes the old copy regardless of the git
         # reset — this protects updates initiated from bases that ship
         # it. (managed_uv.py gets the same fix AND is imported lazily
@@ -568,7 +568,7 @@ def _quarantine_running_hbm_exe(
             f"another process is holding it open).")
         print(
             "    Close HBM AGENT Desktop, exit other `hbm-agent` REPLs, stop the "
-            "gateway, or pause AV scanning, then re-run `hbm-agent update`.")
+            "gateway, or pause AV scanning, then re-run `hbm update`.")
         if failed_out is not None:
             failed_out.append(shim.name)
 
@@ -881,7 +881,7 @@ def _repair_venv_via_import_probes(
         print("  ✓ Venv repair succeeded")
         return "repaired"
     manual = " ".join(shlex.quote(s) for s in _lazy_refresh_repair_specs(broken))
-    print("  ⚠ Venv repair incomplete. Run manually, then `hbm-agent update`:")
+    print("  ⚠ Venv repair incomplete. Run manually, then `hbm update`:")
     print(f"    {' '.join(install_cmd_prefix)} install --force-reinstall {manual}")
     return "failed"
 
@@ -1084,7 +1084,7 @@ def _verify_console_scripts_installed(
         env=env, scripts_dir=scripts_dir,
         log_msg="console script verification: repair install failed: %s",
         fail_msg=(
-            "  ⚠ Entry point repair failed; try `hbm-agent update --force` after "
+            "  ⚠ Entry point repair failed; try `hbm update --force` after "
             "closing other hbm processes.")):
         return
     _report_still_missing(
@@ -1133,7 +1133,7 @@ def _verify_core_dependencies_installed(
     if not applicable:
         return
     # Probe inside the venv Python — sys.executable may be the outer Python that drove
-    # ``hbm-agent update``; the install prefix/env encode which environment we targeted.
+    # ``hbm update``; the install prefix/env encode which environment we targeted.
     venv_python = _resolve_install_target_python(install_cmd_prefix, env)
     if venv_python is None:
         return
@@ -1160,7 +1160,7 @@ def _verify_core_dependencies_installed(
         _run_quarantined_install, install_cmd_prefix + ["install", "--reinstall", "-e", "."],
         env=env, scripts_dir=scripts_dir,
         log_msg="dep verification: repair install failed: %s",
-        fail_msg="  ⚠ Repair install failed; check `hbm-agent update` output above."):
+        fail_msg="  ⚠ Repair install failed; check `hbm update` output above."):
         return
     still_missing = _missing_deps()
     if not still_missing:
@@ -1177,10 +1177,10 @@ def _verify_core_dependencies_installed(
         log_msg="dep verification: per-package repair failed: %s",
         fail_msg=(
             f"  ⚠ Could not install: {', '.join(still_missing)}. "
-            "Run `hbm-agent update --force` after closing other hbm processes.")):
+            "Run `hbm update --force` after closing other hbm processes.")):
         return
     _report_still_missing(
-        _missing_deps(), "Run `hbm-agent update --force` after closing other hbm processes.",
+        _missing_deps(), "Run `hbm update --force` after closing other hbm processes.",
         ok="  ✓ All declared core dependencies now installed")
 
 

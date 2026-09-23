@@ -24,7 +24,7 @@ By default every profile is seeded with the bundled skill catalog, and each `hbm
 **At install time** (applies to the default `~/.hbm` profile):
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh --no-skills
 ```

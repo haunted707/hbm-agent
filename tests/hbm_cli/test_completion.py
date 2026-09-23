@@ -147,7 +147,7 @@ class TestProfileCompletion:
 
 
     def test_bash_profile_actions_complete_profile_names(self):
-        """After 'hbm-agent profile use', complete with profile names."""
+        """After 'hbm profile use', complete with profile names."""
         out = generate_bash(_make_parser())
         # The profile case should have _hbm_profiles for name-taking actions
         lines = out.split("\n")

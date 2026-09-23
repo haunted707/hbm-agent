@@ -1,4 +1,4 @@
-"""Runtime-backed validation behind ``hbm-agent plugins doctor``: every manifest/import/registration
+"""Runtime-backed validation behind ``hbm plugins doctor``: every manifest/import/registration
 check routes through the real runtime contracts instead of a parallel scanner."""
 
 from __future__ import annotations

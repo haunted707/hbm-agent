@@ -1,4 +1,4 @@
-"""Tests for the multi-board kanban layer (``hbm-agent kanban boards …``).
+"""Tests for the multi-board kanban layer (``hbm kanban boards …``).
 
 Covers the pieces added when boards became a first-class concept:
 
@@ -9,7 +9,7 @@ Covers the pieces added when boards became a first-class concept:
   ``HBM_KANBAN_BOARD`` env var.
 * ``connect(board=)`` isolation — writes on one board don't leak.
 * ``create_board`` / ``list_boards`` / ``remove_board`` round trip.
-* CLI surface: ``hbm-agent kanban boards list/create/switch/rm``.
+* CLI surface: ``hbm kanban boards list/create/switch/rm``.
 * ``_default_spawn`` injects ``HBM_KANBAN_BOARD`` into worker env.
 """
 

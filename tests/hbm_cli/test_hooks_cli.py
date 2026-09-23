@@ -182,7 +182,7 @@ class TestHooksDoctor:
 
 
     def test_unallowlisted_script_is_not_executed(self, tmp_path):
-        """Regression for M4: `hbm-agent hooks doctor` used to run every
+        """Regression for M4: `hbm hooks doctor` used to run every
         listed script against a synthetic payload as part of its JSON
         smoke test, which contradicted the documented workflow of
         "spot newly-added hooks *before they register*".  An un-allowlisted

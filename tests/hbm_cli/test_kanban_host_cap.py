@@ -61,7 +61,7 @@ def test_run_daemon_resolves_and_passes_max_in_progress(
     Regression guard for the OOF-30 review finding: ``run_daemon`` only
     forwarded ``max_spawn`` — with no explicit ``--max`` (the shipped
     systemd shape) nothing capped the tick even though the gateway and
-    ``hbm-agent kanban dispatch`` paths both resolved the memory-derived
+    ``hbm kanban dispatch`` paths both resolved the memory-derived
     default.
     """
     captured: dict = {}

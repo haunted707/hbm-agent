@@ -1,4 +1,4 @@
-"""`hbm-agent sessions export` single-file formats accept a directory as OUTPUT."""
+"""`hbm sessions export` single-file formats accept a directory as OUTPUT."""
 
 import json
 import sys

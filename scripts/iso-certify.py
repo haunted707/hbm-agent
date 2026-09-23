@@ -8,7 +8,7 @@ responsive (p99 < 1s) with zero event-loop stalls.
 
 What it does
 ------------
-1. Spawns a SCRATCH dashboard (``hbm-agent dashboard``) bound to loopback on a
+1. Spawns a SCRATCH dashboard (``hbm dashboard``) bound to loopback on a
    free port, with an ISOLATED ``HBM_HOME`` (temp dir, minimal seeded state).
    It NEVER touches the live :9119 dashboard / ai.hbm.dashboard / live
    state.db. Loopback bind ⇒ no auth gate (web_server.should_require_auth).

@@ -265,7 +265,7 @@ def _offer_openclaw_migration(hbm_home: Path) -> bool:
     _info(f"Found OpenClaw data at {openclaw_dir}",
           "HBM AGENT can preview what would be imported before making any changes.", None)
     if not prompt_yes_no("Would you like to see what can be imported?", default=True):
-        print_info("Skipping migration. You can run it later with: hbm-agent claw migrate --dry-run")
+        print_info("Skipping migration. You can run it later with: hbm claw migrate --dry-run")
         return False
 
     # Ensure config.yaml exists before migration tries to read it
@@ -297,7 +297,7 @@ def _offer_openclaw_migration(hbm_home: Path) -> bool:
 
     # ── Phase 2: Confirm and execute ──
     if not prompt_yes_no("Proceed with migration?", default=False):
-        _info("Migration cancelled. You can run it later with: hbm-agent claw migrate",
+        _info("Migration cancelled. You can run it later with: hbm claw migrate",
               "Use --dry-run to preview again, or --preset minimal for a lighter import.")
         return False
 
@@ -312,7 +312,7 @@ def _offer_openclaw_migration(hbm_home: Path) -> bool:
     for key, printer, text in (
         ("migrated", print_success, "Imported {n} item(s) from OpenClaw."),
         ("conflict", print_info,
-         "Skipped {n} item(s) that already exist in HBM AGENT (use hbm-agent claw migrate --overwrite to force)."),
+         "Skipped {n} item(s) that already exist in HBM AGENT (use hbm claw migrate --overwrite to force)."),
         ("skipped", print_info, "Skipped {n} item(s) (not found or unchanged)."),
         ("error", print_warning, "{n} item(s) had errors — check the migration report."),
     ):

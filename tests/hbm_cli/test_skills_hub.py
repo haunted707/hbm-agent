@@ -375,7 +375,7 @@ def _install_mocks(monkeypatch, tmp_path, source_factory, category_hint=""):
 
 
 # ---------------------------------------------------------------------------
-# Regression: full identifier must be recoverable from `hbm-agent skills search`
+# Regression: full identifier must be recoverable from `hbm skills search`
 # even when the slug is too long to fit the terminal width (issue #33674).
 # ---------------------------------------------------------------------------
 

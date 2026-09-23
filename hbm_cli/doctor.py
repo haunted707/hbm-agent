@@ -1,4 +1,4 @@
-"""``hbm-agent doctor`` — diagnose (and with --fix, repair) a HBM AGENT install.
+"""``hbm doctor`` — diagnose (and with --fix, repair) a HBM AGENT install.
 
 ``run_doctor`` walks ``DOCTOR_CHECKS`` in order; each check prints its own rows and returns a ``Finding``.
 Check bodies live in the ``doctor_*`` siblings.
@@ -124,7 +124,7 @@ DOCTOR_CHECKS = (
 
 
 def _ack_advisory(ack_target: str) -> None:
-    """`hbm-agent doctor --ack <id>`: persist the ack and return without running diagnostics."""
+    """`hbm doctor --ack <id>`: persist the ack and return without running diagnostics."""
     from hbm_cli.security_advisories import ADVISORIES, ack_advisory
     valid_ids = {a.id for a in ADVISORIES}
     if ack_target not in valid_ids:
@@ -134,8 +134,8 @@ def _ack_advisory(ack_target: str) -> None:
         print(color(f"  ✓ Acknowledged advisory {ack_target}. It will no longer trigger startup banners.", Colors.GREEN))
     else:
         print(color(f"  ✗ Could not save the acknowledgement for {ack_target}. Make sure {_DHH}/config.yaml is "
-                    f"writable (`hbm-agent config path` prints the exact file), then re-run "
-                    f"`hbm-agent doctor --ack {ack_target}`.", Colors.RED))
+                    f"writable (`hbm config path` prints the exact file), then re-run "
+                    f"`hbm doctor --ack {ack_target}`.", Colors.RED))
         sys.exit(1)
 
 
@@ -156,7 +156,7 @@ def _print_summary(should_fix: bool, total: Finding) -> None:
         print()
         print(numbered)
         if not should_fix:
-            print(color("  Tip: run 'hbm-agent doctor --fix' to auto-fix what's possible.", Colors.DIM))
+            print(color("  Tip: run 'hbm doctor --fix' to auto-fix what's possible.", Colors.DIM))
     else:
         print(color("─" * 60, Colors.GREEN))
         print(color("  All checks passed! 🎉", Colors.GREEN, Colors.BOLD))

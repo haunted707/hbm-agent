@@ -916,7 +916,7 @@ def test_multiplex_ticker_reenumerates_profiles_each_cycle(tmp_path):
 
     def _tick(*args, **kwargs):
         ticked.append(str(get_hbm_home()))
-        if len(ticked) == 1:  # "hbm-agent profile create gamma" happens between two cycles
+        if len(ticked) == 1:  # "hbm profile create gamma" happens between two cycles
             (gamma / "cron").mkdir(parents=True)
             homes.append(("gamma", gamma))
         if len(ticked) >= 4:

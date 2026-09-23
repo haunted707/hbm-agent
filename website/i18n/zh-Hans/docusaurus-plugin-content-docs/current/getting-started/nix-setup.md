@@ -168,7 +168,7 @@ CLI 会自动检测何时需要 sudo 并透明地使用它。没有此配置，�
 systemctl status hbm-agent
 
 # 查看日志（Ctrl+C 停止）
-journalctl -u hbm-agent -f
+journalctl -u hbm -f
 
 # 如果 addToSystemPackages 为 true，测试 CLI
 hbm --version
@@ -535,7 +535,7 @@ scp ~/.hbm/mcp-tokens/my-oauth-server{,.client}.json \
 这可以防止 Nix 声明的内容与磁盘上实际内容之间产生漂移。检测使用两个信号：
 
 1. **`HBM_MANAGED=true`** 环境变量——由 systemd 服务设置，对 gateway 进程可见
-2. **`.managed` 标记文件**，位于 `HBM_HOME` 中——由激活脚本设置，对交互式 shell 可见（例如 `docker exec -it hbm-agent hbm config set ...` 也会被屏蔽）
+2. **`.managed` 标记文件**，位于 `HBM_HOME` 中——由激活脚本设置，对交互式 shell 可见（例如 `docker exec -it hbm hbm config set ...` 也会被屏蔽）
 
 要更改配置，请编辑你的 Nix 配置并运行 `sudo nixos-rebuild switch`。
 
@@ -915,7 +915,7 @@ sudo nixos-rebuild switch
 
 ```bash
 # 两种模式使用相同的 systemd 单元
-journalctl -u hbm-agent -f
+journalctl -u hbm -f
 
 # 容器模式：也可直接查看
 docker logs -f hbm-agent

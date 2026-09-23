@@ -32,7 +32,7 @@ if TYPE_CHECKING:  # annotation-only; the runtime import would be a cycle
 # Log-record parity with the origin module (caplog tests pin "hbm_cli.auth").
 logger = logging.getLogger("hbm_cli.auth")
 
-_UNUSABLE_JWT_RELOGIN = "Re-authenticate with: hbm-agent auth add nous"
+_UNUSABLE_JWT_RELOGIN = "Re-authenticate with: hbm auth add nous"
 
 
 def _unusable_invoke_jwt_error(reason: str, *, no_refresh_token: bool = False) -> AuthError:
@@ -611,9 +611,9 @@ def _refresh_access_token(
             "~/.hbm/auth.json) called POST /api/oauth/token with HBM AGENT's "
             "refresh token without persisting the rotated token back.\n"
             "Nous refresh tokens are single-use — only HBM AGENT may call the "
-            "refresh endpoint. For health checks, use `hbm-agent auth status` "
+            "refresh endpoint. For health checks, use `hbm auth status` "
             "instead.\n"
-            "Re-authenticate with: hbm-agent auth add nous")
+            "Re-authenticate with: hbm auth add nous")
         relogin = True
     raise _nous_err(description, code, relogin=relogin)
 
@@ -1259,7 +1259,7 @@ def _pool_first_oauth_status(
     on_pool_miss: Optional[Callable[[], Optional[Dict[str, Any]]]] = None) -> Dict[str, Any]:
     """Status snapshot for a store-backed OAuth provider (Codex, xAI).
 
-    Pool first (where `hbm-agent auth` / `hbm-agent model` store device_code tokens), then
+    Pool first (where `hbm auth` / `hbm model` store device_code tokens), then
     *on_pool_miss* for a pool-derived degraded status, then the legacy state via *resolve*.
     """
     from hbm_cli.auth import _auth_file_path
@@ -1365,7 +1365,7 @@ def _nous_device_code_login(
             print(format_auth_error(exc))
             print(f"  Subscribe here: {portal_url}/billing")
             print()
-            print("After subscribing, run `hbm-agent model` again to finish setup.")
+            print("After subscribing, run `hbm model` again to finish setup.")
             raise SystemExit(1)
         raise
 
@@ -1569,7 +1569,7 @@ def _login_nous(args, pconfig: ProviderConfig) -> None:
             _restore_active_provider(prior_active_provider)
             print()
             print("No provider change. Nous credentials saved for future use.")
-            print("  Run `hbm-agent model` again to switch to Nous Portal.")
+            print("  Run `hbm model` again to switch to Nous Portal.")
             return
         config_path = _update_config_for_provider(
             "nous", inference_base_url, default_model=selected_model)

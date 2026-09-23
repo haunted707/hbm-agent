@@ -10,7 +10,7 @@
 try:
     import hbm_bootstrap  # noqa: F401
 except ModuleNotFoundError:
-    pass  # partial `hbm-agent update` — only skips the Windows UTF-8 stdio setup
+    pass  # partial `hbm update` — only skips the Windows UTF-8 stdio setup
 
 import json
 import logging
@@ -30,7 +30,7 @@ from hbm_constants import get_hbm_home
 
 
 def _launch_cwd_for_session(source: str) -> Optional[str]:
-    """cwd to stamp on a new session row (``hbm-agent -c`` / ``--resume``), or None.
+    """cwd to stamp on a new session row (``hbm -c`` / ``--resume``), or None.
 
     Only local CLI sessions record one: gateway/cron/remote backends (non-"local" ``TERMINAL_ENV``) have no
     stable host cwd for the agent's tools.

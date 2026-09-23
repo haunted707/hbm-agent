@@ -58,7 +58,7 @@ description: "与 HBM AGENT 的第一次对话——从安装到开始聊天，5
 
 ```bash
 # Linux / macOS / WSL2 / Android (Termux)
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```

@@ -85,8 +85,8 @@ def _render_active_theme_bootstrap_css() -> str:
 _IMMUTABLE_ASSET_CACHE_CONTROL = "public, max-age=31536000, immutable"
 _NO_STORE = {"Cache-Control": "no-store, no-cache, must-revalidate"}
 _HEADLESS_MSG = (
-    "Headless backend (hbm-agent serve): web UI disabled — use "
-    "`hbm-agent dashboard` for the browser UI."
+    "Headless backend (hbm serve): web UI disabled — use "
+    "`hbm dashboard` for the browser UI."
 )
 
 
@@ -105,7 +105,7 @@ def mount_spa(application: FastAPI):
     from hbm_cli.web_server import WEB_DIST, _DASHBOARD_EMBEDDED_CHAT_ENABLED, app
     from hbm_cli.web_deps import _server
 
-    # `hbm-agent serve` is the headless backend: it must NEVER serve the browser SPA, even if a
+    # `hbm serve` is the headless backend: it must NEVER serve the browser SPA, even if a
     # dist is lying around, so only the JSON-RPC/WS/API surface is reachable.
     if os.environ.get("HBM_SERVE_HEADLESS") == "1":
 
@@ -113,7 +113,7 @@ def mount_spa(application: FastAPI):
         async def no_frontend(full_path: str):
             # Desktop token handshake: the Electron shell boots by fetching `/` and reading
             # ``window.__HBM_SESSION_TOKEN__`` for /api/ws auth. When headless 404'd every
-            # path, a renderer whose spawn token no longer matched (e.g. after `hbm-agent update`)
+            # path, a renderer whose spawn token no longer matched (e.g. after `hbm update`)
             # white-screened. Serve a token-only page at the exact root, but ONLY when the auth
             # gate is off: on a gated serve the token must never be readable without auth.
             # See #94227, #95575.
@@ -635,7 +635,7 @@ def _plugin_auth_hint(name: str, provides_tools: list) -> tuple:
             if cached_result is None:
                 _schedule_check_fn_probe(entry.check_fn)
             elif cached_result is False:
-                return True, f"hbm-agent auth {name}"
+                return True, f"hbm auth {name}"
     except Exception:
         pass
     return False, ""

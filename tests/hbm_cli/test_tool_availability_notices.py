@@ -15,7 +15,7 @@ def test_terminal_line_names_backend_reason_and_fix_commands():
     assert "Terminal tool disabled" in text
     assert "'docker'" in text
     assert "Docker daemon is not running" in text
-    assert "hbm doctor" in text and "hbm-agent setup terminal" in text
+    assert "hbm doctor" in text and "hbm setup terminal" in text
     assert "TERMINAL_ENV" not in text
 
 
@@ -28,7 +28,7 @@ def test_web_collapses_env_dump_into_one_provider_sentence():
     lines = tool_availability_warning_lines([_WEB], terminal_reason=None, terminal_backend="local")
     text = "\n".join(lines)
     assert "EXA_API_KEY" not in text
-    assert "Web search is off" in text and "hbm-agent setup tools" in text
+    assert "Web search is off" in text and "hbm setup tools" in text
 
 
 def test_generic_toolset_lists_vars_and_setup_hint():
@@ -45,10 +45,10 @@ def test_nothing_to_report_returns_no_lines():
 
 
 def test_web_notice_cites_setup_tools_not_the_toggle_menu():
-    # `hbm tools` with no subcommand is the enable/disable menu; providers live under `hbm-agent setup tools`.
+    # `hbm tools` with no subcommand is the enable/disable menu; providers live under `hbm setup tools`.
     lines = tool_availability_warning_lines([_WEB], terminal_reason=None, terminal_backend="local")
     text = "\n".join(lines)
-    assert "hbm-agent setup tools" in text
+    assert "hbm setup tools" in text
     assert "hbm tools[/]" not in text
 
 

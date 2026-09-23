@@ -1,4 +1,4 @@
-"""Configuration-file checks for hbm-agent doctor: .env, config.yaml validation, drift, deprecations.
+"""Configuration-file checks for hbm doctor: .env, config.yaml validation, drift, deprecations.
 Split out of ``hbm_cli/doctor.py``."""
 
 from __future__ import annotations
@@ -72,7 +72,7 @@ def collect_relay_plugin_cutover_findings(raw_config: dict | None, env_map: dict
             if name not in effective_env and os.environ.get(name) is not None:
                 effective_env[name] = os.environ[name]
     if not str(effective_env.get(RELAY_PLUGINS_CONFIG_ENV, "")).strip():
-        findings += [(name, f"run `hbm-agent migrate relay` to generate relay-plugins.toml and set {RELAY_PLUGINS_CONFIG_ENV}; "
+        findings += [(name, f"run `hbm migrate relay` to generate relay-plugins.toml and set {RELAY_PLUGINS_CONFIG_ENV}; "
                             "this variable is now ignored and no traces are exported")
                      for name in configured_legacy_relay_env_vars(effective_env)]
     return findings
@@ -143,7 +143,7 @@ def _check_env_file(should_fix: bool, f: Finding) -> None:
         except UnicodeDecodeError:
             content = env_path.read_text(encoding="latin-1")
         if not check_bool(_has_provider_env_config(content), "API key or custom endpoint configured", f"No API key found in {_DHH}/.env"):
-            f.issues.append("Run 'hbm-agent setup' to configure API keys")
+            f.issues.append("Run 'hbm setup' to configure API keys")
     elif (PROJECT_ROOT / '.env').exists():  # project root as fallback
         check_ok(".env file exists (in project directory)")
     else:
@@ -155,11 +155,11 @@ def _check_env_file(should_fix: bool, f: Finding) -> None:
             with warn_on_error(""):
                 os.chmod(str(env_path), 0o600)
             check_ok(f"Created empty {_DHH}/.env")
-            check_info("Run 'hbm-agent setup' to configure API keys")
+            check_info("Run 'hbm setup' to configure API keys")
             f.fixed += 1
         else:
-            check_info("Run 'hbm-agent setup' to create one")
-            f.issues.append("Run 'hbm-agent setup' to create .env")
+            check_info("Run 'hbm setup' to create one")
+            f.issues.append("Run 'hbm setup' to create .env")
 
 
 def _known_provider_ids(cfg: dict) -> tuple[set, list, object, object, object]:
@@ -243,7 +243,7 @@ def _validate_model_config(config_path, issues: list) -> None:
         known_list = ", ".join(sorted(known_providers)) if known_providers else "(unavailable)"
         _fail_and_issue(f"model.provider '{provider_raw}' is not a recognised provider", f"(known: {known_list})",
                         f"model.provider '{provider_raw}' is unknown. Valid providers: {known_list}. "
-                        f"Fix: run 'hbm-agent config set model.provider <valid_provider>'", issues)
+                        f"Fix: run 'hbm config set model.provider <valid_provider>'", issues)
     policy_id = str(runtime_provider or catalog_provider or "").strip().lower()
     accepts_vendor_slug = policy_id in _VENDOR_SLUG_PROVIDERS or policy_id == "custom" or policy_id.startswith("custom:")
     if default_model and "/" in default_model and policy_id and not accepts_vendor_slug:
@@ -256,9 +256,9 @@ def _validate_model_config(config_path, issues: list) -> None:
         with warn_on_error(""):
             if not _provider_has_credentials(runtime_provider):
                 _fail_and_issue(f"model.provider '{runtime_provider}' is set but no API key is configured",
-                                f"(add it to {_DHH}/.env or run 'hbm-agent setup')",
-                                f"No credentials found for provider '{runtime_provider}'. Run 'hbm-agent setup' or set the provider's "
-                                f"API key in {_DHH}/.env, or switch providers with 'hbm-agent config set model.provider <name>'", issues)
+                                f"(add it to {_DHH}/.env or run 'hbm setup')",
+                                f"No credentials found for provider '{runtime_provider}'. Run 'hbm setup' or set the provider's "
+                                f"API key in {_DHH}/.env, or switch providers with 'hbm config set model.provider <name>'", issues)
 
 
 @doctor_check()
@@ -293,7 +293,7 @@ def _drift_config_version(f: Finding, should_fix: bool, config_path) -> None:
     if check_bool(current_ver >= latest_ver, f"Config version up to date (v{current_ver})", outdated):
         return
     if not should_fix:
-        f.issues.append("Run 'hbm-agent doctor --fix' or 'hbm-agent setup' to migrate config")
+        f.issues.append("Run 'hbm doctor --fix' or 'hbm setup' to migrate config")
         return
     try:
         migrate_config(interactive=False, quiet=False)
@@ -301,7 +301,7 @@ def _drift_config_version(f: Finding, should_fix: bool, config_path) -> None:
         f.fixed += 1
     except Exception as mig_err:
         check_warn(f"Auto-migration failed: {mig_err}")
-        f.issues.append("Run 'hbm-agent setup' to migrate config")
+        f.issues.append("Run 'hbm setup' to migrate config")
 
 
 def _drift_stale_root_keys(f: Finding, should_fix: bool, config_path) -> None:
@@ -313,7 +313,7 @@ def _drift_stale_root_keys(f: Finding, should_fix: bool, config_path) -> None:
         return
     check_warn(f"Stale root-level config keys: {', '.join(stale_root_keys)}", "(should be under 'model:' section)")
     if not should_fix:
-        f.issues.append("Stale root-level provider/base_url in config.yaml — run 'hbm-agent doctor --fix'")
+        f.issues.append("Stale root-level provider/base_url in config.yaml — run 'hbm doctor --fix'")
         return
     # Coerce scalar/None ``model:`` into a dict before mutation (setdefault would hand back a scalar).
     raw_model = raw_config.get("model")
@@ -352,9 +352,9 @@ def _drift_max_iterations_ghost(f: Finding, should_fix: bool, config_path) -> No
     if cfg_max_turns is None or env_ghost is None or str(cfg_max_turns).strip() == str(env_ghost).strip():
         return
     check_warn(f"HBM_MAX_ITERATIONS={env_ghost} in .env shadows agent.max_turns={cfg_max_turns} in config.yaml",
-               "(stale ghost from an earlier `hbm-agent setup` run)")
+               "(stale ghost from an earlier `hbm setup` run)")
     if not should_fix:
-        f.issues.append("Stale HBM_MAX_ITERATIONS in .env shadows config.yaml — run 'hbm-agent doctor --fix'")
+        f.issues.append("Stale HBM_MAX_ITERATIONS in .env shadows config.yaml — run 'hbm doctor --fix'")
     elif remove_env_value("HBM_MAX_ITERATIONS"):
         check_ok(f"Removed stale HBM_MAX_ITERATIONS from .env (config.yaml agent.max_turns={cfg_max_turns} is now authoritative)")
         f.fixed += 1
@@ -431,8 +431,8 @@ def _check_plugin_compat(should_fix: bool, f: Finding) -> None:
     for name, hits in sorted(report.items()):
         (check_fail if removal_in_effect() else check_warn)(
             f"{name}: {len(hits)} import(s) of paths removed on {COMPAT_REMOVAL}", f"{hits[0].old} -> {hits[0].new}")
-    check_info("Details: hbm-agent plugins compat")
+    check_info("Details: hbm plugins compat")
     f.manual_issues.append(
-        f"Update {len(report)} plugin(s) still importing pre-decomposition paths (hbm-agent plugins compat) — "
+        f"Update {len(report)} plugin(s) still importing pre-decomposition paths (hbm plugins compat) — "
         + ("they are NOT being loaded" if removal_in_effect() else f"they stop loading on {COMPAT_REMOVAL}")
         + f"; escape hatch: plugins.{ALLOW_KEY}: true")

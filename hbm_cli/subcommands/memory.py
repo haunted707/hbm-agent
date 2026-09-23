@@ -1,4 +1,4 @@
-"""``hbm-agent memory`` subcommand parser."""
+"""``hbm memory`` subcommand parser."""
 
 from __future__ import annotations
 

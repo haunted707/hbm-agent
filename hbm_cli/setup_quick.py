@@ -1,4 +1,4 @@
-"""Streamlined setup flows: the Nous Portal one-shot (`hbm-agent portal`), first-time quick setup,
+"""Streamlined setup flows: the Nous Portal one-shot (`hbm portal`), first-time quick setup,
 Blank Slate setup and the `--quick` missing-items pass. Names from setup.py are imported lazily
 per function so test patches on ``hbm_cli.setup`` take effect."""
 
@@ -20,8 +20,8 @@ def _blank_slate_done(config: dict, hbm_home, tools_line: str, *extra: str, intr
     from hbm_cli.setup import _info, _print_setup_summary, print_success
     print()
     print_success("Blank Slate setup complete — minimal agent ready.")
-    _info(*([intro] if intro else []), tools_line, "  Seed skills:         hbm-agent skills opt-in --sync",
-          "  Add MCP servers:     hbm-agent mcp add", *extra, "  Tune agent settings: hbm-agent setup agent", None)
+    _info(*([intro] if intro else []), tools_line, "  Seed skills:         hbm skills opt-in --sync",
+          "  Add MCP servers:     hbm mcp add", *extra, "  Tune agent settings: hbm setup agent", None)
     _print_setup_summary(config, hbm_home)
 
 
@@ -37,7 +37,7 @@ def _reload_config_into(config: dict, *, dict_only: bool = False) -> None:
 
 def _run_nous_flow(config: dict, *, context: str, cancel_exc: tuple, cancel_lines: tuple, print_error) -> bool:
     """Run ``_model_flow_nous`` (login, model pick, provider switch, Tool Gateway opt-in) — the
-    single source of truth shared with ``hbm-agent model``. False when cancelled or failed (the
+    single source of truth shared with ``hbm model``. False when cancelled or failed (the
     message is already printed)."""
     from hbm_cli.setup import _info
     try:
@@ -55,7 +55,7 @@ def _run_nous_flow(config: dict, *, context: str, cancel_exc: tuple, cancel_line
 
 
 def _run_portal_one_shot(config: dict) -> None:
-    """One-shot Nous Portal setup (``hbm-agent setup --portal`` / ``hbm-agent portal``)."""
+    """One-shot Nous Portal setup (``hbm setup --portal`` / ``hbm portal``)."""
     from hbm_cli.setup import _info, _print_banner, print_error, print_info, print_success
     _print_banner("│     ☤ HBM AGENT Setup — Nous Portal (one-shot)             │")
     _info(None, "  One subscription, 300+ models, plus the Tool Gateway:",
@@ -66,13 +66,13 @@ def _run_portal_one_shot(config: dict) -> None:
     def _on_error(exc: Exception) -> None:
         from hbm_cli.auth_error_copy import provider_setup_failure_lines
         print()
-        lead, *rest = provider_setup_failure_lines(exc, retry_command="hbm-agent portal")
+        lead, *rest = provider_setup_failure_lines(exc, retry_command="hbm portal")
         print_error(f"  {lead}")
         for line in rest:
             print_info(f"  {line}")
 
-    if not _run_nous_flow(config, context="`hbm-agent portal`", cancel_exc=(KeyboardInterrupt, EOFError, SystemExit),
-                          cancel_lines=(None, "  Setup cancelled.", "  You can retry later with `hbm-agent portal`."),
+    if not _run_nous_flow(config, context="`hbm portal`", cancel_exc=(KeyboardInterrupt, EOFError, SystemExit),
+                          cancel_lines=(None, "  Setup cancelled.", "  You can retry later with `hbm portal`."),
                           print_error=_on_error):
         return
 
@@ -81,7 +81,7 @@ def _run_portal_one_shot(config: dict) -> None:
         _reload_config_into(config, dict_only=True)
     print()
     print_success("Portal setup complete.")
-    _info("  Run `hbm-agent portal info` to inspect routing.", "  Run `hbm-agent` to start chatting.")
+    _info("  Run `hbm portal info` to inspect routing.", "  Run `hbm-agent` to start chatting.")
 
 
 def _run_first_time_quick_setup(config: dict, hbm_home, is_existing: bool):
@@ -99,7 +99,7 @@ def _run_first_time_quick_setup(config: dict, hbm_home, is_existing: bool):
 
     def _on_error(exc: Exception) -> None:
         from hbm_cli.auth_error_copy import provider_setup_failure_lines
-        lead, *rest = provider_setup_failure_lines(exc, retry_command="hbm-agent model")
+        lead, *rest = provider_setup_failure_lines(exc, retry_command="hbm model")
         print_warning(lead)
         for line in rest:
             print_info(line)
@@ -117,21 +117,21 @@ def _run_first_time_quick_setup(config: dict, hbm_home, is_existing: bool):
     # Step 4: Offer messaging gateway setup
     print()
     gateway_choice = prompt_choice("Connect a messaging platform? (Telegram, Discord, etc.)", [
-        "Set up messaging now (recommended)", "Skip — set up later with 'hbm-agent setup gateway'",
+        "Set up messaging now (recommended)", "Skip — set up later with 'hbm setup gateway'",
     ], 0)
     if gateway_choice == 0:
         setup_gateway(config)
         save_config(config)
     else:
         # Messaging skipped — still install/start the gateway service so cron jobs run and
-        # platforms come alive as soon as tokens are added later (e.g. via `hbm-agent import`).
+        # platforms come alive as soon as tokens are added later (e.g. via `hbm import`).
         from hbm_cli.gateway import ensure_gateway_service
         ensure_gateway_service(context="setup")
     print()
     print_success("Setup complete! You're ready to go.")
-    _info(None, "  Configure all settings:    hbm-agent setup")
+    _info(None, "  Configure all settings:    hbm setup")
     if gateway_choice != 0:
-        print_info("  Connect Telegram/Discord:  hbm-agent setup gateway")
+        print_info("  Connect Telegram/Discord:  hbm setup gateway")
     _print_macos_fda_tip()
     print()
     _print_setup_summary(config, hbm_home)
@@ -192,7 +192,7 @@ def _blank_slate_minimal_toolsets(config: dict):
 
 
 def _blank_slate_minimize_config(config: dict):
-    """Turn OFF every optional config feature; all opt back in via ``hbm-agent setup agent``."""
+    """Turn OFF every optional config feature; all opt back in via ``hbm setup agent``."""
     config.setdefault("agent", {})["max_turns"] = 90
     config.setdefault("compression", {})["enabled"] = False
     mem = config.setdefault("memory", {})
@@ -264,10 +264,10 @@ def _run_blank_slate_setup(config: dict, hbm_home, is_existing: bool):
         _blank_slate_walkthrough(config, hbm_home)
         return
     save_config(config)
-    # Blank Slate means no bundled skills; record the opt-out so future `hbm-agent update` runs
+    # Blank Slate means no bundled skills; record the opt-out so future `hbm update` runs
     # don't re-inject them.
     _set_bundled_skills_opt_out(True, "skill opt-out")
-    _blank_slate_done(config, hbm_home, "  Enable tools:        hbm-agent tools", "  Enable plugins:      hbm-agent plugins",
+    _blank_slate_done(config, hbm_home, "  Enable tools:        hbm tools", "  Enable plugins:      hbm plugins",
                       intro="Enable anything later, on demand:")
 
 
@@ -288,8 +288,8 @@ def _blank_slate_walkthrough(config: dict, hbm_home):
     def _opted_out(_result) -> None:
         _info("No skills seeded (except the essential `hbm-agent`",
               "skill). A .no-bundled-skills marker keeps future",
-              "`hbm-agent update` runs from re-injecting them. Opt back in any",
-              "time with `hbm-agent skills opt-in --sync`.")
+              "`hbm update` runs from re-injecting them. Opt back in any",
+              "time with `hbm skills opt-in --sync`.")
 
     # Seeding first clears any stale opt-out marker; declining sets it (essential skills still seed).
     _set_bundled_skills_opt_out(
@@ -310,16 +310,16 @@ def _blank_slate_walkthrough(config: dict, hbm_home):
             logger.debug("blank-slate tools_command error: %s", exc)
             print_warning(f"Tool selector encountered an error: {exc}")
     else:
-        print_info("Keeping the minimal toolset. Add tools later with `hbm-agent tools`.")
+        print_info("Keeping the minimal toolset. Add tools later with `hbm tools`.")
 
     # Built-in plugins and MCP servers (off unless chosen)
     for header, question, yes_msg, no_msg in (
         ("Plugins", "Review and enable built-in plugins now?",
-         "Manage plugins with `hbm-agent plugins list` / `hbm-agent plugins install`.",
-         "No plugins enabled. Add later with `hbm-agent plugins`."),
+         "Manage plugins with `hbm plugins list` / `hbm plugins install`.",
+         "No plugins enabled. Add later with `hbm plugins`."),
         ("MCP Servers", "Add an MCP server now?",
-         "Add servers with `hbm-agent mcp add <name> --url ... | --command ...`.",
-         "No MCP servers configured. Add later with `hbm-agent mcp add`."),
+         "Add servers with `hbm mcp add <name> --url ... | --command ...`.",
+         "No MCP servers configured. Add later with `hbm mcp add`."),
     ):
         print_header(header, gap=True)
         print_info(yes_msg if prompt_yes_no(question, default=False) else no_msg)
@@ -329,7 +329,7 @@ def _blank_slate_walkthrough(config: dict, hbm_home):
     if prompt_yes_no("Connect a messaging platform (Telegram, Discord, …)?", default=False):
         setup_gateway(config)
     save_config(config)
-    _blank_slate_done(config, hbm_home, "  Enable more tools:   hbm-agent tools")
+    _blank_slate_done(config, hbm_home, "  Enable more tools:   hbm tools")
 
 
 def _run_quick_setup(config: dict, hbm_home):
@@ -349,7 +349,7 @@ def _run_quick_setup(config: dict, hbm_home):
     current_ver, latest_ver = check_config_version()
     if not (missing_required or missing_optional or missing_config or current_ver < latest_ver):
         print_success("Everything is configured! Nothing to do.")
-        _info(None, "Run 'hbm-agent setup' and choose 'Full Setup' to reconfigure,",
+        _info(None, "Run 'hbm setup' and choose 'Full Setup' to reconfigure,",
               "or pick a specific section from the menu.")
         return
     if missing_required:
@@ -375,7 +375,7 @@ def _run_quick_setup(config: dict, hbm_home):
     if missing_messaging:  # checklist, then prompt for each selected platform's vars
         print_header("Messaging Platforms", gap=True)
         _info("Connect HBM AGENT to messaging apps to chat from anywhere.",
-              "You can configure these later with 'hbm-agent setup gateway'.")
+              "You can configure these later with 'hbm setup gateway'.")
         # Group by platform in first-seen order; vars matching no platform are dropped.
         grouped: dict[str, list] = {}
         emojis = {}

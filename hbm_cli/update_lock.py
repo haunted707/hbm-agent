@@ -25,7 +25,7 @@ UPDATE_MARKER_MAX_AGE_SECONDS = 20 * 60
 MARKER_NAME = ".hbm-update-in-progress"
 
 # Set by an orchestrating updater (Tauri `hbm-setup --update`) to its own pid before
-# spawning `hbm-agent update` as a child stage; the parent holds the marker for its whole run,
+# spawning `hbm update` as a child stage; the parent holds the marker for its whole run,
 # so without this the child would refuse its own parent's lock. Keep in sync with
 # update_child_env in apps/bootstrap-installer/src-tauri/src/update.rs.
 HANDOFF_PID_ENV = "HBM_UPDATE_HANDOFF_PID"
@@ -78,7 +78,7 @@ def _handoff_pid() -> int | None:
 def _is_ancestor_pid(pid: int) -> bool:
     """True when ``pid`` is a live ancestor of this process.
 
-    The orchestrating updater spawns ``hbm-agent update`` as a (grand)child, so a live marker
+    The orchestrating updater spawns ``hbm update`` as a (grand)child, so a live marker
     owned by an ancestor can only be the claim we already run under — an unrelated concurrent
     updater is never in our parent chain. Never our own pid; any failure is "not an ancestor".
     """
@@ -138,8 +138,8 @@ def describe_holder(holder: UpdateHolder) -> str:
         f"process {holder.pid}).\n"
         "\n"
         "  Running two at once would corrupt the install. Wait for it to finish\n"
-        "  (watch `hbm-agent logs`), or close the Desktop/dashboard window that\n"
-        "  started it, then run `hbm-agent update` again."
+        "  (watch `hbm logs`), or close the Desktop/dashboard window that\n"
+        "  started it, then run `hbm update` again."
     )
 
 

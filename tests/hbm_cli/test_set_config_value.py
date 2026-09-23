@@ -604,7 +604,7 @@ class TestMappingGuard:
         (tmp_path / "config.yaml").write_text(_yaml.dump(data))
 
     def test_bare_model_shorthand_preserves_siblings(self, _isolated_hbm_home):
-        """hbm-agent config set model <id> → model.default, siblings survive."""
+        """hbm config set model <id> → model.default, siblings survive."""
         self._write_config(_isolated_hbm_home, {
             "model": {
                 "default": "gpt-4o",

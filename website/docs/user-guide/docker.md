@@ -34,7 +34,7 @@ result before hitting Enter.
 mkdir -p ~/.hbm
 docker run -it --rm \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent setup
+  nousresearch/hbm setup
 ```
 
 This drops you into the setup wizard, which will prompt you for your API keys and write them to `~/.hbm/.env`. You only need to do this once. It is highly recommended to set up a chat system for the gateway to work with at this point.
@@ -53,7 +53,7 @@ docker run -d \
   --restart unless-stopped \
   -v ~/.hbm:/opt/data \
   -p 8642:8642 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 Port 8642 exposes the gateway's [OpenAI-compatible API server](./features/api-server.md) and health endpoint. It's optional if you only use chat platforms (Telegram, Discord, etc.), but required if you want the dashboard or external tools to reach the gateway.
@@ -91,7 +91,7 @@ docker run -d \
   -e API_SERVER_HOST=0.0.0.0 \
   -e API_SERVER_KEY="$(openssl rand -hex 32)" \
   -e API_SERVER_CORS_ORIGINS='*' \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 Opening any port on an internet facing machine is a security risk. You should not do it unless you understand the risks.
@@ -108,7 +108,7 @@ docker run -d \
   -p 8642:8642 \
   -p 9119:9119 \
   -e HBM_DASHBOARD=1 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 The dashboard is supervised by s6 — if it crashes, `s6-supervise` restarts it automatically after a short backoff. Dashboard stdout/stderr is forwarded to `docker logs <container>` (no prefix; the gateway's own output now lives in a per-profile s6-log file — see [Where the logs go](#where-the-logs-go) below — so the two streams don't clash).
@@ -494,7 +494,7 @@ docker run -d \
   --restart unless-stopped \
   --memory=4g --cpus=2 \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ## What the Dockerfile does
@@ -589,7 +589,7 @@ docker run -d \
   --name hbm \
   --restart unless-stopped \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 Or with Docker Compose:
@@ -761,7 +761,7 @@ docker run -d \
   --name hbm \
   -v ~/.hbm:/opt/data \
   -p 8642:8642 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ```yaml
@@ -780,7 +780,7 @@ docker run -d \
   --name hbm \
   --network host \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ```yaml
@@ -844,7 +844,7 @@ docker run -d \
   --name hbm \
   -e PUID=1000 -e PGID=10 \
   -v /volume1/docker/hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 `docker exec hbm <cmd>` automatically drops to UID 10000 too — see [`docker exec` automatically drops to the `hbm` user](#docker-exec-automatically-drops-to-the-hbm-user) for details and the per-invocation opt-out.
@@ -876,7 +876,7 @@ docker run -d \
   --name hbm \
   --shm-size=1g \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ### Gateway not reconnecting after network issues

@@ -1188,7 +1188,7 @@ class PluginManager(PluginLoaderMixin, PluginDispatchMixin, PluginLedgerMixin):
         self._persistent_carryover: List[PluginRegistration] = []
         # Deferred platforms whose client tools registered at discovery (see
         # _register_deferred_platform_tools): imported package (don't re-execute on materialize)
-        # and contributed tool names (so `hbm-agent plugins list` still attributes them).
+        # and contributed tool names (so `hbm plugins list` still attributes them).
         self._predeclared_modules: Dict[str, types.ModuleType] = {}
         self._predeclared_tools: Dict[str, List[str]] = {}
 
@@ -2038,7 +2038,7 @@ def get_plugin_auxiliary_tasks() -> List[Dict[str, Any]]:
 
 
 def get_plugin_toolsets() -> List[tuple]:
-    """Plugin toolsets as ``(key, label, description)`` tuples for the ``hbm-agent tools`` TUI."""
+    """Plugin toolsets as ``(key, label, description)`` tuples for the ``hbm tools`` TUI."""
     manager = get_plugin_manager()
     if not manager._plugin_tool_names:
         return []

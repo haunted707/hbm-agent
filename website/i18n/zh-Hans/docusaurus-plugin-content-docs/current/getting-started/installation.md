@@ -15,7 +15,7 @@ description: "在 Linux、macOS、WSL2、原生 Windows 或通过 Termux 在 And
 基于 git 的安装方式，跟踪 `main` 分支，可立即获取最新变更：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -27,7 +27,7 @@ cd hbm-agent
 打开 PowerShell 并运行：
 
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 安装程序处理**一切**：`uv`、Python 3.11、Node.js 22、`ripgrep`、`ffmpeg`，**以及一个便携式 Git Bash**（PortableGit——一个自包含的 Git-for-Windows 发行版，附带 `bash.exe` 和 HBM AGENT 用于 shell 命令的完整 POSIX 工具链；在 32 位 Windows 上安装程序会回退到 MinGit，后者缺少 bash，终端工具和 agent 浏览器功能将被禁用）。它将仓库克隆到 `%LOCALAPPDATA%\hbm\hbm-agent`，创建虚拟环境，并将 `hbm` 添加到**用户 PATH**。安装完成后请重启终端（或打开新的 PowerShell 窗口）以使 PATH 生效。
@@ -50,7 +50,7 @@ git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scr
 HBM AGENT 现在也提供 Termux 感知的安装路径：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -168,7 +168,7 @@ hbm setup --portal
 2. **以非特权服务用户身份**，运行常规安装程序。它会检测到缺少 sudo，跳过 `--with-deps`，并将 Chromium 安装到用户本地的 Playwright 缓存中：
 
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh
    ```
@@ -176,7 +176,7 @@ hbm setup --portal
    如果想完全跳过 Playwright 步骤——例如在无头环境中运行且不需要浏览器自动化——传入 `--skip-browser`：
 
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh --skip-browser
    ```

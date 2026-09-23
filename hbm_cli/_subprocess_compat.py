@@ -511,7 +511,7 @@ def bounded_probe_run(
     ``communicate()`` after killing the direct child. Killing it can leave a descendant (``git.exe`` under a
     launcher shim, ``conhost.exe`` under wmic/powershell) holding duplicates of the captured stdout/stderr
     handles, so the pipes never reach EOF and the reader-thread join blocks forever. The wmic /
-    ``Get-CimInstance Win32_Process`` gateway scan hit exactly this during ``hbm-agent update`` on slow-WMI
+    ``Get-CimInstance Win32_Process`` gateway scan hit exactly this during ``hbm update`` on slow-WMI
     machines (#87134); the git probes hit it first (#68609 / #66037).
     """
     _popen_kwargs: dict = {"creationflags": windows_hide_flags()} if IS_WINDOWS else {"process_group": 0}

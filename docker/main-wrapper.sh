@@ -74,7 +74,7 @@ cd /opt/data
 . /opt/hbm/.venv/bin/activate
 
 # Restore the original working directory before handing off to
-# the user's command so `hbm-agent chat` starts in the Docker -w
+# the user's command so `hbm chat` starts in the Docker -w
 # directory, not /opt/data.
 cd "$_hbm_orig_cwd"
 

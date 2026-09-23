@@ -93,7 +93,7 @@ def _strip_console_status_footer(text: str) -> str:
     if len(lines) < 2:
         return text.rstrip()
     last, prev = (_strip_ansi(lines[i]).strip() for i in (-1, -2))
-    if not (prev.startswith("Run 'hbm-agent doctor'") and last.startswith("Run 'hbm-agent setup'")):
+    if not (prev.startswith("Run 'hbm doctor'") and last.startswith("Run 'hbm setup'")):
         return text.rstrip()
     lines = lines[:-2]
     _drop_trailing_blank(lines)
@@ -765,7 +765,7 @@ def _cron_pause(_engine: HbmConsoleEngine, args: list[str]) -> str:
     from cron.jobs import pause_job
     return _cron_job_action(
         args, "cron pause <job>", "Paused",
-        lambda ref: pause_job(ref, reason="paused from hbm-agent console"))
+        lambda ref: pause_job(ref, reason="paused from hbm console"))
 
 
 def _cron_resume(_engine: HbmConsoleEngine, args: list[str]) -> str:
@@ -827,7 +827,7 @@ _BUILTIN_COMMANDS = (
 
 def run_console_repl(
     *, stdin=None, stdout=None, stderr=None, interactive: bool | None = None) -> int:
-    """Run the local ``hbm-agent console`` REPL."""
+    """Run the local ``hbm console`` REPL."""
     stdin, stdout, stderr = stdin or sys.stdin, stdout or sys.stdout, stderr or sys.stderr
     if interactive is None:
         interactive = bool(getattr(stdin, "isatty", lambda: False)())

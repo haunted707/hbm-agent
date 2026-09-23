@@ -273,7 +273,7 @@ class TestMigrateGoalToSession:
 
 
 class TestSessionDbCacheAfterProfileDelete:
-    """``hbm-agent profile delete`` force-closes every registry handle under the profile home
+    """``hbm profile delete`` force-closes every registry handle under the profile home
     (``close_all_under``) and rmtrees it; recreating the same name in the long-lived dashboard
     process must not keep persisting goals into the torn-down handle."""
 

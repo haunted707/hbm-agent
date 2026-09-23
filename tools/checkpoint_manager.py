@@ -385,7 +385,7 @@ def _shrink_store_to_cap(store: Path, working_dir: str, cap_bytes: int) -> bool:
 
 def _migrate_legacy_store(base: Path) -> Optional[Path]:
     """Archive pre-v2 per-project shadow repos into ``legacy-<ts>/`` (moved, not deleted —
-    users may want to recover; the archive falls under retention and ``hbm-agent checkpoints
+    users may want to recover; the archive falls under retention and ``hbm checkpoints
     clear-legacy``).  Returns the archive path or None."""
     if not base.exists():
         return None
@@ -405,7 +405,7 @@ def _migrate_legacy_store(base: Path) -> Optional[Path]:
         except OSError as exc:
             logger.warning("Could not archive legacy checkpoint %s: %s", child, exc)
     logger.info("Migrated pre-v2 checkpoint repos to %s. "
-                "Clear with `hbm-agent checkpoints clear-legacy` when safe.", legacy_root)
+                "Clear with `hbm checkpoints clear-legacy` when safe.", legacy_root)
     return legacy_root
 
 
@@ -1162,7 +1162,7 @@ def auto_prune_from_config() -> Dict[str, object]:
     """``maybe_auto_prune_checkpoints`` driven by the ``checkpoints:`` config section — the one
     startup/housekeeping entry point for the CLI and the gateway. ``delete_orphans`` is never
     honoured unattended: a missing workdir is ambiguous (deleted vs. unmounted share); orphan
-    cleanup is only via explicit ``hbm-agent checkpoints prune``. Never raises."""
+    cleanup is only via explicit ``hbm checkpoints prune``. Never raises."""
     try:
         from hbm_cli.config import load_config
         cfg = load_config().get("checkpoints") or {}
@@ -1197,8 +1197,8 @@ def checkpoint_footprint_notice() -> Optional[str]:
         from hbm_cli.sizefmt import format_bytes
         return (f"Filesystem checkpoints (/rollback) are on: {format_bytes(size)} across "
                 f"{status['project_count']} project(s), above the {cap_mb} MB cap (one snapshot per project is "
-                f"always kept). Not using /rollback? `hbm-agent config set checkpoints.enabled false` then "
-                f"`hbm-agent checkpoints clear`; or lower `checkpoints.retention_days`.")
+                f"always kept). Not using /rollback? `hbm config set checkpoints.enabled false` then "
+                f"`hbm checkpoints clear`; or lower `checkpoints.retention_days`.")
     except Exception as exc:
         logger.debug("checkpoint footprint notice skipped: %s", exc)
         return None

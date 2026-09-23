@@ -2339,7 +2339,7 @@ class TestCronDeliveryTargets:
 class TestHomeTargetEnvVarRegistry:
     """Regression: ``_HOME_TARGET_ENV_VARS`` must include every gateway
     platform that supports cron-driven outbound delivery. Missing an
-    entry means ``hbm-agent cron create --deliver=<platform>`` silently
+    entry means ``hbm cron create --deliver=<platform>`` silently
     fails to route through the platform's home channel."""
 
 

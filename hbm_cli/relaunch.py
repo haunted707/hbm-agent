@@ -1,5 +1,5 @@
 """Unified self-relaunch for HBM AGENT CLI: preserves inherited flags (--tui, --dev, --profile, --model…)
-across process replacement so ``hbm-agent sessions browse`` / post-setup relaunch keep the user's mode."""
+across process replacement so ``hbm sessions browse`` / post-setup relaunch keep the user's mode."""
 
 import os
 import pathlib

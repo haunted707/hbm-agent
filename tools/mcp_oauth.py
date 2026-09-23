@@ -340,7 +340,7 @@ def _raise_if_non_interactive(lead: str) -> None:
     """
     if not _is_interactive():
         raise OAuthNonInteractiveError(
-            f"{lead} Run `hbm-agent mcp login <server>` interactively to (re)authorize, then restart or reload the gateway."
+            f"{lead} Run `hbm mcp login <server>` interactively to (re)authorize, then restart or reload the gateway."
         )
 
 
@@ -688,7 +688,7 @@ def _paste_callback_reader(result: dict) -> None:
     if line.lower() in _SKIP_TOKENS:
         result["error"] = _USER_SKIPPED_SENTINEL
         print(
-            "  OAuth skipped. Run `hbm-agent mcp login <server>` later to authenticate, "
+            "  OAuth skipped. Run `hbm mcp login <server>` later to authenticate, "
             "or set ``enabled: false`` on that server in config.yaml to disable persistently.",
             file=sys.stderr)
         return
@@ -1111,7 +1111,7 @@ def _invalidate_tokens_on_client_change(
     if removed:
         logger.warning(
             "MCP OAuth '%s': configured OAuth client changed (client_id %r -> %r); discarded tokens minted under "
-            "the previous client. Re-authorize with: hbm-agent mcp login %s",
+            "the previous client. Re-authorize with: hbm mcp login %s",
             storage._server_name, old_client_id, new_client_id, storage._server_name)
 
 
@@ -1151,7 +1151,7 @@ def humanize_oauth_registration_error(
             f"'{server_name}' is Figma's remote MCP — DCR is allowlisted by exact client_name "
             f"(\"{_FIGMA_DCR_CLIENT_NAME}\" and \"Codex\" work; most other names 403). HBM AGENT defaults to "
             f"client_name: {_FIGMA_DCR_CLIENT_NAME!r} automatically. If you set oauth.client_name yourself, "
-            f"change it to one of those, or clear it and re-run:\n  hbm-agent mcp login {server_name}")
+            f"change it to one of those, or clear it and re-run:\n  hbm mcp login {server_name}")
     return (
         f"'{server_name}' only allows pre-approved OAuth clients — it rejected client registration (403), so no "
         "browser flow can start. Options: set oauth.client_name to a name the provider allowlists, add a "
@@ -1172,7 +1172,7 @@ def build_oauth_auth(server_name: str, server_url: str, oauth_config: dict | Non
     if not _is_interactive() and not storage.has_cached_tokens():
         raise OAuthNonInteractiveError(
             f"MCP OAuth for '{server_name}': non-interactive environment and no cached tokens found. The OAuth flow "
-            f"requires browser authorization. Run `hbm-agent mcp login {server_name}` interactively first to complete "
+            f"requires browser authorization. Run `hbm mcp login {server_name}` interactively first to complete "
             "initial authorization, then cached tokens will be reused.")
     kwargs = build_provider_kwargs(cfg, storage, ssh_proxy_hint=True)
     if HbmOAuthClientProvider is None:

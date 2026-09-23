@@ -21,12 +21,12 @@ DEVICE_FLOW_ERROR_COPY = {
     "expired_token": (
         "The sign-in code expired before it was approved in the browser. Run `{retry}` to get a new code."),
     "access_denied": (
-        "Sign-in was declined in the browser. Run `{retry}` to try again, or `hbm-agent model` to pick a "
+        "Sign-in was declined in the browser. Run `{retry}` to try again, or `hbm model` to pick a "
         "different provider."),
     "invalid_grant": (
         "The sign-in code was not accepted by the server. Run `{retry}` to get a new code."),
     "invalid_client": (
-        "The server did not recognize this copy of HBM AGENT. Run `hbm-agent update`, then `{retry}` again."),
+        "The server did not recognize this copy of HBM AGENT. Run `hbm update`, then `{retry}` again."),
 }
 
 
@@ -51,7 +51,7 @@ def is_cancelled(exc: BaseException) -> bool:
         isinstance(exc, SystemExit) and exc.code in (130, None, 0))
 
 
-def device_flow_error(code: str, description: str, *, retry_command: str = "hbm-agent portal") -> SignInCopyError:
+def device_flow_error(code: str, description: str, *, retry_command: str = "hbm portal") -> SignInCopyError:
     """Exception for an OAuth device-flow error code whose text is already user-facing.
 
     Unknown codes keep the server's description as the lead (it is the only information available)
@@ -78,7 +78,7 @@ def _classify(exc: BaseException, rules: Sequence[_Rule], other: str) -> str:
 
 
 def sign_in_failure_lines(
-    exc: BaseException, *, service_host: str = "portal.nousresearch.com", retry_command: str = "hbm-agent portal",
+    exc: BaseException, *, service_host: str = "portal.nousresearch.com", retry_command: str = "hbm portal",
 ) -> list:
     """Lines to print when a device-code / browser sign-in fails for any non-timeout reason."""
     if isinstance(exc, SignInCopyError):
@@ -91,14 +91,14 @@ def sign_in_failure_lines(
     )
     lead = _classify(
         exc, rules,
-        "Could not sign in. Run `{retry}` to try again, or `hbm-agent model` to pick a different provider.")
+        "Could not sign in. Run `{retry}` to try again, or `hbm model` to pick a different provider.")
     lines = [lead.format(host=service_host, retry=retry_command)]
     if not is_cancelled(exc):
         lines.append(_details_line(exc))
     return lines
 
 
-def provider_setup_failure_lines(exc: BaseException, *, retry_command: str = "hbm-agent model") -> list:
+def provider_setup_failure_lines(exc: BaseException, *, retry_command: str = "hbm model") -> list:
     """Lines to print when the setup wizard's provider step fails: reason, that nothing was saved,
     and how to retry."""
     nothing_saved = (

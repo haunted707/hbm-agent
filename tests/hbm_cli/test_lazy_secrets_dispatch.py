@@ -3,8 +3,8 @@
 These tests invoke the real CLI paths as subprocesses to verify:
 1. `hbm secrets bitwarden setup --help` works (dispatch path)
 2. `hbm update --check` works (update path)
-3. `hbm-agent secrets bitwarden disable` works (handler execution)
-4. `hbm-agent secrets onepassword status` works (lazy backend loads on demand)
+3. `hbm secrets bitwarden disable` works (handler execution)
+4. `hbm secrets onepassword status` works (lazy backend loads on demand)
 
 Unlike test_lazy_secrets_import.py (which inspects sys.modules), these
 run the actual commands and verify exit codes — the exact paths the
@@ -91,7 +91,7 @@ class TestSecretsDispatchE2E:
         assert "cannot import name" not in result.stderr
 
     def test_bitwarden_disable(self) -> None:
-        """`hbm-agent secrets bitwarden disable` must exit 0."""
+        """`hbm secrets bitwarden disable` must exit 0."""
         result = _run_hbm(["secrets", "bitwarden", "disable"])
         assert result.returncode == 0, (
             f"bitwarden disable failed:\n"
@@ -100,7 +100,7 @@ class TestSecretsDispatchE2E:
         )
 
     def test_onepassword_status(self) -> None:
-        """`hbm-agent secrets onepassword status` must exit 0 (1Password lazy backend)."""
+        """`hbm secrets onepassword status` must exit 0 (1Password lazy backend)."""
         result = _run_hbm(["secrets", "onepassword", "status"])
         assert result.returncode in (0, 1), (
             f"onepassword status crashed:\n"
@@ -110,7 +110,7 @@ class TestSecretsDispatchE2E:
         assert "ImportError" not in result.stderr
 
     def test_onepassword_setup_help(self) -> None:
-        """`hbm-agent secrets onepassword setup --help` must exit 0."""
+        """`hbm secrets onepassword setup --help` must exit 0."""
         result = _run_hbm(["secrets", "onepassword", "setup", "--help"])
         assert result.returncode in (0, 2), (
             f"onepassword setup --help failed:\n"

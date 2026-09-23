@@ -1,4 +1,4 @@
-"""``hbm-agent profile create --clone`` leaves messaging channels behind (``hbm_cli.profile_channels``).
+"""``hbm profile create --clone`` leaves messaging channels behind (``hbm_cli.profile_channels``).
 
 Invariant, not snapshot: the clone's credential fingerprint set — computed by the gateway's own
 ``_adapter_credential_fingerprint`` through the migrate preflight — is DISJOINT from the source's,

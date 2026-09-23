@@ -1,4 +1,4 @@
-"""``hbm-agent update`` subcommand parser."""
+"""``hbm update`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -33,7 +33,7 @@ def build_update_parser(subparsers, *, cmd_update: Callable) -> None:
     )
     update_parser.add_argument(
         "--yes", "-y", action="store_true", default=False,
-        help="Run without blocking on prompts: accepts the config-migration and stash-restore prompts, skips the fork-upstream prompt without adding a remote. API-key entry is skipped; run 'hbm-agent config migrate' separately for those.",
+        help="Run without blocking on prompts: accepts the config-migration and stash-restore prompts, skips the fork-upstream prompt without adding a remote. API-key entry is skipped; run 'hbm config migrate' separately for those.",
     )
     update_parser.add_argument(
         "--keep-stash", action="store_true", default=False,

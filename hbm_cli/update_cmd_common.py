@@ -1,4 +1,4 @@
-"""Shared leaf helpers for the ``hbm-agent update`` modules (no HBM AGENT imports; no cycle)."""
+"""Shared leaf helpers for the ``hbm update`` modules (no HBM AGENT imports; no cycle)."""
 
 import logging
 from contextlib import contextmanager

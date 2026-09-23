@@ -60,7 +60,7 @@ For a command-line only install without HBM AGENT Desktop, run:
 
 #### Linux / macOS / WSL2 / Android (Termux)
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -69,7 +69,7 @@ cd hbm-agent
 
 Run in powershell:
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 :::tip Android / Termux

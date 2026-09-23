@@ -1,10 +1,10 @@
-"""``hbm-agent gateway migrate --multiplex`` / ``--standalone``: move a per-profile-gateway install onto one
+"""``hbm gateway migrate --multiplex`` / ``--standalone``: move a per-profile-gateway install onto one
 multiplexed default gateway (and back), with a table-driven preflight.
 
 Standalone per-profile gateways stay supported; this is a migration path, not a removal. The
 preflight reuses the gateway's own conflict logic (``GatewayRunner._adapter_credential_fingerprint``,
 ``platform_binds_port``, the adapters' ``serves_profile_prefix`` declaration) so its verdict matches
-what the multiplexer would do at startup. ``hbm-agent update`` calls :func:`maybe_auto_migrate_after_update`.
+what the multiplexer would do at startup. ``hbm update`` calls :func:`maybe_auto_migrate_after_update`.
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from typing import Callable, Iterator, Optional
 logger = logging.getLogger(__name__)
 
 MANIFEST_NAME = "gateway_migration.json"
-MIGRATE_COMMAND = "hbm-agent gateway migrate --multiplex"
+MIGRATE_COMMAND = "hbm gateway migrate --multiplex"
 _SERVED_WAIT_SECONDS = 90.0
 
 
@@ -147,7 +147,7 @@ class MigrationPlan:
 
     def eligible_for_migration(self) -> bool:
         """>= 2 profiles, at least one secondary with its own gateway, multiplex off, no blockers.
-        This is the AUTO-migration (``hbm-agent update``) bar; the explicit command also proceeds with
+        This is the AUTO-migration (``hbm update``) bar; the explicit command also proceeds with
         zero standalone secondaries (see :func:`cmd_migrate`)."""
         return (
             len(self.profiles) >= 2 and bool(self.standalone_secondaries)
@@ -265,7 +265,7 @@ def _read_multiplex_flag(default_home: Path) -> bool:
 
 def _write_multiplex_flag(default_home: Path, value: bool) -> None:
     """Set ``gateway.multiplex_profiles`` in the DEFAULT profile's config.yaml through the config API
-    (same read-guard + nested-set + atomic write ``hbm-agent config set`` uses; no raw YAML edits)."""
+    (same read-guard + nested-set + atomic write ``hbm config set`` uses; no raw YAML edits)."""
     from hbm_cli.config import _set_nested, _write_user_config, require_readable_config_before_write
     cfg_path = default_home / "config.yaml"
     user_config = require_readable_config_before_write(cfg_path)
@@ -414,7 +414,7 @@ def _check_secondary_port_binders(plan: MigrationPlan, configs: dict[str, object
                     f"Profile '{profile.name}' enables {platform.value}, which binds its own port and has no "
                     f"/p/{profile.name}/ ingress on the default listener yet; the multiplexer would skip "
                     f"the whole profile. Disable it there (platforms.{platform.value}.enabled: false) or "
-                    f"keep '{profile.name}' on a standalone gateway (hbm-agent -p {profile.name} gateway start --force)."
+                    f"keep '{profile.name}' on a standalone gateway (hbm -p {profile.name} gateway start --force)."
                 )
 
 
@@ -461,7 +461,7 @@ def build_migration_plan() -> MigrationPlan:
     from hbm_cli.gateway_migrate_guards import auto_migration_blockers
     # Notices, not blockers: the explicit command is the operator's decision; only the update hook
     # refuses to cross these boundaries on its own.
-    plan.notices.extend(f"Not migrated automatically by `hbm-agent update`: {b}" for b in auto_migration_blockers(plan))
+    plan.notices.extend(f"Not migrated automatically by `hbm update`: {b}" for b in auto_migration_blockers(plan))
     plan.notices.append(
         "Profiles created after the migration are served by the running multiplexer as soon as "
         "they exist (it rescans profiles/ on create/delete and every 30s)."
@@ -504,7 +504,7 @@ def format_plan(plan: MigrationPlan, *, dry_run: bool) -> list[str]:
     target = plan.target_service_kind()
     lines.append(f"  - default: {'restart' if plan.default.has_gateway else 'start'} the gateway"
                  + (f" via {target[0]}" if target else " (detached)") + f", verify it serves {len(plan.profiles)} profiles")
-    lines.append(f"  - record the previous state in {plan.default_home / MANIFEST_NAME} (rollback: hbm-agent gateway migrate --standalone)")
+    lines.append(f"  - record the previous state in {plan.default_home / MANIFEST_NAME} (rollback: hbm gateway migrate --standalone)")
     return lines + _plan_tail(plan)
 
 
@@ -521,7 +521,7 @@ def _plan_tail(plan: MigrationPlan) -> list[str]:
 
 def _no_manifest_lines(default_home: Path) -> list[str]:
     return [f"✗ No migration manifest at {_manifest_path(default_home)}; nothing to roll back.",
-            "  To leave multiplex mode by hand: hbm-agent config set gateway.multiplex_profiles false && hbm-agent gateway restart"]
+            "  To leave multiplex mode by hand: hbm config set gateway.multiplex_profiles false && hbm gateway restart"]
 
 
 def _manifest_secondaries(manifest: dict) -> Optional[list[dict]]:
@@ -595,7 +595,7 @@ def format_update_warning(plan: MigrationPlan, auto_blockers: list[str]) -> list
         "  setup, but this install cannot be migrated automatically yet:",
         *[f"    • {b}" for b in (*plan.blockers, *auto_blockers)],
         f"  After fixing the above, run:  {MIGRATE_COMMAND}",
-        "  (`hbm-agent update` will migrate automatically once nothing blocks it.)",
+        "  (`hbm update` will migrate automatically once nothing blocks it.)",
     ]
 
 
@@ -765,7 +765,7 @@ def apply_migration(plan: MigrationPlan, *, served_wait: float = _SERVED_WAIT_SE
         # Flag off + manifest present = a rollback (or an apply killed before its flag write) that did
         # not finish. Overwriting the manifest would discard the only record of the units to restore.
         _print([f"✗ A previous migration's manifest is still at {_manifest_path(plan.default_home)} (its rollback did not finish).",
-                "  Finish it with: hbm-agent gateway migrate --standalone   (or delete the manifest to start over)"])
+                "  Finish it with: hbm gateway migrate --standalone   (or delete the manifest to start over)"])
         return False
     else:
         blocker = _preflight_apply(plan, target, run_as_user)
@@ -791,20 +791,20 @@ def apply_migration(plan: MigrationPlan, *, served_wait: float = _SERVED_WAIT_SE
                 "  ↩ Rolling back to per-profile gateways so no profile is left without one..."])
         rolled_back = rollback_migration(plan.default_home)
         if not rolled_back:
-            print(f"  Re-run {MIGRATE_COMMAND} to resume, or hbm-agent gateway migrate --standalone to roll back.")
+            print(f"  Re-run {MIGRATE_COMMAND} to resume, or hbm gateway migrate --standalone to roll back.")
         return False
 
     expected = {p.name for p in plan.profiles}
     served = _wait_for_served(plan.default_home, expected, served_wait)
     if served is not None and expected <= set(served):
         _print(["", f"✓ Migrated: the default gateway now serves {len(served)} profiles: {', '.join(served)}",
-                "  Rollback any time with: hbm-agent gateway migrate --standalone",
+                "  Rollback any time with: hbm gateway migrate --standalone",
                 *[f"  • {n}" for n in plan.notices]])
         return True
     missing = sorted(expected - set(served or []))
     _print(["", f"⚠ Migration applied, but the default gateway has not confirmed serving: {', '.join(missing)}",
-            "  Check `hbm-agent gateway status` and the gateway log; the flag and manifest are in place.",
-            "  Rollback: hbm-agent gateway migrate --standalone"])
+            "  Check `hbm gateway status` and the gateway log; the flag and manifest are in place.",
+            "  Rollback: hbm gateway migrate --standalone"])
     return False
 
 
@@ -882,7 +882,7 @@ def rollback_migration(default_home: Optional[Path] = None) -> bool:
                     print(f"  ✗ default: could not restore rollback manifest ({manifest_exc})")
             ok = False
             print(f"  ✗ default: could not restart its standalone gateway ({exc})")
-            print("    The default gateway is still multiplexing; stop it by hand (hbm-agent gateway stop) and re-run.")
+            print("    The default gateway is still multiplexing; stop it by hand (hbm gateway stop) and re-run.")
     if ok:
         print("✓ Rolled back to per-profile gateways.")
     else:
@@ -899,12 +899,12 @@ def _host_supports_migration() -> Optional[str]:
     if gw._running_under_s6():
         return "s6-supervised container: per-profile gateways are s6 slots; set gateway.multiplex_profiles on the default profile and restart the container instead."
     if gw.is_windows():
-        return "Windows Scheduled Tasks are not migrated automatically; set gateway.multiplex_profiles true, stop the per-profile tasks, and `hbm-agent gateway restart`."
+        return "Windows Scheduled Tasks are not migrated automatically; set gateway.multiplex_profiles true, stop the per-profile tasks, and `hbm gateway restart`."
     return None
 
 
 def cmd_migrate(args) -> None:
-    """``hbm-agent gateway migrate [--multiplex|--standalone] [--dry-run] [--yes]``."""
+    """``hbm gateway migrate [--multiplex|--standalone] [--dry-run] [--yes]``."""
     if getattr(args, "standalone", False):
         if getattr(args, "dry_run", False):
             default_home = _default_home()
@@ -940,7 +940,7 @@ def cmd_migrate(args) -> None:
 
 
 def maybe_auto_migrate_after_update() -> None:
-    """``hbm-agent update`` hook: with >= 2 profiles, per-profile gateways present and multiplex off,
+    """``hbm update`` hook: with >= 2 profiles, per-profile gateways present and multiplex off,
     migrate automatically when unblocked (deterministic, never prompts) or print the blocker block.
     ``gateway.auto_multiplex_migration: false`` on the default profile opts out; a secondary behind a
     service-domain / UNIX-user / HBM_HOME boundary blocks this path only (the explicit command decides)."""

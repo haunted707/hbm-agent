@@ -1,4 +1,4 @@
-"""Tests for ``hbm-agent dashboard register``.
+"""Tests for ``hbm dashboard register``.
 
 Covers the CLI half of self-hosted dashboard registration:
   - Docker-style auto-name generation

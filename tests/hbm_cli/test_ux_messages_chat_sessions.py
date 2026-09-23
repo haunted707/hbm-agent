@@ -87,14 +87,14 @@ def test_owned_message_first_line_is_plain_and_details_follow():
     assert "desktop" in rest[0]
 
 
-# ── cli-30: hbm-agent sessions with a bad id / unopenable DB ──────────────────
+# ── cli-30: hbm sessions with a bad id / unopenable DB ──────────────────
 
 def test_sessions_not_found_points_to_list(capsys):
     from hbm_cli.sessions_cmd import _not_found
     assert _not_found("abc") == 1
     out = capsys.readouterr().out
     assert "No session 'abc'" in out
-    assert "hbm-agent sessions list" in out
+    assert "hbm sessions list" in out
 
 
 def test_sessions_db_open_failure_points_to_repair(monkeypatch, capsys):
@@ -117,7 +117,7 @@ def test_sessions_db_open_failure_points_to_repair(monkeypatch, capsys):
     code = sessions_cmd.cmd_sessions(args, parser)
     out = capsys.readouterr().out
     assert code == 1
-    assert "hbm-agent sessions repair" in out
+    assert "hbm sessions repair" in out
     assert out.splitlines()[0].startswith("Could not open your session history database")
     assert "Details: database disk image is malformed" in out
 

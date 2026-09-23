@@ -4,7 +4,7 @@
 This script crawls every skill source (skills.sh, GitHub taps, official,
 clawhub, lobehub) and writes a JSON index with resolved
 GitHub paths. The index is served as a static file on the docs site so that
-`hbm-agent skills search/install` can use it without hitting the GitHub API.
+`hbm skills search/install` can use it without hitting the GitHub API.
 
 Usage:
     # Local (uses gh CLI or GITHUB_TOKEN for auth)

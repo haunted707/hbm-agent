@@ -1,4 +1,4 @@
-"""CLI subcommand: ``hbm-agent pets <subcommand>``."""
+"""CLI subcommand: ``hbm pets <subcommand>``."""
 
 from __future__ import annotations
 
@@ -19,7 +19,7 @@ def _cmd_list(args) -> int:
     if args.installed:
         pets = store.installed_pets()
         if not pets:
-            print("No pets installed. Try: hbm-agent pets install boba")
+            print("No pets installed. Try: hbm pets install boba")
             return 0
         print(f"Installed pets ({len(pets)}):")
         for pet in pets:
@@ -48,7 +48,7 @@ def _cmd_list(args) -> int:
         print(f"  {mark} {entry.slug:<28} {entry.display_name}  ({entry.kind})")
     if limit and len(entries) > limit:
         print(f"  … {len(entries) - limit} more (use --limit 0 or --query to filter)")
-    print("\nInstall one with: hbm-agent pets install <slug>")
+    print("\nInstall one with: hbm pets install <slug>")
     return 0
 
 
@@ -69,7 +69,7 @@ def _cmd_install(args) -> int:
         _set_active(slug)
         print(f"✓ {pet.display_name} is now the active pet (display.pet.slug={slug}, enabled)")
     else:
-        print(f"  Make it active with: hbm-agent pets select {slug}")
+        print(f"  Make it active with: hbm pets select {slug}")
     return 0
 
 
@@ -91,7 +91,7 @@ def _cmd_select(args) -> int:
     if not slug:
         pets = store.installed_pets()
         if not pets:
-            _err("✗ no pets installed — run: hbm-agent pets install boba")
+            _err("✗ no pets installed — run: hbm pets install boba")
             return 1
         slug = _interactive_pick(pets)
         if not slug:
@@ -99,7 +99,7 @@ def _cmd_select(args) -> int:
 
     pet = store.load_pet(slug)
     if pet is None or not pet.exists:
-        _err(f"✗ '{slug}' is not installed — run: hbm-agent pets install {slug}")
+        _err(f"✗ '{slug}' is not installed — run: hbm pets install {slug}")
         return 1
 
     _set_active(slug)
@@ -137,7 +137,7 @@ def _cmd_show(args) -> int:
     slug = (args.slug or "").strip() or str(cfg.get("slug", "") or "")
     pet = store.resolve_active_pet(slug)
     if pet is None:
-        _err("✗ no pet to show — run: hbm-agent pets install boba")
+        _err("✗ no pet to show — run: hbm pets install boba")
         return 1
 
     mode_cfg = args.mode or str(cfg.get("render_mode", "auto") or "auto")
@@ -230,13 +230,13 @@ def _cmd_doctor(args) -> int:
 
     ok = True
     if not pets:
-        print("  → no pets installed. Run: hbm-agent pets install boba")
+        print("  → no pets installed. Run: hbm pets install boba")
         ok = False
     elif active is None:
-        print("  → active pet unresolved. Run: hbm-agent pets select <slug>")
+        print("  → active pet unresolved. Run: hbm pets select <slug>")
         ok = False
     elif not enabled:
-        print("  → pet display is disabled. Run: hbm-agent pets select " + active.slug)
+        print("  → pet display is disabled. Run: hbm pets select " + active.slug)
 
     try:
         import PIL  # noqa: F401

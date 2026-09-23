@@ -10,7 +10,7 @@ tells plugin authors and users about that:
 * :func:`removal_in_effect` — True once today >= the removal date (or the layer is already gone).
 * :func:`warn_once` — the per-name runtime warning emitted by the PLUGIN-COMPAT ``__getattr__`` blocks.
 
-Surfaces that read from here: the CLI banner, ``hbm-agent plugins compat``, ``hbm-agent doctor``, the post-update
+Surfaces that read from here: the CLI banner, ``hbm plugins compat``, ``hbm doctor``, the post-update
 notices, the TUI/Desktop ``plugins.compat_report`` RPC, and ``PluginManager`` (which skips a hitting plugin
 after the date unless ``plugins.allow_deprecated_imports: true``).
 
@@ -310,7 +310,7 @@ def disable_reason(manifest, *, today: Optional[_dt.date] = None) -> Optional[st
     hits = plugin_hits(manifest)
     if not hits:
         return None
-    return (f"uses {len(hits)} import path(s) removed on {COMPAT_REMOVAL}; run `hbm-agent plugins compat` "
+    return (f"uses {len(hits)} import path(s) removed on {COMPAT_REMOVAL}; run `hbm plugins compat` "
             f"for the list, update the plugin, or set plugins.{ALLOW_KEY}: true to force-load")
 
 
@@ -323,15 +323,15 @@ def summary_lines(report: Dict[str, List[Hit]], *, today: Optional[_dt.date] = N
     if removal_in_effect(today) and allow_deprecated_imports():
         head = (f"{n} plugin{'s' if n != 1 else ''} force-loaded via plugins.{ALLOW_KEY}: they import paths "
                 f"removed on {COMPAT_REMOVAL}: {names}")
-        tail = "Update the plugin(s); the old paths no longer exist. Details: hbm-agent plugins compat"
+        tail = "Update the plugin(s); the old paths no longer exist. Details: hbm plugins compat"
     elif removal_in_effect(today):
         head = (f"{n} plugin{'s' if n != 1 else ''} DISABLED: they import paths removed on {COMPAT_REMOVAL}: {names}")
-        tail = f"Update the plugin(s) or set plugins.{ALLOW_KEY}: true to force-load. Details: hbm-agent plugins compat"
+        tail = f"Update the plugin(s) or set plugins.{ALLOW_KEY}: true to force-load. Details: hbm plugins compat"
     else:
         d = days_until_removal(today)
         head = (f"{n} plugin{'s' if n != 1 else ''} use{'s' if n == 1 else ''} import paths that stop working on "
                 f"{COMPAT_REMOVAL} ({d} day{'s' if d != 1 else ''}): {names}")
-        tail = "Check for plugin updates or notify the author before then. Details: hbm-agent plugins compat"
+        tail = "Check for plugin updates or notify the author before then. Details: hbm plugins compat"
     return [head, tail]
 
 

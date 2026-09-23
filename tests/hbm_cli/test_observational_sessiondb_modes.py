@@ -1,4 +1,4 @@
-"""Regression coverage for #110173: observational `hbm-agent sessions` readers stay read-only."""
+"""Regression coverage for #110173: observational `hbm sessions` readers stay read-only."""
 
 from argparse import Namespace
 from unittest.mock import MagicMock

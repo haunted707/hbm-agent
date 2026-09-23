@@ -1,8 +1,8 @@
 """Oneshot (-z) mode: send a prompt, get the final content block, exit.
 
-Toolsets = explicit --toolsets, else the user's "cli" toolsets from `hbm-agent tools`. Rules /
+Toolsets = explicit --toolsets, else the user's "cli" toolsets from `hbm tools`. Rules /
 memory / AGENTS.md / preloaded skills = same as a normal chat turn. Approvals are auto-bypassed
-(HBM_YOLO_MODE=1). Model/provider mirror `hbm-agent chat`: both optional; only --model → auto-detect
+(HBM_YOLO_MODE=1). Model/provider mirror `hbm chat`: both optional; only --model → auto-detect
 the provider; only --provider → error (ambiguous).
 """
 
@@ -61,7 +61,7 @@ def _build_preloaded_skills_prompt(skills: object = None) -> str | None:
             raise ValueError(f"Unknown skill(s): {missing_display}")
         logging.warning(
             "Unknown skill(s) requested, skipping: %s. Continuing with: %s. "
-            "List available skills with `hbm-agent skills list`.",
+            "List available skills with `hbm skills list`.",
             missing_display,
             ", ".join(loaded_skills),
         )
@@ -96,7 +96,7 @@ def _validate_explicit_toolsets(toolsets: object = None) -> tuple[list[str] | No
     try:
         from toolsets import validate_toolset
     except Exception as exc:
-        return None, f"hbm-agent -z: failed to validate --toolsets: {exc}\n"
+        return None, f"hbm -z: failed to validate --toolsets: {exc}\n"
 
     built_in = [name for name in normalized if validate_toolset(name)]
     unresolved = [name for name in normalized if name not in built_in]
@@ -116,7 +116,7 @@ def _validate_explicit_toolsets(toolsets: object = None) -> tuple[list[str] | No
         ignored = [name for name in normalized if name not in _ALL_TOOLSETS]
         if ignored:
             sys.stderr.write(
-                "hbm-agent -z: --toolsets all enables every toolset; "
+                "hbm -z: --toolsets all enables every toolset; "
                 f"ignoring additional entries: {', '.join(ignored)}\n"
             )
         return None, None
@@ -128,14 +128,14 @@ def _validate_explicit_toolsets(toolsets: object = None) -> tuple[list[str] | No
     valid = built_in + mcp_valid
 
     if unknown:
-        sys.stderr.write(f"hbm-agent -z: ignoring unknown --toolsets entries: {', '.join(unknown)}\n")
+        sys.stderr.write(f"hbm -z: ignoring unknown --toolsets entries: {', '.join(unknown)}\n")
     if disabled:
         sys.stderr.write(
-            "hbm-agent -z: ignoring disabled MCP servers (set enabled: true in config.yaml to use): "
+            "hbm -z: ignoring disabled MCP servers (set enabled: true in config.yaml to use): "
             f"{', '.join(disabled)}\n"
         )
     if not valid:
-        return None, "hbm-agent -z: --toolsets did not contain any valid toolsets.\n"
+        return None, "hbm -z: --toolsets did not contain any valid toolsets.\n"
     return valid, None
 
 
@@ -186,7 +186,7 @@ def run_oneshot(
     env_model_early = os.getenv("HBM_INFERENCE_MODEL", "").strip()
     if provider and not ((model or "").strip() or env_model_early):
         sys.stderr.write(
-            "hbm-agent -z: --provider requires --model (or HBM_INFERENCE_MODEL). "
+            "hbm -z: --provider requires --model (or HBM_INFERENCE_MODEL). "
             "Pass both explicitly, or neither to use your configured defaults.\n"
         )
         return 2
@@ -238,7 +238,7 @@ def run_oneshot(
             _write_usage_file(usage_file, result, failure=repr(failure))
             raise failure
         _write_usage_file(usage_file, result, failure=str(failure))
-        real_stderr.write(f"hbm-agent -z: agent failed: {failure}\n")
+        real_stderr.write(f"hbm -z: agent failed: {failure}\n")
         real_stderr.flush()
         return 1
 
@@ -259,7 +259,7 @@ def run_oneshot(
     if not (response or "").strip():
         if result.get("failed") or result.get("partial"):
             return 2
-        real_stderr.write("hbm-agent -z: no final response was produced; treating the run as failed.\n")
+        real_stderr.write("hbm -z: no final response was produced; treating the run as failed.\n")
         real_stderr.flush()
         return 1
     return 0
@@ -356,7 +356,7 @@ def _load_resume_target(session_db, resume: Optional[str]) -> tuple[Optional[str
     ``session_meta`` rows dropped. An unknown session raises (the user passed an explicit id;
     silently starting a fresh session is the resume-dropped failure mode this exists to fix —
     see #105892). An empty stored transcript still returns the resolved id: the turn replays
-    nothing but is recorded under the requested session — ``hbm-agent -z "hello" -c <title>
+    nothing but is recorded under the requested session — ``hbm -z "hello" -c <title>
     --create-if-missing`` must fill the titled session it created, not mint a fresh id
     (same contract as the interactive /resume of an empty session).
 

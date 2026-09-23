@@ -16,7 +16,7 @@ token acquisition (re-exchange the ``anon_`` credential; there is no refresh tok
 
 Users are never shown the words guest / anonymous / account for this state: surfaces say
 "Nous · free tier". Two user-facing verbs reach the same flow, both keeping the identity's
-connectors: ``hbm-agent auth upgrade`` in a terminal and ``/login`` inside a chat.
+connectors: ``hbm auth upgrade`` in a terminal and ``/login`` inside a chat.
 
 Lifecycle lives in ONE primitive, :func:`ensure_portal_identity`: adopt what the shared store already
 holds, else mint under the shared-store lock. It is the only minter; nothing else calls
@@ -55,10 +55,10 @@ GUEST_ONBOARDING_ENV = "HBM_GUEST_ONBOARDING"
 GUEST_MINT_TIMEOUT_SECONDS = 5.0
 # Copy shared by every surface that names the free tier (R-USR-1): never guest / anonymous / account.
 FREE_TIER_LABEL = "Nous · free tier"
-UPGRADE_HINT = "Run `hbm-agent auth upgrade` to sign in with a Nous account, or /login inside a chat."
+UPGRADE_HINT = "Run `hbm auth upgrade` to sign in with a Nous account, or /login inside a chat."
 FREE_TIER_NOT_SIGNED_IN = (
     "You're not signed in. Free inference and connectors are always on. "
-    "Run `hbm-agent auth` to sign in with a Nous account.")
+    "Run `hbm auth` to sign in with a Nous account.")
 
 
 class AnonCredentialDead(AuthError):
@@ -641,9 +641,9 @@ _WELCOME_ROUTE_COPY = {
 }
 # The sign-in door, phrased for a chat surface (slash command) and for a terminal.
 _SIGNIN_CHAT = "To sign in: /login."
-_SIGNIN_TERMINAL = "To sign in: `hbm-agent auth upgrade`."
+_SIGNIN_TERMINAL = "To sign in: `hbm auth upgrade`."
 _MODEL_HINT_CHAT = "Run /model and pick the Nous row again."
-_MODEL_HINT_TERMINAL = "Run `hbm-agent model` and pick the Nous row again."
+_MODEL_HINT_TERMINAL = "Run `hbm model` and pick the Nous row again."
 # Terminal copy for a free-model outage once the retries are spent (5xx, transport failure).
 FREE_TIER_OUTAGE_COPY = ("The free model is having trouble responding right now. "
                          "Try sending your message again in a minute.")
@@ -765,7 +765,7 @@ def apply_model_switch(agent: Any) -> Optional[str]:
 
     Runs once per recorded header, between calls. The conversation keeps its history; only the id
     the next request carries changes, so a promoted account stops relying on the gateway's reverse
-    map. The config write is the same one a sign-in completion uses, so ``hbm-agent model`` and the
+    map. The config write is the same one a sign-in completion uses, so ``hbm model`` and the
     gateway's config re-read agree with the live session.
     """
     pending = getattr(agent, "_nous_pending_model_switch", None)
@@ -840,7 +840,7 @@ def mark_guest_notice_shown() -> bool:
     return True
 
 
-# --- ``hbm-agent auth upgrade``: sign the guest into a real Nous account, keeping its connectors ---------
+# --- ``hbm auth upgrade``: sign the guest into a real Nous account, keeping its connectors ---------
 #
 # Wire: the normal device-code flow, with a promotion intent registered on NAS BETWEEN the code
 # request and the token poll (``POST /api/anonymous/promotion-intent {token, user_code, device_code}``).
@@ -972,7 +972,7 @@ def settle_after_upgrade(account_state: Dict[str, Any]) -> Dict[str, Any]:
     same pick as ``GET /api/model/recommended-default``), through the same config write a plain Nous
     login uses. A config on the user's own model and host is left alone.
 
-    Every sign-in completion (CLI ``hbm-agent auth upgrade``, the desktop poller) calls this once, after
+    Every sign-in completion (CLI ``hbm auth upgrade``, the desktop poller) calls this once, after
     ``persist_nous_credentials``. Returns ``{"model": str, "changed": bool}``: ``model`` is the default
     the config now carries (``""`` when it carries none); ``changed`` says whether this call wrote it.
     Never raises: a failed pick or write is logged and reported as ``changed: False`` so the sign-in
@@ -1003,7 +1003,7 @@ def settle_after_upgrade(account_state: Dict[str, Any]) -> Dict[str, Any]:
         # One write: host and default move together, so a failure leaves the config as it was
         # rather than the account host paired with the welcome model. No eligible recommendation
         # (Portal unreachable, or the plan and org policy admit nothing) clears the default in that
-        # same write; the runtime's silent default applies until the user picks one with `hbm-agent model`.
+        # same write; the runtime's silent default applies until the user picks one with `hbm model`.
         _update_config_for_provider(
             "nous", str(account_state.get("inference_base_url") or ""),
             default_model=model if on_welcome_model else None,

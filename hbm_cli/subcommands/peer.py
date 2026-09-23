@@ -1,9 +1,9 @@
-"""``hbm-agent peer`` — bot-to-bot DMs across machines/gateways.
+"""``hbm peer`` — bot-to-bot DMs across machines/gateways.
 
 A *peer* is another HBM AGENT gateway running the ``api_server`` platform; its stock
 API is the transport (no new server surface). ``dm`` resolves the remote canonical
 "Bot Chat" session (creating it when missing) and runs ONE synchronous turn — the
-cross-machine twin of ``hbm-agent -p <bot> chat --in ~ -c "Bot Chat"``. ``run``/``status``
+cross-machine twin of ``hbm -p <bot> chat --in ~ -c "Bot Chat"``. ``run``/``status``
 /``stop`` do the same turn through the async Runs API. Peer labels/URLs live in
 config.yaml (``bot_peers``); the key lives in ``~/.hbm/.env`` as
 ``HBM_PEER_<NAME>_KEY``. ``<peer>/<profile>`` targets the ``/p/<profile>/`` mirror.
@@ -73,7 +73,7 @@ def _request(
     if headers:
         request_headers.update(headers)
     req = urllib.request.Request(url, data=data, method=method, headers=request_headers)
-    # The peer URL is user-registered (``hbm-agent peer add``); a redirect to a
+    # The peer URL is user-registered (``hbm peer add``); a redirect to a
     # different origin must not carry the Authorization: Bearer key with it —
     # a compromised/MITM'd peer could otherwise harvest it. open_credentialed_url
     # strips non-safelisted headers across a cross-origin redirect.
@@ -150,7 +150,7 @@ def _parse_target(target: str) -> tuple[str, str | None]:
     peer = peer.strip()
     profile = profile.strip() or None
     if not peer:
-        raise ValueError("Peer name required (hbm-agent peer dm <peer>[/<agent>] ...)")
+        raise ValueError("Peer name required (hbm peer dm <peer>[/<agent>] ...)")
     if profile and not _PROFILE_RE.match(profile):
         raise ValueError(f"Invalid agent/profile name: {profile!r}")
     return peer, profile
@@ -171,11 +171,11 @@ def _resolve_peer_target(target: str) -> tuple[str, str | None, dict, str]:
     peer_name, profile = _parse_target(target)
     peer = _load_peers().get(peer_name)
     if not isinstance(peer, dict) or not peer.get("url"):
-        raise LookupError(f"No peer named '{peer_name}'. Run: hbm-agent peer list")
+        raise LookupError(f"No peer named '{peer_name}'. Run: hbm peer list")
     key = _peer_secret(peer_name)
     if not key:
         raise PermissionError(
-            f"No API key for peer '{peer_name}'. Set it: hbm-agent peer add {peer_name} "
+            f"No API key for peer '{peer_name}'. Set it: hbm peer add {peer_name} "
             f"--url <url> --key <key> (or add {_peer_key_env(peer_name)}=<key> to ~/.hbm/.env)")
     return peer_name, profile, peer, key
 
@@ -243,7 +243,7 @@ def _peer_add(args) -> int:
     else:
         print(
             f"Peer '{name}' saved ({url}). No key given — set the peer's API_SERVER_KEY with:\n"
-            f"  hbm-agent peer add {name} --url {url} --key <key>\n"
+            f"  hbm peer add {name} --url {url} --key <key>\n"
             f"  (or add {_peer_key_env(name)}=<key> to ~/.hbm/.env)")
     return 0
 
@@ -263,7 +263,7 @@ def _peer_remove(args) -> int:
 def _peer_list(args) -> int:
     peers = _load_peers()
     if not peers:
-        print("No peers registered. Add one: hbm-agent peer add <name> --url http://host:port --key <API_SERVER_KEY>")
+        print("No peers registered. Add one: hbm peer add <name> --url http://host:port --key <API_SERVER_KEY>")
         return 0
     for name in sorted(peers):
         entry = peers[name] if isinstance(peers[name], dict) else {}
@@ -370,7 +370,7 @@ def cmd_peer(args) -> int:
     if action in _REGISTRY_ACTIONS:
         return _REGISTRY_ACTIONS[action](args)
     if action not in {"dm", "run", "status", "stop"}:
-        print("Unknown peer action. See: hbm-agent peer --help", file=sys.stderr)
+        print("Unknown peer action. See: hbm peer --help", file=sys.stderr)
         return 2
     try:
         peer_name, profile, peer, key = _resolve_peer_target(args.target)
@@ -396,21 +396,21 @@ def build_peer_parser(subparsers) -> None:
     parser = subparsers.add_parser(
         "peer", help="Bot-to-bot DMs across machines (peer HBM AGENT gateways)",
         description="Register other HBM AGENT gateways as peers and message their agents. "
-            "'hbm-agent peer dm <peer>[/<agent>] \"...\"' delivers into the remote "
+            "'hbm peer dm <peer>[/<agent>] \"...\"' delivers into the remote "
             "agent's canonical Bot Chat over the peer's API server and prints "
-            "the reply — the cross-machine twin of 'hbm-agent -p <bot> chat'. "
+            "the reply — the cross-machine twin of 'hbm -p <bot> chat'. "
             "The peer must run the api_server platform; its API_SERVER_KEY is "
             "stored locally as a credential in ~/.hbm/.env.",
         epilog=(
             "Examples:\n"
-            "  hbm-agent peer add spark --url http://spark.lan:8377 --key <API_SERVER_KEY>\n"
-            "  hbm-agent peer list\n"
-            '  hbm-agent peer dm spark "Message from 🤖 dixie (@dixie): disk status?"\n'
-            '  hbm-agent peer dm spark/researcher "..."   # named profile on a multiplexed peer\n'
-            "  hbm-agent peer run spark --idempotency-key ticket-123 < long-task.txt\n"
-            "  hbm-agent peer status spark run_abc123\n"
-            "  hbm-agent peer stop spark run_abc123\n"
-            "  hbm-agent peer remove spark\n"
+            "  hbm peer add spark --url http://spark.lan:8377 --key <API_SERVER_KEY>\n"
+            "  hbm peer list\n"
+            '  hbm peer dm spark "Message from 🤖 dixie (@dixie): disk status?"\n'
+            '  hbm peer dm spark/researcher "..."   # named profile on a multiplexed peer\n'
+            "  hbm peer run spark --idempotency-key ticket-123 < long-task.txt\n"
+            "  hbm peer status spark run_abc123\n"
+            "  hbm peer stop spark run_abc123\n"
+            "  hbm peer remove spark\n"
             "\n"
             "Exit codes: 0 ok, 1 delivery/peer error, 2 usage error."),
         formatter_class=argparse.RawDescriptionHelpFormatter)
@@ -431,7 +431,7 @@ def build_peer_parser(subparsers) -> None:
         sp = peer_sub.add_parser(name, help=help)
         sp.add_argument("target", help="<peer> or <peer>/<agent> (named profile on a multiplexed peer)")
         if run_id:
-            sp.add_argument("run_id", help="Run ID returned by 'hbm-agent peer run'")
+            sp.add_argument("run_id", help="Run ID returned by 'hbm peer run'")
         else:
             sp.add_argument("message", nargs="?", default=None, help="Message text (or stdin)")
             if name == "run":

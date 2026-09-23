@@ -1,11 +1,11 @@
-"""E2E: ``hbm-agent peer dm`` against a REAL api_server gateway whose canonical
+"""E2E: ``hbm peer dm`` against a REAL api_server gateway whose canonical
 Bot Chat session is HIDDEN (issue #91583).
 
 Two real HBM homes in spirit: the "peer" side is a real
 :class:`APIServerAdapter` bound to a real loopback TCP socket over a real
 SQLite ``state.db`` (its own tmp HBM_HOME) containing a hidden
 ``Bot Chat`` row — exactly what Bot Mode leaves behind. The "local" side is
-the stock ``hbm-agent peer dm`` client code (``hbm_cli.subcommands.peer``),
+the stock ``hbm peer dm`` client code (``hbm_cli.subcommands.peer``),
 untouched, talking real HTTP with the real API key auth.
 
 Only the model turn itself is stubbed (``_run_agent``); every HTTP handler,

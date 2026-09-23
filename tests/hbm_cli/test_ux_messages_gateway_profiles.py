@@ -86,7 +86,7 @@ def test_invalid_profile_name_explains_rule_in_words_with_example():
     assert "Must match" not in msg and "[a-z0-9]" not in msg
     assert "lowercase" in msg
     assert "my-work" in msg
-    assert "hbm-agent profile create my-work" in msg
+    assert "hbm profile create my-work" in msg
 
 
 def test_existing_profile_error_offers_use_and_list(tmp_path, monkeypatch):
@@ -96,8 +96,8 @@ def test_existing_profile_error_offers_use_and_list(tmp_path, monkeypatch):
         profiles.create_profile("work", no_alias=True, no_skills=True)
     msg = str(info.value)
     assert "already exists at" not in msg
-    assert "hbm-agent profile use work" in msg
-    assert "hbm-agent profile list" in msg
+    assert "hbm profile use work" in msg
+    assert "hbm profile list" in msg
 
 
 def test_missing_profile_error_points_at_list(tmp_path, monkeypatch):
@@ -106,7 +106,7 @@ def test_missing_profile_error_points_at_list(tmp_path, monkeypatch):
         profiles.delete_profile("wrk")
     msg = str(info.value)
     assert "No profile named 'wrk'" in msg
-    assert "hbm-agent profile list" in msg
+    assert "hbm profile list" in msg
 
 
 # --- cli-28: concurrent update refusal ---------------------------------------------------------

@@ -26,7 +26,7 @@ def test_skill_fetch_failure_names_search_and_doctor():
     c, buf = _console()
     _print_fetch_failure(c, sources=[], identifier="someone/typo-skill")
     out = buf.getvalue()
-    assert "hbm-agent skills search typo-skill" in out
+    assert "hbm skills search typo-skill" in out
     assert "hbm doctor" in out
     assert "from any source" not in out
 
@@ -71,7 +71,7 @@ def test_banner_failed_mcp_line_shows_reason_and_command():
     line = _mcp_server_line({"name": "gh", "transport": "stdio", "connected": False, "status": "failed",
                              "error": "missing executable 'npx' (ensure Node.js is installed)"}, dim="grey", text="white")
     assert "could not connect" in line and "missing executable 'npx'" in line
-    assert "hbm-agent mcp test gh" in line
+    assert "hbm mcp test gh" in line
 
     auth = _mcp_server_line({"name": "linear", "transport": "http", "connected": False, "status": "failed",
                              "error": "Client error '401 Unauthorized' for url"}, dim="grey", text="white")
@@ -142,7 +142,7 @@ def test_doctor_ack_failure_names_config_path_and_retry(monkeypatch, capsys):
         assert exc.code == 1
     out = capsys.readouterr().out
     assert "~/.hbm/profiles/work/config.yaml" in out
-    assert "hbm-agent config path" in out and f"hbm doctor --ack {ADVISORIES[0].id}" in out
+    assert "hbm config path" in out and f"hbm doctor --ack {ADVISORIES[0].id}" in out
     assert "Failed to persist" not in out
 
 

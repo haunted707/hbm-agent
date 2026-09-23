@@ -70,9 +70,9 @@ def reconcile_profile_gateways(
 
     Always registers a ``gateway-default`` slot for the root profile (the implicit profile at
     the top of ``$HBM_HOME``): ``hbm_cli.gateway`` maps an empty profile suffix to it,
-    so it is what ``hbm-agent gateway start`` (no ``-p``) targets.
+    so it is what ``hbm gateway start`` (no ``-p``) targets.
 
-    Without it, bare ``hbm-agent gateway start`` inside the container would land on ``s6-svc -u
+    Without it, bare ``hbm gateway start`` inside the container would land on ``s6-svc -u
     /run/service/gateway-default`` → uncaught ``CalledProcessError`` → traceback to the user (PR #30136
     review).
     """
@@ -101,7 +101,7 @@ def reconcile_profile_gateways(
     profiles_root = hbm_home / "profiles"
     if profiles_root.is_dir():
         for entry in sorted(profiles_root.iterdir()):
-            # SOUL.md (seeded by `hbm-agent profile create`) is the "real profile" marker.
+            # SOUL.md (seeded by `hbm profile create`) is the "real profile" marker.
             if not entry.is_dir() or not (entry / "SOUL.md").exists():
                 continue
             # "default" is reserved for the root profile slot above.
@@ -275,7 +275,7 @@ def _register_service(scandir: Path, profile: str, *, start: bool) -> None:
         _write_exec(tmp_dir / "finish", S6ServiceManager._render_finish_script())
         (tmp_dir / "log").mkdir()
         _write_exec(tmp_dir / "log" / "run", S6ServiceManager._render_log_run(profile))
-        if not start:  # `hbm-agent -p <profile> gateway start` brings it up later (s6-svc -u)
+        if not start:  # `hbm -p <profile> gateway start` brings it up later (s6-svc -u)
             (tmp_dir / "down").touch()
         # Pre-create supervise/ with hbm ownership BEFORE publishing so s6-supervise inherits
         # it and runtime s6-svc calls as the hbm user won't EACCES.

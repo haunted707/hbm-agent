@@ -159,7 +159,7 @@ def register_blueprint_suggestion(spec: BlueprintSpec) -> Optional[Dict[str, Any
 
 def export_blueprint(job: Dict[str, Any], body: str, *, blueprint_name: Optional[str] = None) -> str:
     """Inverse of ``create_blueprint_job``: render a cron job as a SKILL.md (with a
-    ``metadata.hbm.blueprint`` block) ready for ``hbm-agent skills publish``.
+    ``metadata.hbm.blueprint`` block) ready for ``hbm skills publish``.
     ``body`` becomes the SKILL.md body; its first line is the description."""
     import yaml
 

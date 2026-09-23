@@ -23,7 +23,7 @@ def migrate_profile_identity(old_name: str, new_name: str) -> bool:
     """Retry the session/routing identity migration of a rename that already completed.
 
     ``rename_profile`` runs the migration itself; this is the standalone retry behind
-    ``hbm-agent profile migrate-identity <old> <new>`` for when that attempt failed. The rename
+    ``hbm profile migrate-identity <old> <new>`` for when that attempt failed. The rename
     cannot simply be repeated — ``profiles/<old>`` is gone — and the identity to migrate is read
     from the DB rows that still name *old*, so only the new profile has to exist here.
 
@@ -90,7 +90,7 @@ def _migrate_profile_identity(old_canon: str, new_canon: str, live_mux: bool) ->
         print(
             "⚠ Profile was renamed, but the live gateway could not migrate session identity"
             f" ({reason}). Restart the gateway, then run:\n"
-            f"    hbm-agent profile migrate-identity {old_canon} {new_canon}",
+            f"    hbm profile migrate-identity {old_canon} {new_canon}",
             file=sys.stderr)
         return False
 

@@ -572,7 +572,7 @@ def test_credential_pool_device_code_seed_respects_suppression(tmp_path, monkeyp
 
 
 def test_auth_remove_xai_oauth_clears_singleton_and_sticks(tmp_path, monkeypatch):
-    """End-to-end regression: ``hbm-agent auth remove xai-oauth 1`` for a
+    """End-to-end regression: ``hbm auth remove xai-oauth 1`` for a
     singleton-seeded entry must clear auth.json providers.xai-oauth AND
     suppress further re-seeding — otherwise the next ``load_pool`` call
     silently resurrects the entry from the still-present singleton, making
@@ -600,7 +600,7 @@ def test_auth_remove_xai_oauth_clears_singleton_and_sticks(tmp_path, monkeypatch
     raw = json.loads((hbm_home / "auth.json").read_text())
     assert "xai-oauth" in raw.get("providers", {})
 
-    # Act: the user runs `hbm-agent auth remove xai-oauth 1`.
+    # Act: the user runs `hbm auth remove xai-oauth 1`.
     auth_remove_command(SimpleNamespace(provider="xai-oauth", target="1"))
 
     # Post-state: auth.json singleton must be cleared so a re-seed has
@@ -941,7 +941,7 @@ def test_pool_sync_back_preserves_active_provider(tmp_path, monkeypatch):
     picking a provider.  ``_save_provider_state`` flips ``active_provider``;
     using it on the sync-back path means every xAI/Codex/Nous refresh in a
     multi-provider setup silently overrides the user's chosen active
-    provider (visible to ``hbm-agent auth status``, ``hbm setup``, and the
+    provider (visible to ``hbm auth status``, ``hbm setup``, and the
     ``hbm`` no-arg dispatcher).  Pin the ``set_active=False`` contract so
     no future refactor regresses to the legacy semantic."""
     from agent.credential_pool import load_pool

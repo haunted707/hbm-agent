@@ -185,7 +185,7 @@ def test_targeted_unload_disposes_persistent_auth_provider():
     ctx.register_dashboard_auth_provider(_Basic())
     assert get_provider("basic") is not None
 
-    # `hbm-agent plugins disable basic` drives a targeted unload of that plugin.
+    # `hbm plugins disable basic` drives a targeted unload of that plugin.
     assert manager.unload("basic") is True
 
     assert get_provider("basic") is None, (

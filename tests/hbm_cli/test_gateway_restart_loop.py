@@ -26,7 +26,7 @@ class TestGatewayLifecyclePattern:
     @pytest.mark.parametrize("text", [
         "hbm gateway restart",
         "hbm gateway stop",
-        "hbm-agent gateway uninstall",
+        "hbm gateway uninstall",
         "hbm  gateway  restart",         # double spaces
         "Hermez Gateway Restart".lower().replace("z", "s"),  # case handled
         "HBM GATEWAY RESTART",           # uppercase
@@ -147,7 +147,7 @@ class TestGatewayLifecyclePattern:
         "restart the server application",
         "hbm cron list",
         "hbm update",
-        "hbm-agent config set model claude",
+        "hbm config set model claude",
         "echo 'just a normal cron job'",
         "run the backup script",
         "gateway is running fine",
@@ -525,7 +525,7 @@ class TestTerminalToolGatewayLifecycleGuard:
         "systemctl --user restart hbm-gateway",
         "systemctl stop hbm-gateway.service",
         "hbm gateway restart",
-        "hbm-agent gateway uninstall",
+        "hbm gateway uninstall",
         "launchctl kickstart gui/501/ai.hbm.gateway",
         "launchctl bootout gui/501/ai.hbm.gateway",
         # #62891 exact reported shape and its bootstrap sibling.

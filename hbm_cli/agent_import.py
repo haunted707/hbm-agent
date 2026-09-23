@@ -1,8 +1,8 @@
-"""hbm-agent import-agent — import Claude Code / Codex CLI setups into HBM AGENT.
+"""hbm import-agent — import Claude Code / Codex CLI setups into HBM AGENT.
 
 Secrets are NEVER imported: credential files are never read, and MCP env vars with secret-looking
 names (KEY, TOKEN, SECRET, PASSWORD, ...) are stripped and reported so the user re-adds them via
-``hbm-agent setup`` or config.yaml.
+``hbm setup`` or config.yaml.
 """
 
 from __future__ import annotations
@@ -60,7 +60,7 @@ def load_yaml_file(path: Path) -> Dict[str, Any]:
     :class:`ConfigReadError` so the caller refuses and leaves the file byte-identical."""
     if not path.exists():
         return {}
-    fix_hint = "Fix it with `hbm-agent config edit` (or move it aside), then re-run the import."
+    fix_hint = "Fix it with `hbm config edit` (or move it aside), then re-run the import."
 
     def refusal(detail: str) -> ConfigReadError:
         return ConfigReadError(f"Refusing to overwrite {path}: {detail}")
@@ -522,7 +522,7 @@ class AgentImporter:
 
 
 def import_agent_command(args) -> None:
-    """Handle ``hbm-agent import-agent`` (invoked from hbm_cli.main)."""
+    """Handle ``hbm import-agent`` (invoked from hbm_cli.main)."""
     from hbm_cli.config import get_config_path, load_config, save_config
     from hbm_constants import get_hbm_home
     from hbm_cli.setup import (Colors, color, print_header, print_info, print_success,
@@ -540,12 +540,12 @@ def import_agent_command(args) -> None:
         if not detected:
             print()
             print_error("No supported agent setup found (~/.claude or ~/.codex).")
-            print_info("Specify one explicitly: hbm-agent import-agent claude-code --source /path")
+            print_info("Specify one explicitly: hbm import-agent claude-code --source /path")
             return
         if len(detected) > 1 and explicit_source is None:
             print()
             print_info("Multiple agent setups detected: " + ", ".join(detected))
-            print_info("Pick one: hbm-agent import-agent claude-code   or   hbm-agent import-agent codex")
+            print_info("Pick one: hbm import-agent claude-code   or   hbm import-agent codex")
             return
         agent = detected[0]
     source_dir = Path(explicit_source or Path.home() / _AGENT_DEFAULT_DIRS[agent])
@@ -557,7 +557,7 @@ def import_agent_command(args) -> None:
     if not source_dir.is_dir():
         print()
         print_error(f"Agent directory not found: {source_dir}")
-        print_info(f"Specify a custom path: hbm-agent import-agent {agent} --source /path/to/{_AGENT_DEFAULT_DIRS[agent]}")
+        print_info(f"Specify a custom path: hbm import-agent {agent} --source /path/to/{_AGENT_DEFAULT_DIRS[agent]}")
         return
     hbm_home = get_hbm_home()
     print()
@@ -566,7 +566,7 @@ def import_agent_command(args) -> None:
     print_info(f"Source:      {source_dir}")
     print_info(f"Target:      {hbm_home}")
     print_info(f"Overwrite:   {'yes' if overwrite else 'no (skip conflicts)'}")
-    print_info("Secrets:     never imported — run 'hbm-agent setup' for credentials")
+    print_info("Secrets:     never imported — run 'hbm setup' for credentials")
     # Ensure config.yaml exists before the import tries to merge into it
     if not get_config_path().exists():
         save_config(load_config())
@@ -604,7 +604,7 @@ def import_agent_command(args) -> None:
     if not args.yes:
         if not sys.stdin.isatty():
             print_info("Non-interactive session — preview only.")
-            print_info(f"To execute, re-run with: hbm-agent import-agent {agent} --yes")
+            print_info(f"To execute, re-run with: hbm import-agent {agent} --yes")
             return
         if not prompt_yes_no("Proceed with import?", default=True):
             print_info("Import cancelled.")
@@ -616,13 +616,13 @@ def import_agent_command(args) -> None:
     from hbm_cli.agent_import_sync import update_sync_manifest
     try:
         update_sync_manifest(agent, source_dir.resolve(), hbm_home.resolve(), overwrite, report)
-        print_info("Source registered for sync — re-run 'hbm-agent import-agent --sync' "
+        print_info("Source registered for sync — re-run 'hbm import-agent --sync' "
                    "any time to pull in changes.")
     except OSError as exc:
         logger.warning("Could not update import sync manifest: %s", exc)
     print()
     print_success("Import complete.")
-    print_info("API keys and credentials were NOT imported — run 'hbm-agent setup' "
+    print_info("API keys and credentials were NOT imported — run 'hbm setup' "
                "to configure providers, or add them to ~/.hbm/.env.")
 
 
@@ -657,7 +657,7 @@ def print_import_report(report: Dict[str, Any], dry_run: bool) -> None:
         print(color("  ⚷ Secrets stripped (never imported):", Colors.YELLOW))
         for name in stripped:
             print(f"      {name}")
-        print_info("Re-add credentials deliberately via 'hbm-agent setup' or ~/.hbm/.env.")
+        print_info("Re-add credentials deliberately via 'hbm setup' or ~/.hbm/.env.")
         print()
     summary = report.get("summary", {})
     parts = [f"{summary[k]} {label}" for k, _, _, label in groups if summary.get(k)]

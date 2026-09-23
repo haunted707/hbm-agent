@@ -208,7 +208,7 @@ source ~/.bashrc
 # If you previously installed with sudo, clean up:
 sudo rm /usr/local/bin/hbm
 # Then re-run the standard installer
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -767,7 +767,7 @@ Skills with very long descriptions are truncated to 40 characters in the Telegra
 
 1. Install HBM AGENT on the new machine:
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh
    ```

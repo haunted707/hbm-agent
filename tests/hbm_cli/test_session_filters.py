@@ -1,5 +1,5 @@
 """Tests for hbm_cli.session_filters — CLI time/filter parsing for
-`hbm-agent sessions prune` / `hbm-agent sessions archive`."""
+`hbm sessions prune` / `hbm sessions archive`."""
 
 import time
 from argparse import Namespace

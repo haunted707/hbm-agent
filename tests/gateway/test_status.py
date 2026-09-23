@@ -364,9 +364,9 @@ class TestGatewayRuntimeStatus:
         monkeypatch.setattr(status, "_pid_exists", lambda pid: True)
         monkeypatch.setattr(status, "_get_process_start_time", lambda pid: 1000)
         for cmdline in (
-            "hbm-agent -p coder gateway run --replace",
+            "hbm -p coder gateway run --replace",
             "/opt/hbm/.venv/bin/hbm-agent --profile coder gateway run --replace",
-            "hbm_home=/opt/data/profiles/coder hbm-agent gateway run --replace",
+            "hbm_home=/opt/data/profiles/coder hbm gateway run --replace",
         ):
             monkeypatch.setattr(status, "_read_process_cmdline", lambda pid, c=cmdline: c)
             assert (

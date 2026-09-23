@@ -20,7 +20,7 @@ After=network.target
 
 [Service]
 Type=simple
-ExecStart=/usr/bin/env hbm-agent kanban daemon --force --interval 60 --pidfile %t/hbm-kanban-dispatcher.pid
+ExecStart=/usr/bin/env hbm kanban daemon --force --interval 60 --pidfile %t/hbm-kanban-dispatcher.pid
 Restart=on-failure
 RestartSec=5
 # Log to the journal via stdout/stderr; the dispatcher also writes per-task

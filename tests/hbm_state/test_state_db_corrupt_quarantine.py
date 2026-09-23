@@ -103,7 +103,7 @@ class TestQuarantinedHandleStopsTouchingTheFile:
         assert db._conn is None
         assert any(
             "Skipping the close-time WAL checkpoint" in rec.getMessage()
-            and "hbm-agent sessions recover" in rec.getMessage()
+            and "hbm sessions recover" in rec.getMessage()
             for rec in caplog.records
         )
 
@@ -264,7 +264,7 @@ class TestVacuumAndMaintenanceRespectQuarantine:
     """vacuum()/optimize_fts() must check the same
     quarantine flags _execute_write does before touching the connection.
 
-    Without this, `hbm-agent sessions vacuum`/`optimize` and the default-on
+    Without this, `hbm sessions vacuum`/`optimize` and the default-on
     ``maybe_auto_prune_and_vacuum`` auto-maintenance could run VACUUM /
     FTS5 'optimize' / an explicit WAL checkpoint directly over a
     structurally damaged, replaced, or split-WAL-generation file — turning

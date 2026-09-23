@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """HBM AGENT CLI — interactive terminal interface (``python cli.py --help`` for usage)."""
 
-# Must be the very first import (UTF-8 stdio on Windows). Missing only mid-``hbm-agent update``.
+# Must be the very first import (UTF-8 stdio on Windows). Missing only mid-``hbm update``.
 try:
     import hbm_bootstrap  # noqa: F401
 except ModuleNotFoundError:
@@ -490,7 +490,7 @@ def load_cli_config() -> Dict[str, Any]:
     defaults = _expand_env_vars(defaults)
 
     # Administrator-pinned (managed scope) values overlay LAST; cli.py builds its config
-    # independently of hbm_cli.config, so this keeps parity with `hbm-agent config`. Fail-open.
+    # independently of hbm_cli.config, so this keeps parity with `hbm config`. Fail-open.
     from hbm_cli import managed_scope
 
     defaults = managed_scope.apply_managed_overlay(defaults)
@@ -1061,7 +1061,7 @@ def _cleanup_worktree(info: Dict[str, str] = None) -> None:
         if _repo_is_shallow(repo_root):
             # Shallow boundary makes the unpushed verdict unreliable; the startup pruner reaps later.
             _cprint(f"\n\033[33m⚠ Shallow clone — cannot verify push state, keeping: {wt_path}\033[0m")
-            print("  The next `hbm-agent -w` session deepens the clone and prunes merged worktrees automatically.")
+            print("  The next `hbm -w` session deepens the clone and prunes merged worktrees automatically.")
         else:
             _cprint(f"\n\033[33m⚠ Worktree has unpushed commits, keeping: {wt_path}\033[0m")
             print(f"  To clean up manually: git worktree remove --force {wt_path}")
@@ -2407,7 +2407,7 @@ def save_config_value(key_path: str, value: any) -> bool:
             os.chmod(config_path, 0o600)
         except (OSError, NotImplementedError):
             pass
-        # Same unpinned-cron notice as `hbm-agent config set` for every model switch.
+        # Same unpinned-cron notice as `hbm config set` for every model switch.
         from hbm_cli.config import warn_unpinned_cron_jobs_after_model_config_change
 
         warn_unpinned_cron_jobs_after_model_config_change(key_path, value)
@@ -2421,7 +2421,7 @@ def _normalize_moa_model(model: Optional[str]) -> tuple[Optional[str], Optional[
     """``moa:<preset>`` -> ``("moa", preset)`` (same routing as ``/moa``); anything else -> ``(None, model)``.
 
     Returns ``("moa", "<preset>")`` when *model* selects the MoA virtual provider, otherwise ``(None,
-    model)`` unchanged. This gives non-interactive ``hbm-agent chat -Q -m moa:<preset>`` the same routing the
+    model)`` unchanged. This gives non-interactive ``hbm chat -Q -m moa:<preset>`` the same routing the
     interactive ``/moa`` command and the model picker already use: ``resolve_runtime_provider`` handles
     ``requested_provider == "moa"`` and ``agent_init`` builds the MoAClient off ``provider == "moa"``.
     Without this the raw ``moa:<preset>`` string is sent to the real provider and rejected with a 401/400
@@ -3091,7 +3091,7 @@ class HbmCLI(CLIProcessNotificationsMixin, CLIAgentSetupMixin, CLICommandsMixin,
                 logger.warning(
                     "Unknown skill(s) requested, skipping: %s. "
                     "Continuing with: %s. "
-                    "List available skills with `hbm-agent skills list`.",
+                    "List available skills with `hbm skills list`.",
                     missing_display,
                     ", ".join(loaded_skills),
                 )
@@ -3822,7 +3822,7 @@ class HbmCLI(CLIProcessNotificationsMixin, CLIAgentSetupMixin, CLICommandsMixin,
             print(
                 "Error: stdin (fd 0) is not available.\n"
                 "This can happen with certain Python installations (e.g. uv-managed cPython on macOS).\n"
-                "Try reinstalling Python via pyenv or Homebrew, then re-run: hbm-agent setup"
+                "Try reinstalling Python via pyenv or Homebrew, then re-run: hbm setup"
             )
             return False
         if sys.platform == "darwin":
@@ -3942,7 +3942,7 @@ class HbmCLI(CLIProcessNotificationsMixin, CLIAgentSetupMixin, CLICommandsMixin,
                     f"\nError: stdin is not usable ({_stdin_err}).\n"
                     "This can happen with certain Python installations (e.g. uv-managed cPython on macOS)\n"
                     "where kqueue cannot register fd 0.\n"
-                    "Try reinstalling Python via pyenv or Homebrew, then re-run: hbm-agent setup"
+                    "Try reinstalling Python via pyenv or Homebrew, then re-run: hbm setup"
                 )
             else:
                 raise
@@ -4640,7 +4640,7 @@ def main(
 
     _join_worktree = _start_worktree_setup(list_tools, list_toolsets, worktree, w)
     query = query or q
-    # ``hbm-agent chat`` already validated this; the direct Fire entry point gets the same contract.
+    # ``hbm chat`` already validated this; the direct Fire entry point gets the same contract.
     if output_format == "stream-json":
         if not query:
             raise ValueError("--format stream-json requires -q/--query")

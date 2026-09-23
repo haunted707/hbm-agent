@@ -1,5 +1,5 @@
 """Configuration management for HBM AGENT: config.yaml / .env loading, saving,
-validation, migration, and the ``hbm-agent config`` command."""
+validation, migration, and the ``hbm config`` command."""
 
 import copy
 import difflib
@@ -55,7 +55,7 @@ _PARSE_FAILURE_FALLBACK_MSG = {
     "refuse-write": "Nothing was written, so the existing file is preserved."}
 _PARSE_FAILURE_DEFAULTS_MSG = (
     "HBM AGENT is running on default settings until it is fixed, so none of your saved settings are applied.")
-_PARSE_FAILURE_REPAIR_MSG = "Open it with `hbm-agent config edit`, fix {where}, then run `hbm-agent config check`."
+_PARSE_FAILURE_REPAIR_MSG = "Open it with `hbm config edit`, fix {where}, then run `hbm config check`."
 
 
 def _yaml_error_location(exc: Exception) -> str:
@@ -108,7 +108,7 @@ def _warn_config_parse_failure(
         msg += f" A copy of the broken file was saved to {backup_path}."
     logger.warning("%s Details: %s", msg, _yaml_error_details(exc))
     try:
-        sys.stderr.write(f"⚠️  hbm-agent config: {msg}\n    Details: {_yaml_error_details(exc)}\n")
+        sys.stderr.write(f"⚠️  hbm config: {msg}\n    Details: {_yaml_error_details(exc)}\n")
         sys.stderr.flush()
     except Exception:
         pass
@@ -264,7 +264,7 @@ _NIX_STORE = Path("/nix/store")
 # detection instead of blocking config writes.
 _IGNORED_MANAGED_VALUES = frozenset({"brew", "homebrew"})
 # Explicit opt-out (``HBM_MANAGED=false``): without this a bool-shaped value became a package
-# manager literally named "false" and is_managed() blocked `hbm-agent update` (#12864).
+# manager literally named "false" and is_managed() blocked `hbm update` (#12864).
 _MANAGED_FALSE_VALUES = frozenset({"false", "0", "no", "off"})
 
 
@@ -324,7 +324,7 @@ def detect_install_method(project_root: Optional[Path] = None) -> str:
     ``$HBM_HOME/.install_method`` -> managed marker -> /nix/store path -> .git dir -> unknown.
     The stamp lives next to the code because HBM_HOME is shared data: a container and a host
     install can bind-mount the same home, so a home-scoped ``docker`` stamp would make the host
-    ``hbm-agent update`` refuse to run. A legacy ``docker`` value is therefore ignored unless we are
+    ``hbm update`` refuse to run. A legacy ``docker`` value is therefore ignored unless we are
     really inside a container, and being in a container alone never implies 'docker'.
 
     The supported installs self-identify via the code-scoped stamp: - the curl installer
@@ -391,7 +391,7 @@ def recommended_update_command_for_method(method: str) -> str:
     """Return the update command or guidance for a given install method."""
     if is_nix_install_method(method):
         return _NIX_UPDATE_MSG
-    return _UPDATE_COMMAND_BY_METHOD.get(method, "hbm-agent update")
+    return _UPDATE_COMMAND_BY_METHOD.get(method, "hbm update")
 
 
 def recommended_update_command() -> str:
@@ -406,7 +406,7 @@ def recommended_update_command() -> str:
 # forks. The published image excludes ``.git``, so the git update path can never succeed there
 # and the generic "reinstall via install.sh" fallback would install a NEW host-side HBM AGENT.
 _DOCKER_UPDATE_MESSAGE = """\
-✗ ``hbm-agent update`` doesn't apply inside the Docker container.
+✗ ``hbm update`` doesn't apply inside the Docker container.
 
 HBM AGENT runs as a published image (nousresearch/hbm-agent), not a
 git checkout — the container has no working tree to pull into.  Update by
@@ -433,7 +433,7 @@ Notes:
 
 
 def format_docker_update_message() -> str:
-    """Return the user-facing message for ``hbm-agent update`` inside Docker."""
+    """Return the user-facing message for ``hbm update`` inside Docker."""
     return _DOCKER_UPDATE_MESSAGE
 
 
@@ -515,8 +515,8 @@ def require_parseable_user_config(*, ignore_user_config: bool = False) -> None:
     where = _yaml_error_location(parse_error)
     message = (
         f"HBM AGENT stopped because your settings file ({config_path}) has a formatting error"
-        f"{f' at {where}' if where else ''}. Fix it with `hbm-agent config edit` and check with "
-        "`hbm-agent config check`, or add --ignore-user-config to run once with default settings.")
+        f"{f' at {where}' if where else ''}. Fix it with `hbm config edit` and check with "
+        "`hbm config check`, or add --ignore-user-config to run once with default settings.")
     if backup_path is not None:
         message += f" A copy of the broken file is at {backup_path}."
     message += f" Details: {_yaml_error_details(parse_error)}"
@@ -721,7 +721,7 @@ def _split_key_path(key: str) -> list[str]:
     """Split a dotted config-key path, honoring backslash-escaped dots (``a\\.b`` -> ``a.b``).
     Backslashes before any other character are preserved verbatim.
 
-    ``hbm-agent config set`` uses ``.`` as the nesting separator, so a key that itself contains a literal dot
+    ``hbm config set`` uses ``.`` as the nesting separator, so a key that itself contains a literal dot
     (e.g. provider names like ``qwen3.5-397b-wafer``) was silently split into bogus nested segments
     (#84064).
     """
@@ -946,7 +946,7 @@ _ENV_CONFIG_KEYS = frozenset({
 
 
 def _is_env_config_key(key: str) -> bool:
-    """Return whether `hbm-agent config set` routes this credential-shaped key to .env through the
+    """Return whether `hbm config set` routes this credential-shaped key to .env through the
     provider credential lifecycle. Non-secret env settings (``*_HOME_CHANNEL``, ``*_ALLOWED_USERS``)
     are ``config_env_routing.is_env_setting_key`` and take the plain ``.env`` path."""
     if "." in key:
@@ -1000,7 +1000,7 @@ def get_missing_skill_config_vars() -> List[Dict[str, Any]]:
     try:
         all_vars = discover_all_skill_config_vars()
     except Exception as e:
-        # A malformed SKILL.md must never break `hbm-agent update`; this prompting is a nicety.
+        # A malformed SKILL.md must never break `hbm update`; this prompting is a nicety.
         logger.debug("discover_all_skill_config_vars failed: %s", e)
         return []
     if not all_vars:
@@ -1240,7 +1240,7 @@ def _validate_web_backends(config: Dict[str, Any], issues: List[ConfigIssue]) ->
             _issue(issues, "warning",
                    f"web.{_key} is set to '{_val}', but {note} — "
                    "web_search/web_extract will fail until it is changed",
-                   "Run 'hbm-agent tools' and pick a different Web Search & Extract provider")
+                   "Run 'hbm tools' and pick a different Web Search & Extract provider")
 
 
 def validate_config_structure(config: Optional[Dict[str, Any]] = None) -> List["ConfigIssue"]:
@@ -1298,7 +1298,7 @@ def print_config_warnings(config: Optional[Dict[str, Any]] = None) -> None:
     for ci in issues:
         marker = "\033[31m✗\033[0m" if ci.severity == "error" else "\033[33m⚠\033[0m"
         lines.append(f"  {marker} {ci.message}")
-    lines.append("  \033[2mRun 'hbm-agent doctor' for fix suggestions.\033[0m")
+    lines.append("  \033[2mRun 'hbm doctor' for fix suggestions.\033[0m")
     sys.stderr.write("\n".join(lines) + "\n\n")
 
 
@@ -1389,7 +1389,7 @@ def migrate_config(interactive: bool = True, quiet: bool = False) -> Dict[str, A
         msg = support_floor_message()
         results["warnings"].append(msg)
         # stderr so it is visible even on quiet startup paths.
-        sys.stderr.write(f"⚠ hbm-agent config: {msg}\n")
+        sys.stderr.write(f"⚠ hbm config: {msg}\n")
         if not quiet:
             print(f"  ⚠ {msg}")
     else:
@@ -1488,7 +1488,7 @@ def _offer_list(heading: str, items: List[str], question: str) -> bool:
         print(f"    • {item}")
     print()
     if not _ask_yes_no(question):
-        print("  Set later with: hbm-agent config set <key> <value>")
+        print("  Set later with: hbm config set <key> <value>")
         return False
     print()
     return True
@@ -1798,7 +1798,7 @@ def _normalize_root_model_keys(config: Dict[str, Any]) -> Dict[str, Any]:
     sees a nested dict, and the id is canonicalized to ``default``.
 
     Also aliases ``api_base`` → ``base_url`` (issue #8919). ``api_base`` is the intuitive name OpenAI-SDK /
-    LiteLLM users reach for, and ``hbm-agent config set`` blindly accepts any dotted key — so
+    LiteLLM users reach for, and ``hbm config set`` blindly accepts any dotted key — so
     ``model.api_base`` got written, confirmed, and then silently ignored by the runtime resolver (which
     reads only ``model.base_url``), causing requests to fall back to OpenRouter. We migrate the alias to the
     canonical key (fallback-only — never override an explicit ``base_url``) and drop the alias so it can't
@@ -1807,7 +1807,7 @@ def _normalize_root_model_keys(config: Dict[str, Any]) -> Dict[str, Any]:
     ~14 other readers select the chat model via ``model.default``; ``model.model`` was already aliased
     inline at some sites but ``model.name`` was not, so a custom-provider config like ``model: {name: <id>,
     provider: <custom>}`` resolved to an empty model and the API request went out with ``model=`` (HTTP 400
-    from OpenAI-compatible backends) — while display paths (``hbm-agent status``/``dump``) read ``name`` and
+    from OpenAI-compatible backends) — while display paths (``hbm status``/``dump``) read ``name`` and
     *showed* the model, making the failure silent. Normalizing here (the single load/save chokepoint) means
     every reader, present and future, sees a populated ``default`` and the stale alias is migrated out of
     config.yaml on the next save. Precedence: ``default`` > ``model`` > ``name`` (never overrides an
@@ -2005,7 +2005,7 @@ def _backups_dir_display() -> str:
 
 _FIX_PERMS = "Fix the file permissions or move it aside first."
 _FIX_YAML = (
-    "Fix it with `hbm-agent config edit` and check with `hbm-agent config check`, or copy the newest good "
+    "Fix it with `hbm config edit` and check with `hbm config check`, or copy the newest good "
     "file from {backups} over config.yaml.")
 
 
@@ -2207,7 +2207,7 @@ def _last_known_good_fallback(config_path: Path, path_key: str, cache_sig, exc: 
     lkg = _LAST_EXPANDED_CONFIG_BY_PATH.get(path_key)
     fallback = "last-known-good"
     if lkg is None:
-        # Fresh process (CLI restart, `hbm-agent config get`): nothing loaded yet in this process, so
+        # Fresh process (CLI restart, `hbm config get`): nothing loaded yet in this process, so
         # fall back to the newest byte-exact copy the last successful parse left in backups/config/.
         # It holds the raw file (``${VAR}`` templates intact), so it goes through the same
         # canonicalize -> expand -> managed-overlay pipeline as a normal load.
@@ -2341,8 +2341,8 @@ _FALLBACK_COMMENT = """
 #
 # Supported providers:
 #   openrouter   (OPENROUTER_API_KEY)  — routes to any model
-#   openai-codex (OAuth — hbm-agent auth) — OpenAI Codex
-#   nous         (OAuth — hbm-agent auth) — Nous Portal
+#   openai-codex (OAuth — hbm auth) — OpenAI Codex
+#   nous         (OAuth — hbm auth) — Nous Portal
 #   zai          (ZAI_API_KEY)         — Z.AI / GLM
 #   kimi-coding  (KIMI_API_KEY)        — Kimi / Moonshot
 #   kimi-coding-cn (KIMI_CN_API_KEY)   — Kimi / Moonshot (China)
@@ -2879,7 +2879,7 @@ def _show_model_section(config: Dict[str, Any]) -> None:
         env_ghost = None
     if env_ghost is not None and str(env_ghost).strip() != str(cfg_max_turns).strip():
         print(color(f"                ⚠ .env has stale HBM_MAX_ITERATIONS={env_ghost} "
-                    f"(run 'hbm-agent doctor --fix' to remove)", Colors.YELLOW))
+                    f"(run 'hbm doctor --fix' to remove)", Colors.YELLOW))
 
 
 def _show_display_section(config: Dict[str, Any]) -> None:
@@ -3026,9 +3026,9 @@ def show_config():
 
     print()
     print(color("─" * 60, Colors.DIM))
-    print(color("  hbm-agent config edit     # Edit config file", Colors.DIM))
-    print(color("  hbm-agent config set <key> <value>", Colors.DIM))
-    print(color("  hbm-agent setup           # Run setup wizard", Colors.DIM))
+    print(color("  hbm config edit     # Edit config file", Colors.DIM))
+    print(color("  hbm config set <key> <value>", Colors.DIM))
+    print(color("  hbm setup           # Run setup wizard", Colors.DIM))
     print()
 
 
@@ -3219,8 +3219,8 @@ def warn_unpinned_cron_jobs_after_model_config_change(
     print(
         f"ℹ️  {affected} unpinned cron {noun} {verb} running on the {axis} it was created under "
         f"(its {axis}_snapshot), not the new global {axis}. To move it, pin it with "
-        "`hbm-agent cron edit <job_id> --provider <provider> --model <model>` or set a fleet default "
-        "with `hbm-agent config set cron.model <model>`.")
+        "`hbm cron edit <job_id> --provider <provider> --model <model>` or set a fleet default "
+        "with `hbm config set cron.model <model>`.")
 
 
 def _default_value_for_key(dotted_key: str):
@@ -3377,7 +3377,7 @@ _SCALAR_WORDS = {
 
 
 def _coerce_config_set_value(key: str, value: str) -> Any:
-    """Auto-coerce a ``hbm-agent config set`` string to bool/None/int/float/list/dict.
+    """Auto-coerce a ``hbm config set`` string to bool/None/int/float/list/dict.
     String-typed settings (per ``DEFAULT_CONFIG``) are preserved verbatim so enum members such as
     ``approvals.mode="off"`` never become booleans. List/mapping literals are parsed so
     isinstance-gated readers see real structures; the trigger is conservative."""
@@ -3416,7 +3416,7 @@ def _redirect_platform_display_key(key: str) -> tuple[str, Optional[str]]:
     Only known display settings (``OVERRIDEABLE_KEYS``) are redirected. Returns ``(key, note)``;
     the gateway import is guarded so the CLI works where the gateway package is unavailable.
 
-    Before #71047 a write such as ``hbm-agent config set platforms.telegram.streaming false`` landed on a key
+    Before #71047 a write such as ``hbm config set platforms.telegram.streaming false`` landed on a key
     the gateway never reads: ``config get`` echoed the new value back while the runtime kept the old
     ``display.platforms`` one — a silent no-op that looks like a duplicated key to the user.
     """
@@ -3473,9 +3473,9 @@ def _guard_section_overwrite(key: str, value: Any, user_config: Dict[str, Any], 
             err.append(f"  ... and {len(sub) - 8} more")
     err += [
         "  Use a dotted path to set a specific leaf key:",
-        f"    hbm-agent config set {key}.<sub-key> <value>",
+        f"    hbm config set {key}.<sub-key> <value>",
         "  Or use --force to replace the entire section:",
-        f"    hbm-agent config set --force {key} {value!r}"]
+        f"    hbm config set --force {key} {value!r}"]
     print("\n".join(err), file=sys.stderr)
     sys.exit(1)
 
@@ -3593,7 +3593,7 @@ def set_config_value(key: str, value: str, force: bool = False):
         _exit_invalid(f"✗ {e}")
     # api_base -> base_url alias at set-time too (mirrors _normalize_root_model_keys).
     if key.strip().lower() in ("model.api_base", "api_base"):
-        # Normalize the api_base → base_url alias at set-time too (issue #8919), so a fresh `hbm-agent config
+        # Normalize the api_base → base_url alias at set-time too (issue #8919), so a fresh `hbm config
         # set model.api_base ...` lands on the canonical key the runtime resolver actually reads, instead of
         # being silently ignored.
         user_config = _normalize_root_model_keys(user_config)
@@ -3723,17 +3723,17 @@ def _run_write_command(fn, *args) -> None:
         _exit_invalid(f"✗ {exc}")
 
 
-_USAGE_GET = ("Usage: hbm-agent config get <key> [--json] [--raw]", [
-    "hbm-agent config get model", "hbm-agent config get terminal.backend",
-    "hbm-agent config get skills.config --json"], None)
-_USAGE_SET = ("Usage: hbm-agent config set [--force] <key> <value>", [
-    "hbm-agent config set model anthropic/claude-sonnet-4", "hbm-agent config set terminal.backend docker",
-    "hbm-agent config set OPENROUTER_API_KEY sk-or-..."], [
+_USAGE_GET = ("Usage: hbm config get <key> [--json] [--raw]", [
+    "hbm config get model", "hbm config get terminal.backend",
+    "hbm config get skills.config --json"], None)
+_USAGE_SET = ("Usage: hbm config set [--force] <key> <value>", [
+    "hbm config set model anthropic/claude-sonnet-4", "hbm config set terminal.backend docker",
+    "hbm config set OPENROUTER_API_KEY sk-or-..."], [
     "", "  --force: skip the unknown-key notice for unrecognized keys,",
     "           and allow a scalar to replace a whole mapping section"])
-_USAGE_UNSET = ("Usage: hbm-agent config unset <key>", [
-    "hbm-agent config unset model", "hbm-agent config unset terminal.backend",
-    "hbm-agent config unset OPENROUTER_API_KEY"], None)
+_USAGE_UNSET = ("Usage: hbm config unset <key>", [
+    "hbm config unset model", "hbm config unset terminal.backend",
+    "hbm config unset OPENROUTER_API_KEY"], None)
 
 
 def _cmd_config_get(args):
@@ -3833,7 +3833,7 @@ def _cmd_config_check(args):
     if missing_config:
         print()
         print(color(f"  {len(missing_config)} new config option(s) available", Colors.YELLOW))
-        print("    Run 'hbm-agent config migrate' to add them")
+        print("    Run 'hbm config migrate' to add them")
 
     print()
 
@@ -3851,15 +3851,15 @@ _CONFIG_SUBCOMMANDS = {
     "check": _cmd_config_check}
 
 _CONFIG_USAGE = """Available commands:
-  hbm-agent config           Show current configuration
-  hbm-agent config edit      Open config in editor
-  hbm-agent config get <key>          Print a resolved config value
-  hbm-agent config set <key> <value>   Set a config value
-  hbm-agent config unset <key>        Remove a config value
-  hbm-agent config check     Check for missing/outdated config
-  hbm-agent config migrate   Update config with new options
-  hbm-agent config path      Show config file path
-  hbm-agent config env-path  Show .env file path"""
+  hbm config           Show current configuration
+  hbm config edit      Open config in editor
+  hbm config get <key>          Print a resolved config value
+  hbm config set <key> <value>   Set a config value
+  hbm config unset <key>        Remove a config value
+  hbm config check     Check for missing/outdated config
+  hbm config migrate   Update config with new options
+  hbm config path      Show config file path
+  hbm config env-path  Show .env file path"""
 
 
 def config_command(args):
@@ -3924,7 +3924,7 @@ def _platform_plugin_manifests():
 
 def _inject_platform_plugin_env_vars() -> None:
     """Populate OPTIONAL_ENV_VARS from bundled platform plugin manifests so Teams / IRC / Google
-    Chat etc. are configurable in ``hbm-agent config`` UI without the core knowing they exist.
+    Chat etc. are configurable in ``hbm config`` UI without the core knowing they exist.
 
     ``requires_env`` / ``optional_env`` entries are a bare name or a dict with ``name`` plus
     optional ``description``/``url``/``password``/``prompt``/``category``. Failures are swallowed

@@ -267,7 +267,7 @@ class TestCreateProfile:
 # ===================================================================
 
 class TestNoSkillsOptOut:
-    """Tests for `hbm-agent profile create --no-skills` and the opt-out marker."""
+    """Tests for `hbm profile create --no-skills` and the opt-out marker."""
 
     def test_no_skills_writes_marker_and_skips_seeding(self, profile_env):
         profile_dir = create_profile("orchestrator", no_alias=True, no_skills=True)
@@ -939,7 +939,7 @@ class TestRenameProfile:
         assert "Restart the gateway" in capsys.readouterr().err
 
     def test_migrate_identity_command_repairs_a_failed_live_migration(self, profile_env, capsys):
-        """The failed-live-migration end state must be recoverable: `hbm-agent profile
+        """The failed-live-migration end state must be recoverable: `hbm profile
         migrate-identity <old> <new>` rekeys the durable rows once no gateway holds the store, and
         is idempotent (a second run has nothing left to rekey but still succeeds)."""
         from hbm_cli.profile_cmd import cmd_profile
@@ -968,7 +968,7 @@ class TestRenameProfile:
              patch("hbm_cli.profiles._notify_multiplexer"), \
              patch("gateway.control_socket.migrate_gateway_profile_identity", return_value=None):
             rename_profile("oldname", "newname")
-        assert "hbm-agent profile migrate-identity oldname newname" in capsys.readouterr().err
+        assert "hbm profile migrate-identity oldname newname" in capsys.readouterr().err
 
         # Gateway restarted/stopped → the retry command repairs both stores.
         with patch("hbm_cli.profiles._live_default_multiplexer", return_value=False):

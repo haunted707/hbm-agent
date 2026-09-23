@@ -1,4 +1,4 @@
-"""Git worktree isolation for ``hbm-agent -w`` sessions: create, classify, prune.
+"""Git worktree isolation for ``hbm -w`` sessions: create, classify, prune.
 
 Every git call goes through ``_git``/``_git_out``/``_git_quiet`` (UTF-8 text, captured,
 bounded timeout). Classification helpers fail SAFE toward "preserve". ``cli`` re-exports
@@ -325,7 +325,7 @@ def _setup_worktree(repo_root: str = None, sync_base: bool = True,
     repo_root = repo_root or _git_repo_root()
     if not repo_root:
         _cprint("\033[31m✗ --worktree requires being inside a git repository.\033[0m")
-        print("  cd into your project repo first, then run hbm-agent -w")
+        print("  cd into your project repo first, then run hbm -w")
         return None
 
     wt_name = ((name and re.sub(r"[^A-Za-z0-9._-]+", "-", name).strip("-._")[:40])
@@ -638,7 +638,7 @@ def _worktree_branch_pushed_exact(
 def _worktree_lock_is_live(repo_root: str, worktree_path: str, timeout: int = 10):
     """Lock state: ``"live"`` (owning pid runs), ``"dead"`` (pid gone / non-hbm reason), None (unlocked).
 
-    ``hbm-agent -w`` locks with reason ``hbm pid=<pid>``; ``worktree remove --force`` refuses
+    ``hbm -w`` locks with reason ``hbm pid=<pid>``; ``worktree remove --force`` refuses
     locked trees, so a crashed session's lock would keep its tree forever. Fails SAFE toward "live".
     """
     try:
@@ -837,7 +837,7 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
 
     if preserved_stale:
         logger.warning("Preserving %d worktree(s) older than 7 days with unmerged work "
-                       "(run `hbm-agent worktree prune` to review and reclaim): %s",
+                       "(run `hbm worktree prune` to review and reclaim): %s",
                        len(preserved_stale), ", ".join(sorted(preserved_stale)))
 
     _prune_orphaned_branches(repo_root, protect=kept_branches)
@@ -849,8 +849,8 @@ def _prune_stale_worktrees(repo_root: str, max_age_hours: int = 24) -> None:
         count, size_mb = worktrees_summary(repo_root)
         if count >= 10 or (size_mb or 0) >= 5120:
             size_txt = f"{size_mb / 1024:.1f}GB" if size_mb else "unknown size"
-            logger.warning(".worktrees/ holds %d tree(s) (%s) — run `hbm-agent worktree list` "
-                           "to audit and `hbm-agent worktree prune` to reclaim safely.", count, size_txt)
+            logger.warning(".worktrees/ holds %d tree(s) (%s) — run `hbm worktree list` "
+                           "to audit and `hbm worktree prune` to reclaim safely.", count, size_txt)
     except Exception:
         pass
 

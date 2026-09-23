@@ -291,7 +291,7 @@ class HbmACPAgent(SlashCommandsMixin, acp.Agent):
 
     def _build_model_state(self, state: SessionState) -> SessionModelState | None:
         """Authenticated providers + models, from the shared HBM AGENT inventory (same substrate
-        as ``hbm-agent model``/TUI/dashboard) so the selector isn't just the current curated list."""
+        as ``hbm model``/TUI/dashboard) so the selector isn't just the current curated list."""
         model = str(state.model or getattr(state.agent, "model", "") or "").strip()
         provider = getattr(state.agent, "provider", None) or detect_provider() or "openrouter"
         try:

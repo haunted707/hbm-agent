@@ -510,11 +510,11 @@ def _apply_tool_selection(
 
     Probe-success: curses checklist; pre-check priority *prior_selection* (reinstall) > manifest
     ``tools.default_enabled`` > all; all-on clears any filter. Probe-fail: keep the prior filter,
-    else apply ``default_enabled``, else no filter; point the user at ``hbm-agent mcp configure``.
+    else apply ``default_enabled``, else no filter; point the user at ``hbm mcp configure``.
     """
     print()
     name = entry.name
-    configure_hint = f"`hbm-agent mcp configure {name}`"
+    configure_hint = f"`hbm mcp configure {name}`"
 
     # Exclude-mode manifests never probe: the curated exclude list (names or globs) is written as-is
     # and everything else stays enabled, including tools the server adds later. A prior include
@@ -597,7 +597,7 @@ def _apply_tool_selection(
         return
     if len(chosen_indices) == len(probed):
         # Clear the filter: tools the server adds later are auto-enabled too. To pin the current set,
-        # re-run `hbm-agent mcp configure <name>` and unselect a tool (switches to include-mode).
+        # re-run `hbm mcp configure <name>` and unselect a tool (switches to include-mode).
         _write_tools_filter(name, "include", None)
         _say(
             f"  ✓ All {len(probed)} tools enabled (no filter — new tools "
@@ -631,11 +631,11 @@ def install_entry(entry: CatalogEntry, *, enable: bool = True) -> None:
         _say("  Configure credentials:", Colors.CYAN)
         _prompt_env_vars(entry.auth.env)
     elif entry.auth.type == "oauth" and entry.auth.provider:
-        # Provider-mediated OAuth relies on the existing `hbm-agent auth <provider>` flow; surface
+        # Provider-mediated OAuth relies on the existing `hbm auth <provider>` flow; surface
         # guidance rather than auto-running it to keep install decoupled from provider-auth lifecycle.
         _say(
             f"  This MCP uses {entry.auth.provider} OAuth. Run "
-            f"`hbm-agent auth {entry.auth.provider}` if you have not "
+            f"`hbm auth {entry.auth.provider}` if you have not "
             "already authenticated.",
             Colors.YELLOW)
     elif entry.auth.type == "oauth":

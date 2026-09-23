@@ -20,7 +20,7 @@ If you prefer a real POSIX environment (for the dashboard's embedded terminal, `
 Open **PowerShell** (or Windows Terminal) and run:
 
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 No admin rights required. The installer goes to `%LOCALAPPDATA%\hbm\` and adds `hbm` to your **User PATH** — open a new terminal after it finishes.
@@ -28,7 +28,7 @@ No admin rights required. The installer goes to `%LOCALAPPDATA%\hbm\` and adds `
 **Installer options** (passed to the local `install.ps1`):
 
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1 -NoVenv -SkipSetup -Branch main
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1 -NoVenv -SkipSetup -Branch main
 ```
 
 | Parameter | Default | Purpose |

@@ -91,7 +91,7 @@ def test_format_turn_completion_corrupt_never_names_the_live_db():
     when pointed at a live state.db, splitting the store into two
     generations whose acknowledged writes vanish. The guidance that ships
     in the corruption banner must be the snapshot-copying
-    `hbm-agent sessions recover` lane.
+    `hbm sessions recover` lane.
     """
     from run_agent import AIAgent
 

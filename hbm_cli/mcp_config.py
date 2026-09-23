@@ -1,4 +1,4 @@
-"""MCP Server Management CLI — ``hbm-agent mcp`` subcommand."""
+"""MCP Server Management CLI — ``hbm mcp`` subcommand."""
 
 import asyncio
 import logging
@@ -612,9 +612,9 @@ def cmd_mcp_add(args):
     if not url and not command:
         _error("Must specify --url <endpoint>, --command <cmd>, or --preset <name>")
         _info("Examples:")
-        _info('  hbm-agent mcp add ink --url "https://mcp.ml.ink/mcp"')
-        _info('  hbm-agent mcp add github --command npx --args @modelcontextprotocol/server-github')
-        _info('  hbm-agent mcp add myserver --preset mypreset')
+        _info('  hbm mcp add ink --url "https://mcp.ml.ink/mcp"')
+        _info('  hbm mcp add github --command npx --args @modelcontextprotocol/server-github')
+        _info('  hbm mcp add myserver --preset mypreset')
         return
 
     if name in _get_mcp_servers() and not _confirm(
@@ -650,7 +650,7 @@ def cmd_mcp_add(args):
             server_config["enabled"] = False
             if _save_mcp_server(name, server_config):
                 _success(f"Saved '{name}' to config (disabled)")
-                _info("Fix the issue, then: hbm-agent mcp test " + name)
+                _info("Fix the issue, then: hbm mcp test " + name)
         return
 
     if not tools:
@@ -682,7 +682,7 @@ def cmd_mcp_remove(args):
     _remove_mcp_server(name)
     _success(f"Removed '{name}' from config")
     # Route OAuth cleanup through MCPOAuthManager so any provider cached in this process (e.g. from
-    # an earlier `hbm-agent mcp test`) is evicted too.
+    # an earlier `hbm mcp test`) is evicted too.
     try:
         from tools.mcp_oauth_manager import get_manager
         get_manager().remove(name)
@@ -699,8 +699,8 @@ def cmd_mcp_list(args=None):
         _info("No MCP servers configured.")
         print()
         _info("Add one with:")
-        _info('  hbm-agent mcp add <name> --url <endpoint>')
-        _info('  hbm-agent mcp add <name> --command <cmd> --args <args...>')
+        _info('  hbm mcp add <name> --url <endpoint>')
+        _info('  hbm mcp add <name> --command <cmd> --args <args...>')
         print()
         return
 
@@ -751,11 +751,11 @@ def _probe_failure_next_step(name: str, exc: BaseException) -> str:
     from tools.mcp_tool_errors import _format_connect_error, _is_auth_error, _unwrap_exception_group
     root = _unwrap_exception_group(exc)
     if _is_auth_error(root) or getattr(getattr(root, "response", None), "status_code", None) in (401, 403):
-        return f"The server rejected the sign-in. Run: hbm-agent mcp login {name}"
+        return f"The server rejected the sign-in. Run: hbm mcp login {name}"
     if "missing executable" in _format_connect_error(exc):
         return (f"Install that command, or set mcp_servers.{name}.command in {display_hbm_home()}/config.yaml "
                 "to its full path.")
-    return f"Check the server is running and the URL/command in its config, then run: hbm-agent mcp test {name}"
+    return f"Check the server is running and the URL/command in its config, then run: hbm mcp test {name}"
 
 
 def cmd_mcp_test(args):
@@ -811,7 +811,7 @@ def _reauth_oauth_server(name: str, server_config: dict, *, flow: str | None = N
         return False
     if server_config.get("auth") != "oauth":
         _error(f"Server '{name}' is not configured for OAuth (auth={server_config.get('auth')})")
-        _info("Use `hbm-agent mcp remove` + `hbm-agent mcp add` to reconfigure auth.")
+        _info("Use `hbm mcp remove` + `hbm mcp add` to reconfigure auth.")
         return False
 
     oauth_cfg = server_config.get("oauth") or {}
@@ -831,7 +831,7 @@ def _reauth_oauth_server(name: str, server_config: dict, *, flow: str | None = N
 
     # The probe triggers the OAuth flow (browser redirect + callback capture). Honor the configured
     # connect_timeout, floored at 315s (the 300s OAuth callback window + headroom) — matching the GUI
-    # re-auth path in web_server.py. force_interactive_oauth: `hbm-agent mcp login` is explicitly
+    # re-auth path in web_server.py. force_interactive_oauth: `hbm mcp login` is explicitly
     # user-initiated even when stdin isn't a TTY (desktop / agent-spawned terminals), where
     # _is_interactive() alone would refuse to open a browser.
     try:
@@ -868,7 +868,7 @@ def _reauth_oauth_server(name: str, server_config: dict, *, flow: str | None = N
             ):
                 print(color(f"    {line}", Colors.DIM))
             print()
-            _info("Then re-run `hbm-agent mcp login " + name + "`.")
+            _info("Then re-run `hbm mcp login " + name + "`.")
             return False
         if tools:
             _success(f"Authenticated — {len(tools)} tool(s) available")
@@ -920,7 +920,7 @@ def cmd_mcp_reauth(args):
         return
     if not name:
         _error("Specify a server name, or use --all to re-auth every OAuth server.")
-        _info("Usage: hbm-agent mcp reauth <name>   |   hbm-agent mcp reauth --all")
+        _info("Usage: hbm mcp reauth <name>   |   hbm mcp reauth --all")
         return
     cfg = _lookup_server(name, servers)
     if cfg is not None:
@@ -964,7 +964,7 @@ def cmd_mcp_configure(args):
     """Reconfigure which tools are enabled for an existing MCP server."""
     import sys as _sys
     if not _sys.stdin.isatty():
-        print("Error: 'hbm-agent mcp configure' requires an interactive terminal.", file=_sys.stderr)
+        print("Error: 'hbm mcp configure' requires an interactive terminal.", file=_sys.stderr)
         _sys.exit(1)
     name = args.name
     cfg = _lookup_server(name, _get_mcp_servers(), "Available")
@@ -1037,24 +1037,24 @@ def cmd_mcp_configure(args):
 
 
 _MCP_USAGE = (
-    "hbm-agent mcp                                    Open the catalog picker (default)",
-    "hbm-agent mcp catalog                            List Nous-approved MCPs",
-    "hbm-agent mcp install <name>                     Install a catalog MCP",
-    "hbm-agent mcp serve                              Run as MCP server",
-    "hbm-agent mcp add <name> --url <endpoint>        Add a custom MCP server",
-    "hbm-agent mcp add <name> --command <cmd>         Add a stdio server",
-    "hbm-agent mcp add <name> --preset <preset>       Add from a known preset",
-    "hbm-agent mcp remove <name>                      Remove a server",
-    "hbm-agent mcp list                               List configured servers",
-    "hbm-agent mcp test <name>                        Test connection",
-    "hbm-agent mcp configure <name>                   Toggle tools",
-    "hbm-agent mcp login <name>                       Re-authenticate OAuth",
-    "hbm-agent mcp reauth <name> | --all              Re-auth one or all OAuth servers",
+    "hbm mcp                                    Open the catalog picker (default)",
+    "hbm mcp catalog                            List Nous-approved MCPs",
+    "hbm mcp install <name>                     Install a catalog MCP",
+    "hbm mcp serve                              Run as MCP server",
+    "hbm mcp add <name> --url <endpoint>        Add a custom MCP server",
+    "hbm mcp add <name> --command <cmd>         Add a stdio server",
+    "hbm mcp add <name> --preset <preset>       Add from a known preset",
+    "hbm mcp remove <name>                      Remove a server",
+    "hbm mcp list                               List configured servers",
+    "hbm mcp test <name>                        Test connection",
+    "hbm mcp configure <name>                   Toggle tools",
+    "hbm mcp login <name>                       Re-authenticate OAuth",
+    "hbm mcp reauth <name> | --all              Re-auth one or all OAuth servers",
 )
 
 
 def mcp_command(args):
-    """Main dispatcher for ``hbm-agent mcp`` subcommands."""
+    """Main dispatcher for ``hbm mcp`` subcommands."""
     action = getattr(args, "mcp_action", None)
     if action == "serve":
         from mcp_serve import run_mcp_server

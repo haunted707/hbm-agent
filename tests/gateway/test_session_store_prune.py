@@ -257,4 +257,4 @@ class TestReadmeSentinel:
         assert next(iter(raw)) == "_README"
         # The note points users at the real store and command.
         assert "state.db" in raw["_README"]
-        assert "hbm-agent sessions list" in raw["_README"]
+        assert "hbm sessions list" in raw["_README"]

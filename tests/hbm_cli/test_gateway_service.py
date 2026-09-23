@@ -1947,7 +1947,7 @@ class TestLegacyHbmUnitDetection:
 
         assert "Legacy" in out
         assert "hbm.service" in out
-        assert "hbm-agent gateway migrate-legacy" in out
+        assert "hbm gateway migrate-legacy" in out
 
 
 class TestRemoveLegacyHbmUnits:
@@ -2018,7 +2018,7 @@ class TestRemoveLegacyHbmUnits:
 
 
 class TestMigrateLegacyCommand:
-    """Tests for the `hbm-agent gateway migrate-legacy` subcommand dispatch."""
+    """Tests for the `hbm gateway migrate-legacy` subcommand dispatch."""
 
     def test_migrate_legacy_subparser_accepts_dry_run_and_yes(self):
         """Verify the argparse subparser is registered and parses flags."""
@@ -2313,7 +2313,7 @@ class TestSystemScopeRemediationOutput:
         assert "system-wide service" in out
         assert "start requires root" in out
         assert "sudo systemctl start hbm-gateway" in out
-        assert "sudo hbm-agent gateway uninstall --system" in out
+        assert "sudo hbm gateway uninstall --system" in out
         assert "hbm gateway install" in out
 
 

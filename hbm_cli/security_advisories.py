@@ -69,7 +69,7 @@ ADVISORIES: tuple[Advisory, ...] = (
             "and any other credential files for tokens that may have been read.",
             "Check GitHub for unexpected new SSH keys, deploy keys, or webhook "
             "additions on repos you have admin on.",
-            "After cleanup: hbm-agent doctor --ack shai-hulud-2026-05  to dismiss "
+            "After cleanup: hbm doctor --ack shai-hulud-2026-05  to dismiss "
             "this warning.",
         ),
         published="2026-05-12",
@@ -171,7 +171,7 @@ def short_banner_lines(hits: list[AdvisoryHit]) -> list[str]:
     lines = [
         f"SECURITY ADVISORY [{primary.advisory.id}]: {primary.advisory.title}",
         f"  Detected: {primary.package}=={primary.installed_version}",
-        "  Run 'hbm-agent doctor' for remediation steps.",
+        "  Run 'hbm doctor' for remediation steps.",
     ]
     if len(hits) > 1:
         lines.insert(1, f"  ({len(hits) - 1} additional advisor{'ies' if len(hits) > 2 else 'y'} also active.)")
@@ -276,7 +276,7 @@ def gateway_log_message(hits: list[AdvisoryHit]) -> Optional[str]:
         return (f"Security advisory [{h.advisory.id}] active: {h.package}=={h.installed_version} "
                 f"matches {h.advisory.title}. See {h.advisory.url}")
     return (f"{len(fresh)} security advisories active (IDs: {', '.join(h.advisory.id for h in fresh)}). "
-            "Run `hbm-agent doctor` on the gateway host for details.")
+            "Run `hbm doctor` on the gateway host for details.")
 
 
 # ---- BEGIN PLUGIN-COMPAT (revert-scheduled; see COMPAT_MANIFEST.md) ----
@@ -285,7 +285,7 @@ def gateway_log_message(hits: list[AdvisoryHit]) -> Optional[str]:
 # The whole block is removed by reverting the commit that added it.
 
 def render_doctor_section(hits: list[AdvisoryHit]) -> tuple[bool, list[str]]:
-    """Render the security-advisory section for ``hbm-agent doctor``.
+    """Render the security-advisory section for ``hbm doctor``.
 
     Returns ``(has_problems, lines)``. Caller is responsible for printing
     with whatever color scheme it uses.

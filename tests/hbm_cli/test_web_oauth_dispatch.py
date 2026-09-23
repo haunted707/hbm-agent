@@ -734,7 +734,7 @@ def test_xai_dashboard_poller_seeds_single_entry_and_clears_suppression(tmp_path
         encoding="utf-8",
     )
 
-    # Prior `hbm-agent auth remove xai-oauth` left the source suppressed.
+    # Prior `hbm auth remove xai-oauth` left the source suppressed.
     auth_mod.suppress_credential_source("xai-oauth", "device_code")
     assert auth_mod.is_source_suppressed("xai-oauth", "device_code") is True
 

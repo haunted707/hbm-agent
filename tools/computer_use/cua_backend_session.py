@@ -306,7 +306,7 @@ class _CuaDriverSession:
             from hbm_constants import display_hbm_home
             raise RuntimeError(
                 f"cua-driver session never reached ready (timeout 30s; stuck in phase: "
-                f"{getattr(self, '_startup_phase', 'unknown')}). Run `hbm-agent computer-use doctor` and check "
+                f"{getattr(self, '_startup_phase', 'unknown')}). Run `hbm computer-use doctor` and check "
                 f"{display_hbm_home()}/logs/agent.log for the phase timings.")
         if self._setup_error is not None:
             raise RuntimeError(f"cua-driver session setup failed: {self._setup_error}") from self._setup_error

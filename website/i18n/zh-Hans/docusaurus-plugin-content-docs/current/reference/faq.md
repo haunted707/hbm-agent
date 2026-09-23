@@ -33,7 +33,7 @@ HBM AGENT 可与任何兼容 OpenAI 的 API 配合使用。支持的提供商包
 **原生不支持。** HBM AGENT 需要类 Unix 环境。在 Windows 上，请安装 [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) 并在其中运行 HBM AGENT。标准安装命令在 WSL2 中可完美运行：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -63,7 +63,7 @@ cd hbm-agent
 快速安装：
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -229,7 +229,7 @@ source ~/.bashrc
 # 如果之前使用 sudo 安装，请先清理：
 sudo rm /usr/local/bin/hbm
 # 然后重新运行标准安装程序
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -756,7 +756,7 @@ skills:
 
 1. 在新机器上安装 HBM AGENT：
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh
    ```

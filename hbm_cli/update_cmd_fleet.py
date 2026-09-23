@@ -1,4 +1,4 @@
-"""Gateway fleet restart + post-update verification for ``hbm-agent update``.
+"""Gateway fleet restart + post-update verification for ``hbm update``.
 
 Split out of ``hbm_cli/update_cmd.py``; every name is re-imported there so
 ``hbm_cli.update_cmd.<name>`` keeps resolving/monkeypatching. Origin helpers are
@@ -88,7 +88,7 @@ def _receipt_looks_unfinished(receipt: dict) -> bool:
 
     The command boundary stamps a ``stop_reason`` on every receipt, including clean
     ones (``completed at command boundary``, ``sys.exit(0)``); it must not make a
-    successful receipt look unfinished, or the next ``hbm-agent update`` retriggers
+    successful receipt look unfinished, or the next ``hbm update`` retriggers
     ``fleet_restart_pending`` from pre-pull plan SHAs (#98022).
     """
     exit_code = receipt.get("exit_code")
@@ -284,10 +284,10 @@ def _pending_fleet_restart_needed() -> bool:
 def _warn_pending_fleet_restart(*, startup: bool = False) -> None:
     """Print the specific interrupted-update fleet-restart warning."""
     stream = sys.stderr if startup else sys.stdout
-    print("⚠ A previous `hbm-agent update` pulled new code but did not restart running gateways.", file=stream)
+    print("⚠ A previous `hbm update` pulled new code but did not restart running gateways.", file=stream)
     print("  Gateways may still be serving pre-update modules (mixed sys.modules).", file=stream)
     if startup:
-        print("  Run `hbm-agent update` or `hbm-agent gateway restart`.", file=stream)
+        print("  Run `hbm update` or `hbm gateway restart`.", file=stream)
 
 
 def _warn_pending_fleet_restart_on_startup() -> None:
@@ -362,7 +362,7 @@ def _run_pending_fleet_restart() -> bool:
         _m()._purge_stale_hbm_modules()
     # Warn if legacy HBM AGENT gateway unit files are still installed. When both hbm.service (from a
     # pre-rename install) and the current hbm-gateway.service are enabled, they SIGTERM-fight for the
-    # same bot token (see PR #11909). Flagging here means every `hbm-agent update` surfaces the issue until the
+    # same bot token (see PR #11909). Flagging here means every `hbm update` surfaces the issue until the
     # user migrates.
     try:
         from hbm_cli.gateway import (
@@ -431,11 +431,11 @@ def _run_pending_fleet_restart() -> bool:
 def _defer_fleet_restart_after_update(*, update_complete: bool, resume_incomplete: bool = False) -> None:
     """Record a deliberately deferred fleet restart and return/exit on outcome.
 
-    ``hbm-agent update --no-gateway-restart`` (cron running inside the gateway's
+    ``hbm update --no-gateway-restart`` (cron running inside the gateway's
     own cgroup) updated code and dependencies but must not restart the fleet:
     the SIGUSR1 drain + systemd restart would kill the updater itself. The
     ``fleet_restart_pending`` marker written before the pull is KEPT so the
-    next normal update (or ``hbm-agent gateway restart``) catches up.
+    next normal update (or ``hbm gateway restart``) catches up.
 
     Outcome contract (same success/partial meaning as the normal path):
     a STALE fleet caused only by this deliberate deferral is expected and
@@ -451,7 +451,7 @@ def _defer_fleet_restart_after_update(*, update_complete: bool, resume_incomplet
     print()
     print("→ Gateway restart skipped (--no-gateway-restart).")
     print("  Code and dependencies are updated; gateways still serve pre-update code.")
-    print("  Restart them separately: `hbm-agent gateway restart` or a daily-restart cron.")
+    print("  Restart them separately: `hbm gateway restart` or a daily-restart cron.")
     print("  (fleet restart deferred — marker kept for catch-up)")
     with suppress(Exception):
         from hbm_cli.update_receipt import record_skip
@@ -465,7 +465,7 @@ def _defer_fleet_restart_after_update(*, update_complete: bool, resume_incomplet
 
 
 def _apply_pending_fleet_restart_catchup(*, defer: bool = False) -> None:
-    """On an already-up-to-date ``hbm-agent update``, finish a skipped restart.
+    """On an already-up-to-date ``hbm update``, finish a skipped restart.
 
     No-op when nothing is pending; exits 1 on incomplete catch-up so automation
     does not treat the fleet as healthy. ``defer`` (``--no-gateway-restart``) keeps
@@ -479,7 +479,7 @@ def _apply_pending_fleet_restart_catchup(*, defer: bool = False) -> None:
         print()
         _warn_pending_fleet_restart()
         print("  (fleet restart deferred — --no-gateway-restart; marker kept)")
-        print("  Restart separately: `hbm-agent gateway restart` or next non-cron update.")
+        print("  Restart separately: `hbm gateway restart` or next non-cron update.")
         return
     print()
     _warn_pending_fleet_restart()
@@ -487,7 +487,7 @@ def _apply_pending_fleet_restart_catchup(*, defer: bool = False) -> None:
     if _run_pending_fleet_restart():
         _clear_fleet_restart_pending_marker()
         return
-    print("  ⚠ Fleet restart incomplete. Recover with: hbm-agent gateway restart")
+    print("  ⚠ Fleet restart incomplete. Recover with: hbm gateway restart")
     sys.exit(1)
 
 
@@ -609,13 +609,13 @@ def _warn_incomplete_gateway_fleet_restart(failed_units: list) -> None:
         # See #88848.
         print("  Listed services may be deregistered from launchd, or still")
         print("  running pre-update code (mixed sys.modules). Recover with:")
-        print("    hbm-agent gateway status")
+        print("    hbm gateway status")
         print("    launchctl list | grep <label>")
         print("    launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/<label>.plist")
         return
     print("  Skipped units may still be running pre-update code (mixed")
     print("  sys.modules). Restart them manually, then verify:")
-    print("    hbm-agent gateway status")
+    print("    hbm gateway status")
     if any(not name.startswith("ai.hbm.") for name in ordered):
         print("    systemctl --user restart <unit>   # user-scope")
         print("    sudo systemctl restart <unit>     # system-scope")
@@ -654,7 +654,7 @@ def _restart_launchd_gateway_after_update(*, supervision_verify: bool = True) ->
             print(
                 f"  ⚠ Gateway restart failed: {stderr}\n"
                 "    The gateway may be DOWN on pre-update code. "
-                "Recover manually: hbm-agent gateway restart"
+                "Recover manually: hbm gateway restart"
             )
             return [], [current_label]
     except (FileNotFoundError, subprocess.TimeoutExpired) as e:
@@ -664,7 +664,7 @@ def _restart_launchd_gateway_after_update(*, supervision_verify: bool = True) ->
             # The old code `pass`ed here (#74973's second silent variant); count it and tell the operator.
             "  ⚠ Could not restart the gateway "
             f"({e.__class__.__name__}: {e}).\n"
-            "    Recover manually: hbm-agent gateway restart"
+            "    Recover manually: hbm gateway restart"
         )
         return [], [current_label]
 
@@ -681,7 +681,7 @@ def _restart_launchd_gateway_after_update(*, supervision_verify: bool = True) ->
         return [current_label], []
     print(
         f"  ✗ {current_label} restarted but launchd is not supervising it.\n"
-        "    Check logs, then: hbm-agent gateway restart"
+        "    Check logs, then: hbm gateway restart"
     )
     return [], [current_label]
 
@@ -849,8 +849,8 @@ def _warn_gateway_restart_phase_aborted(exc: BaseException, pids) -> None:
         print("  Any gateway still running is serving pre-update code")
         print("  (mixed sys.modules) against the updated checkout.")
     print("  Restart it manually, then verify:")
-    print("    hbm-agent gateway restart")
-    print("    hbm-agent gateway status")
+    print("    hbm gateway restart")
+    print("    hbm gateway status")
 
 
 def _drain_or_signal_gateway_for_update(pid: int, drain_budget: float, label: str) -> bool:
@@ -1006,13 +1006,13 @@ def _restart_one_systemd_gateway_unit(
             f"  ⚠ {svc_name} is a system service and restarting it needs root.\n"
             f"    Restart it manually to load the new version:\n"
             f"      sudo systemctl restart {svc_name}\n"
-            f"    To let `hbm-agent update` restart it automatically, allow\n"
+            f"    To let `hbm update` restart it automatically, allow\n"
             f"    passwordless sudo for systemctl, or run updates with sudo."
         )
         return
 
     # Blunt restart — only when the graceful path failed (no SIGUSR1 wiring, drain over
-    # budget, restart-policy mismatch). Mirrors `hbm-agent gateway restart` (`systemd_restart()`).
+    # budget, restart-policy mismatch). Mirrors `hbm gateway restart` (`systemd_restart()`).
     restart = _systemctl_reset_and_restart(_manage_cmd, svc_name, scope_cmd=scope_cmd)
     if restart.returncode != 0:
         failed_or_stale_units.append(svc_name)
@@ -1060,7 +1060,7 @@ def _restart_systemd_gateway_units(restarted_services, failed_or_stale_units, re
         print(
             f"  ⚠ systemctl timed out listing {scope}-scope "
             f"gateway units ({exc.cmd if exc.cmd else 'unknown command'}). "
-            f"Check the gateway with: hbm-agent gateway status"
+            f"Check the gateway with: hbm gateway status"
         )
 
     def _on_unit_timeout(svc_name: str, exc: subprocess.TimeoutExpired) -> None:
@@ -1209,9 +1209,9 @@ def _restart_manual_gateways(out: _GatewayRestartOutcome, _drain_budget) -> None
         unmapped_count = (len(out.killed_pids) - len(out.relaunched_profiles) - len(out.externally_supervised_profiles))
         if unmapped_count:
             print(f"  → Stopped {unmapped_count} manual gateway process(es)")
-            print("    Restart manually: hbm-agent gateway run")
+            print("    Restart manually: hbm gateway run")
             if unmapped_count > 1:
-                print("    (or: hbm-agent -p <profile> gateway run  for each profile)")
+                print("    (or: hbm -p <profile> gateway run  for each profile)")
 
 
 def _force_kill_stuck_gateways(killed_pids) -> None:
@@ -1417,7 +1417,7 @@ def _print_legacy_units_warning() -> None:
     print("  hbm-gateway.service for the bot token and cause SIGTERM")
     print("  flap loops. Remove them with:")
     print()
-    print("    hbm-agent gateway migrate-legacy")
+    print("    hbm gateway migrate-legacy")
     print()
     print("  (add `sudo` if any are in system scope)")
 
@@ -1482,12 +1482,12 @@ def _verify_fleet_after_update(restart, *, _pre_update_plan, _windows_gateway_re
     _finish_dashboard_update_cleanup(node_failures, already_restarted_units=set(restart.restarted_services))
 
     # Success-path twin of the abort-recovery probe: the restart phase only touches
-    # units, so a unit-less `hbm-agent serve` keeps stale sys.modules. Runs AFTER
+    # units, so a unit-less `hbm serve` keeps stale sys.modules. Runs AFTER
     # dashboard cleanup so a respawned manual dashboard isn't a survivor. Rows feed
     # reconciliation (survivor → exit 1); ``None`` = probe failed, stays fail-closed.
     # Check if any pre-update serve/dashboard runtimes survived on pre-update code generations (#100479).
     # This is the SUCCESS-path twin of the abort-recovery probe above: the restart phase only restarts
-    # units, so an sshd-spawned `serve --isolated` or a manual `hbm-agent serve` (no unit) is left running its
+    # units, so an sshd-spawned `serve --isolated` or a manual `hbm serve` (no unit) is left running its
     # pre-update sys.modules graph — and its cron ticker keeps firing agent jobs that ImportError on every
     # symbol added in the pulled range. The rows also feed the plan-vs-execution reconciliation below, so a
     # survivor is escalated (exit 1) instead of merely printed.
@@ -1499,7 +1499,7 @@ def _verify_fleet_after_update(restart, *, _pre_update_plan, _windows_gateway_re
 
     print()
     print("Tip: You can now select a provider and model:")
-    print("  hbm-agent model              # Select provider and model")
+    print("  hbm model              # Select provider and model")
 
     # Compare every live gateway's stamped code_sha against the fresh checkout
     # instead of assuming the restart phase worked.

@@ -277,7 +277,7 @@ def test_register_cli_uses_egress_command_dest():
     A future grep-and-refactor on proxy_command should not hit this
     subparser by accident."""
 
-    parser = argparse.ArgumentParser(prog="hbm-agent egress")
+    parser = argparse.ArgumentParser(prog="hbm egress")
     proxy_cli.register_cli(parser)
     # Parse a no-op invocation and confirm the attribute name.
     args = parser.parse_args(["install"])

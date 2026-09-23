@@ -135,7 +135,7 @@ class TestRefusalCopy:
         card = anon_auth.welcome_refusal_copy(refusal, model="gpt-5", in_chat=True, door=False)
         assert chat == f"{card} {anon_auth._SIGNIN_CHAT}"   # door=False drops exactly the tail
         terminal = anon_auth.welcome_refusal_copy(refusal, model="gpt-5", in_chat=False)
-        assert "`hbm-agent auth upgrade`" in terminal and "/login" not in terminal
+        assert "`hbm auth upgrade`" in terminal and "/login" not in terminal
 
     def test_capacity_copy_carries_the_retry(self):
         refusal = anon_auth.parse_welcome_refusal({"reason": "at_capacity", "retry_after": 30})

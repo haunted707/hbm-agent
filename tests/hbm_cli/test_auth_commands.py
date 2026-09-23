@@ -907,7 +907,7 @@ def test_clear_provider_auth_removes_provider_pool_entries(tmp_path, monkeypatch
 
 
 def test_logout_resets_codex_config_when_auth_state_already_cleared(tmp_path, monkeypatch, capsys):
-    """`hbm-agent logout --provider openai-codex` must still clear model.provider.
+    """`hbm logout --provider openai-codex` must still clear model.provider.
 
     Users can end up with auth.json already cleared but config.yaml still set to
     openai-codex.  Previously logout reported no auth state and left the agent

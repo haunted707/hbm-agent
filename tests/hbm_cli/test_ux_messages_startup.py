@@ -73,7 +73,7 @@ def test_invalid_profile_flag_value_explains_rule_and_exits(monkeypatch):
     assert exc.value.code == 2
     text = err.getvalue()
     assert "'Work Bot' is not a valid profile name" in text
-    assert "hbm-agent profile list" in text
+    assert "hbm profile list" in text
     assert "Must match" not in text
 
 
@@ -121,7 +121,7 @@ def test_bare_continue_with_no_session_names_the_next_step(monkeypatch):
     with redirect_stdout(out), redirect_stderr(out), pytest.raises(SystemExit):
         _main._resolve_continue_arg(args, use_tui=False)
     text = out.getvalue()
-    assert "hbm-agent sessions list" in text
+    assert "hbm sessions list" in text
     assert "No previous CLI session" in text
 
 

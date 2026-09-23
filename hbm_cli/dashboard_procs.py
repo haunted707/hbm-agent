@@ -74,11 +74,11 @@ def _scan_dashboard_processes(*, exclude_pids: set[int] | None = None) -> list[t
     """``(pid, cmdline)`` of running ``dashboard``/``serve`` processes; empty on any scan error.
 
     A forgotten dashboard keeps the old Python backend against the new JS bundle after
-    ``hbm-agent update`` (every API call 401s). *exclude_pids* (Desktop's HBM_DESKTOP_CHILD_PID
+    ``hbm update`` (every API call 401s). *exclude_pids* (Desktop's HBM_DESKTOP_CHILD_PID
     backends) are never returned.
 
     *exclude_pids* is an optional set of PIDs that must never be returned. This is used by the HBM AGENT
-    Desktop Electron app to protect its own backend child process: when the desktop spawns ``hbm-agent serve``
+    Desktop Electron app to protect its own backend child process: when the desktop spawns ``hbm serve``
     as a backend and triggers an auto-update, the update must not kill the backend that the desktop itself
     manages. The desktop sets the environment variable ``HBM_DESKTOP_CHILD_PID`` on the spawned backend
     process; ``_kill_stale_dashboard_processes`` reads it and passes it here. (#37532)
@@ -138,7 +138,7 @@ def _profile_flag_value(argv: list[str]) -> str | None:
 
 def _is_ephemeral_port_zero_backend(argv: list[str]) -> bool:
     """True for Desktop-style ``serve|dashboard --port 0`` backends — replaying them after
-    ``hbm-agent update`` multiplies listening backends because ``--port 0`` binds a fresh port.
+    ``hbm update`` multiplies listening backends because ``--port 0`` binds a fresh port.
 
     See #78821.
     """
@@ -214,7 +214,7 @@ def _filter_dashboard_respawn_candidates(
     (``HBM_DESKTOP_CHILD_PID``) owns their lifecycle. These are also the PPID-1 orphans that previously
     multiplied across updates because ``--port 0`` always binds a fresh free port. 2. A foreign install's
     backend is owned by that install's supervisor/user. 3. 4. See #78821, #94030.
-    Intentionally does **not** blanket-skip every PPID-1 process: a prior ``hbm-agent update`` respawn detaches
+    Intentionally does **not** blanket-skip every PPID-1 process: a prior ``hbm update`` respawn detaches
     with ``start_new_session=True``, so fixed-port manual backends are reparented to init and must still be
     eligible for the next update's #40449 restart.
     """
@@ -322,7 +322,7 @@ def _kill_stale_dashboard_processes(
     reason: str = "the running backend no longer matches the updated frontend", *,
     restart_managed: bool = False, already_restarted_units: "set[str] | None" = None,
 ) -> dict[str, list]:
-    """Kill running ``hbm-agent dashboard`` / ``hbm-agent serve`` processes (update end, ``--stop``).
+    """Kill running ``hbm dashboard`` / ``hbm serve`` processes (update end, ``--stop``).
 
     With ``restart_managed`` (update only) systemd-owned PIDs get their unit restarted after the
     kill (systemd treats our SIGTERM as a clean stop, so ``Restart=on-failure`` never fires) and
@@ -332,7 +332,7 @@ def _kill_stale_dashboard_processes(
     Manually-started dashboards are not auto-restarted because we don't know the original launch args
     (--host, --port, --insecure, --tui, --no-open). See #68934.
     *already_restarted_units* names units (no ``.service`` suffix) the caller already restarted directly —
-    e.g. ``hbm-agent update``'s systemd fleet-restart loop, which restarts ``hbm-serve*`` units before this
+    e.g. ``hbm update``'s systemd fleet-restart loop, which restarts ``hbm-serve*`` units before this
     function runs. Without excluding them, a Serve-only install's freshly restarted process is found again
     here and restarted a second time for no benefit (review on #83595).
     """
@@ -412,7 +412,7 @@ def _kill_stale_dashboard_processes(
             print(f"  ⚠ PID(s) supervised by launchd job {target}: a KeepAlive job restarts itself.\n"
                   f"    To keep it down: launchctl bootout {target}")
         if any(p not in pid_launchd for p in killed):
-            print("  Restart the dashboard when you're ready:\n    hbm-agent dashboard --port <port>")
+            print("  Restart the dashboard when you're ready:\n    hbm dashboard --port <port>")
     return {"matched": list(pids), "killed": list(killed), "failed": list(failed),
             "unrecovered": list(unrecovered)}
 
@@ -424,7 +424,7 @@ def _restart_killed_backends(
     """Update path: restart systemd units, kickstart launchd jobs (macOS), respawn manual argv
     (detached, headless, logged to logs/dashboard-restart.log; one per profile, no ``--port 0``).
     Returns PIDs not brought back."""
-    # Two categories: Without this, a remote backend (hbm-agent serve) under Restart=on-failure never comes
+    # Two categories: Without this, a remote backend (hbm serve) under Restart=on-failure never comes
     # back after our clean SIGTERM, and the Desktop can't reconnect (#68934). Filtered so Desktop
     # ``serve|dashboard --port 0`` backends are not resurrected and duplicates collapse to one per profile
     # (#78821).
@@ -474,7 +474,7 @@ def _restart_killed_backends(
     if failed_cmds:
         unrecovered.extend(p for p in killed if pid_cmdline.get(p) in failed_cmds)
     if failed_restarts or unrecovered:
-        print("  Restart anything not auto-restarted when you're ready:\n    hbm-agent dashboard --port <port>")
+        print("  Restart anything not auto-restarted when you're ready:\n    hbm dashboard --port <port>")
     return unrecovered
 
 
@@ -544,14 +544,14 @@ def _detect_concurrent_hbm_instances(
 
 
 def _is_desktop_local_serve_cmdline(command: str) -> bool:
-    """True for the Desktop-local shape ``hbm-agent serve [--isolated] --host 127.0.0.1 --port 0``.
+    """True for the Desktop-local shape ``hbm serve [--isolated] --host 127.0.0.1 --port 0``.
 
     Long-lived headless serves (``--host <tailscale-ip> --port 9119``) must never match —
     those are operator-managed remote backends that legitimately run with ppid 1.
     """
     from hbm_cli.update_cmd_windows import _hbm_holder_subcommand
     # Canonical token matcher, never argv substrings: ``kanban --preserve-cache`` contains "serve" and
-    # ``vim notes about hbm-agent serve`` contains both markers — this predicate decides a kill.
+    # ``vim notes about hbm serve`` contains both markers — this predicate decides a kill.
     if _hbm_holder_subcommand(command) != "serve":
         return False
     tokens = command.lower().split()
@@ -596,7 +596,7 @@ def _process_ppid(pid: int) -> int | None:
 
 
 # SSH remote-backend lock ownership: ``backend.lock.json`` is written by the Desktop SSH runtime
-# (apps/desktop/electron/remote-lifecycle.ts) for every ``hbm-agent serve`` it spawns. Such a backend
+# (apps/desktop/electron/remote-lifecycle.ts) for every ``hbm serve`` it spawns. Such a backend
 # is legitimate even at ppid 1 (sshd exited); the reap must NEVER kill a PID a valid lock claims
 # — that once killed a production backend. Schema mirrors the writer; mismatches are ignored.
 _LOCKFILE_SCHEMA_VERSION = 2
@@ -678,9 +678,9 @@ def _process_age_seconds(pid: int) -> float:
 
 
 def _reap_orphaned_desktop_local_serves(
-    *, reason: str = "orphaned desktop-local hbm-agent serve", signal_term=None, signal_kill=None,
+    *, reason: str = "orphaned desktop-local hbm serve", signal_term=None, signal_kill=None,
     sleep_fn=None, lock_owned_pids_fn=None, process_age_seconds_fn=None) -> dict[str, list]:
-    """Kill leftover Desktop-local ``hbm-agent serve`` backends with no parent. Never raises.
+    """Kill leftover Desktop-local ``hbm serve`` backends with no parent. Never raises.
 
     When Electron dies uncleanly its ``serve --host 127.0.0.1 --port 0`` children are
     reparented to pid 1 with their MCP trees alive; each Desktop boot then stacks a fresh

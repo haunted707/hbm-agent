@@ -182,7 +182,7 @@ def cmd_skills(args):
 
 
 def _cmd_skills_trust(args):
-    """``hbm-agent skills trust|untrust [path]`` — manage ``skills.trusted_project_dirs``.
+    """``hbm skills trust|untrust [path]`` — manage ``skills.trusted_project_dirs``.
 
     With no path, operates on the project root enclosing the current directory
     (nearest ancestor with ``.git``).

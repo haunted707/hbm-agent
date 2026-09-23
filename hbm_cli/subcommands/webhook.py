@@ -1,4 +1,4 @@
-"""``hbm-agent webhook`` subcommand parser."""
+"""``hbm webhook`` subcommand parser."""
 
 from __future__ import annotations
 

@@ -32,7 +32,7 @@
 ## 快速安装
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -43,7 +43,7 @@ cd hbm-agent
 >
 > **Windows：** 在 PowerShell 中运行：
 > ```powershell
-> git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+> git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 > ```
 > 安装完成后，可能需要重启终端，然后运行 `hbm` 开始对话。
 
@@ -175,7 +175,7 @@ hbm claw migrate --overwrite  # 覆盖已有冲突
 `hbm update`、托管 venv、lazy dependencies、gateway 和 docs tooling 使用的布局。
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 cd "${HBM_HOME:-$HOME/.hbm}/hbm-agent"

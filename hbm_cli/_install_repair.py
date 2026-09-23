@@ -39,7 +39,7 @@ def _is_termux_env(env: dict | None = None) -> bool:
 def _stdout_to_stderr():
     """Route fd 1 (and sys.stdout) to stderr for the duration of an install.
 
-    ``hbm-agent acp`` speaks JSON-RPC on stdout; an inherited-fd install child writing there would
+    ``hbm acp`` speaks JSON-RPC on stdout; an inherited-fd install child writing there would
     corrupt the protocol.
     """
     saved_sys_stdout = sys.stdout
@@ -105,7 +105,7 @@ def _launchers_missing(target: Path) -> bool:
 
 
 def _default_hbm_root() -> Path | None:
-    """The DEFAULT HBM AGENT root (not ``get_hbm_home()``, which under ``hbm-agent -p <name>`` is
+    """The DEFAULT HBM AGENT root (not ``get_hbm_home()``, which under ``hbm -p <name>`` is
     ``profiles\\<name>`` and would fail the managed-clone gate for profile users); ``None`` when
     unresolvable."""
     from hbm_constants import get_default_hbm_root
@@ -169,7 +169,7 @@ def ensure_windows_bin_launchers(
     The canonical launcher home is the managed binary dir — the default HBM AGENT root's ``bin``
     (``%LOCALAPPDATA%\\hbm\\bin``, next to the managed uv) — which lives OUTSIDE the git checkout so no
     git operation can ever touch it. It is a per-machine dir shared by every profile: ``get_hbm_home()``
-    would point inside ``profiles\\<name>`` under ``hbm-agent -p``, so the anchor here is
+    would point inside ``profiles\\<name>`` under ``hbm -p``, so the anchor here is
     :func:`hbm_constants.get_default_hbm_root`. See #83797.
     """
     if windows is None:
@@ -264,7 +264,7 @@ def _write_user_path_raw(entries: list[str], kind: int) -> None:
 def migrate_windows_bin_path(
     root, *, windows: bool | None = None, read_user_path=None, write_user_path=None,
 ) -> bool:
-    """One-time PATH migration to the ``HBM_HOME\\bin`` launcher layout (``hbm-agent update`` tail).
+    """One-time PATH migration to the ``HBM_HOME\\bin`` launcher layout (``hbm update`` tail).
 
     1. stage launchers into the managed binary dir; 2. verify both are present — otherwise STOP,
     leaving the user PATH untouched (never strip a working entry before its replacement is proven);
@@ -393,7 +393,7 @@ def _restore_quarantined_exes(moved: list[tuple[Path, Path]]) -> None:
 
     Delegates to the shared helper in the stdlib-only ``_early_recovery`` module: one retry ladder and one
     recovery message for every restore site, instead of the near-identical copies that had already drifted
-    (#75584). Warnings land on stderr — this module runs in the early-recovery path and ``hbm-agent acp``
+    (#75584). Warnings land on stderr — this module runs in the early-recovery path and ``hbm acp``
     speaks JSON-RPC on stdout.
     """
     _er.restore_quarantined_shims(moved)

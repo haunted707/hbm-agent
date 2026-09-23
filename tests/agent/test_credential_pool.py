@@ -2124,7 +2124,7 @@ def test_reset_statuses_clears_a_cooldown_that_is_still_binding(tmp_path, monkey
     snapshot so one process cannot resurrect a key another has just benched.
     ``reset_statuses`` clears ``last_status_at`` to None, which that merge reads
     as epoch 0 — older than any real timestamp — so the reset always lost and
-    the cooldown was copied straight back. ``hbm-agent auth reset`` printed "Reset
+    the cooldown was copied straight back. ``hbm auth reset`` printed "Reset
     status on 1 credentials" and changed nothing on disk.
 
     The cooldown here is deliberately RECENT. Once a cooldown has expired the

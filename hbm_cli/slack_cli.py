@@ -1,4 +1,4 @@
-"""``hbm-agent slack manifest`` — generate the Slack app manifest JSON that registers every gateway
+"""``hbm slack manifest`` — generate the Slack app manifest JSON that registers every gateway
 command as a native Slack slash (``/btw``, ``/stop``, ``/model``, …)."""
 from __future__ import annotations
 
@@ -85,7 +85,7 @@ def slack_manifest_command(args) -> int:
     slashes_only = getattr(args, "slashes_only", False)
 
     def fail(msg: str) -> int:
-        print(f"hbm-agent slack manifest: {msg}", file=sys.stderr)
+        print(f"hbm slack manifest: {msg}", file=sys.stderr)
         return 2
 
     if slashes_only and (long_description is not None or long_description_file is not None):
@@ -143,7 +143,7 @@ def slack_manifest_command(args) -> int:
         "     slash commands changed.\n"
         "  4. Make sure Socket Mode is enabled and you have a bot token\n"
         "     (xoxb-...) and app token (xapp-...) configured via\n"
-        "     `hbm-agent setup`.\n", file=sys.stderr)
+        "     `hbm setup`.\n", file=sys.stderr)
     return 0
 
 

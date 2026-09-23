@@ -1,4 +1,4 @@
-"""``hbm-agent skin`` — list, switch, and tweak skins from the CLI.
+"""``hbm skin`` — list, switch, and tweak skins from the CLI.
 
 ``set`` is the load-bearing verb: it changes ONE color of the ACTIVE skin **in place**, so tweaking
 (say) the tool marker never disturbs the rest of the look — background included. Editing the file
@@ -80,7 +80,7 @@ def _skin_list() -> int:
 
 
 def skin_command(args) -> None:
-    """Dispatch ``hbm-agent skin <verb>``."""
+    """Dispatch ``hbm skin <verb>``."""
     verb = getattr(args, "skin_command", None)
     if verb == "set":
         sys.exit(_skin_set(args.key, args.value, getattr(args, "skin", None)))

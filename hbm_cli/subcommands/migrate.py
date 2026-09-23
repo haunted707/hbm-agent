@@ -1,4 +1,4 @@
-"""``hbm-agent migrate`` subcommand parser."""
+"""``hbm migrate`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -32,10 +32,10 @@ def build_migrate_parser(subparsers) -> None:
         description="The NeMo Relay cutover stopped reading the legacy exporter variables; a .env that still "
             "carries them (and no HBM_NEMO_RELAY_PLUGINS_TOML) exports nothing. Generate "
             "<hbm home>/relay-plugins.toml from them, point HBM_NEMO_RELAY_PLUGINS_TOML at it, "
-            "and comment the legacy lines out. `hbm-agent update` runs this for every profile automatically.")
+            "and comment the legacy lines out. `hbm update` runs this for every profile automatically.")
     migrate_relay.add_argument(
         "--all-profiles", action="store_true",
-        help="Migrate the default home and every named profile (what `hbm-agent update` does)")
+        help="Migrate the default home and every named profile (what `hbm update` does)")
     migrate_relay.add_argument(
         "--no-validate", action="store_true",
         help="Skip activating the generated file through Relay's validator before writing it")

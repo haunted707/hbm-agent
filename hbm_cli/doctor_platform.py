@@ -1,4 +1,4 @@
-"""Host-platform checks for hbm-agent doctor: interpreter, SQLite, certificates, macOS TCC, gateway supervision, command install.
+"""Host-platform checks for hbm doctor: interpreter, SQLite, certificates, macOS TCC, gateway supervision, command install.
 Split out of ``hbm_cli/doctor.py``, which re-exports every name so ``hbm_cli.doctor.<name>`` keeps resolving (and monkeypatching)."""
 
 from __future__ import annotations
@@ -32,7 +32,7 @@ def _sqlite_upgrade_hint(install_method: str | None = None) -> str:
     method = install_method or detect_install_method(PROJECT_ROOT)
     cmd = recommended_update_command_for_method(method)
     action = cmd if is_nix_install_method(method) else {  # nix: prose guidance, not a shell command
-        "docker": f"run `{cmd}`, then recreate all HBM AGENT containers", "apt": f"run `{cmd}`"}.get(method, "run `hbm-agent update`")
+        "docker": f"run `{cmd}`, then recreate all HBM AGENT containers", "apt": f"run `{cmd}`"}.get(method, "run `hbm update`")
     return f"({action}; fixed versions: 3.51.3+ / 3.50.7 / 3.44.6 — see https://sqlite.org/wal.html#walresetbug)"
 
 
@@ -177,7 +177,7 @@ def _check_version_consistency(issues: list[str]) -> None:
     if pyproject_version == init_version:
         return check_ok("Version files consistent", f"({init_version})")
     _fail_and_issue("Version mismatch between source files", f"(pyproject.toml {pyproject_version} != hbm_cli/__init__.py {init_version})",
-                    "Re-sync version files (e.g. run 'hbm-agent update', or set hbm_cli/__init__.py __version__ to match pyproject.toml)", issues)
+                    "Re-sync version files (e.g. run 'hbm update', or set hbm_cli/__init__.py __version__ to match pyproject.toml)", issues)
 
 
 def _check_s6_supervision(issues: list[str]) -> None:
@@ -196,7 +196,7 @@ def _check_s6_supervision(issues: list[str]) -> None:
         (check_ok if up else check_info)(f"{static}: up" if up else f"{static}: down (expected if not enabled via env)")
     profiles = mgr.list_profile_gateways()
     if not profiles:
-        return check_info("No per-profile gateways registered yet — create one with `hbm-agent profile create <name>`")
+        return check_info("No per-profile gateways registered yet — create one with `hbm profile create <name>`")
     up_count = sum(1 for p in profiles if mgr.is_running(f"gateway-{p}"))
     check_ok(f"Per-profile gateways: {up_count}/{len(profiles)} supervised up"
              + (f" ({', '.join(sorted(profiles))})" if len(profiles) <= 8 else ""))
@@ -225,7 +225,7 @@ def check_certificates(should_fix: bool = False, issues: "list | None" = None) -
     check_fail("SSL CA certificate bundle is broken", first_error)
     pip_cmd = f"{sys.executable} -m pip install --force-reinstall certifi"
     if not should_fix:
-        issues.append(f"Repair the CA bundle: run `hbm-agent doctor --fix`, or `{pip_cmd}`")
+        issues.append(f"Repair the CA bundle: run `hbm doctor --fix`, or `{pip_cmd}`")
         return
     print("    → Repairing: force-reinstalling certifi...")
     try:
@@ -271,7 +271,7 @@ def _check_gateway_service_linger(issues: list[str]) -> None:
 
 _TCC_CDHASH_DETAIL = (
     "the desktop bundle's designated requirement is cdhash-pinned (pre-#73681 build) — rebuilds invalidate "
-    "all permission grants. Run `hbm-agent update` to get the stable identifier-pinned signing identity, "
+    "all permission grants. Run `hbm update` to get the stable identifier-pinned signing identity, "
     "then re-grant permissions once.")
 _TCC_STABLE_DETAIL = {
     True: "(certificate-anchored DR; grants survive rebuilds)",
@@ -385,7 +385,7 @@ def _check_security_advisories(should_fix: bool, f: Finding) -> None:
         # Fail row + remediation text indented under it as one section; also into the summary action list.
         _fail_and_issue(f"{hit.advisory.title}", f"({hit.package}=={hit.installed_version})",
                         f"Resolve security advisory {hit.advisory.id}: uninstall {hit.package}=={hit.installed_version} "
-                        f"and rotate credentials, then run `hbm-agent doctor --ack {hit.advisory.id}`.", f.manual_issues)
+                        f"and rotate credentials, then run `hbm doctor --ack {hit.advisory.id}`.", f.manual_issues)
         for line in full_remediation_text(hit):
             print(f"    {color(line, Colors.YELLOW)}" if line else "")
     acked_ids = get_acked_ids()  # acked-but-still-installed stays visible
@@ -483,7 +483,7 @@ def _check_command_installation(should_fix: bool, f: Finding) -> None:
             return check_ok(f"{display}/hbm → correct target")
         check_warn(f"{display}/hbm points to wrong target", f"(→ {target}, expected → {expected})")
         if not should_fix:
-            return f.issues.append(f"Broken symlink at {display}/hbm — run 'hbm-agent doctor --fix'")
+            return f.issues.append(f"Broken symlink at {display}/hbm — run 'hbm doctor --fix'")
         link.unlink()
         verb = "Fixed"
     elif link.exists():  # regular file (wrapper script), not a symlink
@@ -491,7 +491,7 @@ def _check_command_installation(should_fix: bool, f: Finding) -> None:
     else:
         check_fail(f"{display}/hbm not found", "(hbm-agent command may not work outside the venv)")
         if not should_fix:
-            return f.issues.append(f"Missing {display}/hbm symlink — run 'hbm-agent doctor --fix'")
+            return f.issues.append(f"Missing {display}/hbm symlink — run 'hbm doctor --fix'")
         link_dir.mkdir(parents=True, exist_ok=True)
         verb = "Created"
     link.symlink_to(venv_bin)

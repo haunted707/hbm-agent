@@ -1,4 +1,4 @@
-"""Text / ``--json`` output helpers shared by the ``hbm-agent kanban`` CLI modules."""
+"""Text / ``--json`` output helpers shared by the ``hbm kanban`` CLI modules."""
 
 from __future__ import annotations
 

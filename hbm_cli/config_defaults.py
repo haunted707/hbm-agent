@@ -41,7 +41,7 @@ DEFAULT_CONFIG = {
     # 0/null disables.
     "max_live_sessions": 16,
     "session": {
-        # Per-terminal `hbm-agent -c`: each CLI session writes a breadcrumb under
+        # Per-terminal `hbm -c`: each CLI session writes a breadcrumb under
         # $HBM_HOME/terminal-sessions/<terminal-id>, so bare -c/--continue resumes THIS
         # terminal's session (tmux/kitty/wezterm pane, tty). false = resume globally most-recent.
         "terminal_continue": True,
@@ -55,7 +55,7 @@ DEFAULT_CONFIG = {
         "budget_warning_ratio": None,
         # Wall-clock budget (seconds) per run. null = off. When set: one-time wrap-up notice at 80%
         # elapsed; implicit provider stale timeouts capped to remaining budget. CLI equivalent:
-        # `hbm-agent chat --run-budget N`.
+        # `hbm chat --run-budget N`.
         "run_budget_seconds": None,
         # Gateway inactivity timeout (seconds). Only fires when the agent is completely idle — not
         # while calling tools or receiving API responses. 0 = unlimited.
@@ -203,12 +203,12 @@ DEFAULT_CONFIG = {
         "session_stall_timeout": 300,
         # Transcript-sanitiser heal escalation: after this many pre-send heal passes within a
         # 10-minute window, log one ERROR and queue a ONE-TIME out-of-band notice pointing at /debug
-        # share or `hbm-agent doctor` (status channel only; prompt cache untouched). 0 = no escalation
+        # share or `hbm doctor` (status channel only; prompt cache untouched). 0 = no escalation
         # (per-window WARNINGs still fire).
         # See #96870.
         "sanitizer_heal_escalation_threshold": 3,
         # Seconds of continuous reconnect failure before a platform gets needs_attention flagged in
-        # gateway status (`hbm-agent status` / fleet monitoring). Retries never stop — a signal, not a
+        # gateway status (`hbm status` / fleet monitoring). Retries never stop — a signal, not a
         # circuit breaker. 0 = disable.
         "reconnect_attention_after": 7200,
         # Freshness window (seconds) for the auto-continue note. After a crash/restart mid-run the
@@ -361,8 +361,8 @@ DEFAULT_CONFIG = {
         # keyless_fallback is false.
         "keyless_rescue": True,
         # Per-vendor tier for vendors with both a keyless free endpoint and a keyed paid path (exa,
-        # parallel, firecrawl, keenable; tavily is opt-in keyless via `hbm-agent tools`, not a ring
-        # member). Set by the `hbm-agent tools` picker. "free" = always anonymous endpoint even with a
+        # parallel, firecrawl, keenable; tavily is opt-in keyless via `hbm tools`, not a ring
+        # member). Set by the `hbm tools` picker. "free" = always anonymous endpoint even with a
         # key; "paid" = always keyed (missing key = error; vendor excluded from the ring); unset =
         # keyed when the key is present, else the ring.
         "provider_tier": {},
@@ -410,7 +410,7 @@ DEFAULT_CONFIG = {
         "use_real_profile": False,
         # Windows only: a running Chrome/Edge/Brave locks its cookie DB, so the profile can't be
         # copied. When on, a locked profile still blocks and the agent ASKS first; on approval it
-        # runs `hbm-agent browser close-profile` (kills that profile's browser tree, unsaved tabs lost)
+        # runs `hbm browser close-profile` (kills that profile's browser tree, unsaved tabs lost)
         # and retries once; still locked -> stays blocked, no auto-kill. No effect on macOS/Linux
         # (copy-while-running works).
         "real_profile_autoclose": False,
@@ -448,7 +448,7 @@ DEFAULT_CONFIG = {
         "extension_control": {"enabled": False, "developer_mode": False},
     },
     # Filesystem checkpoints: snapshot the working directory once per turn (on the first
-    # write_file/patch call); restore with /rollback. Opt-in via `hbm-agent chat --checkpoints` or
+    # write_file/patch call); restore with /rollback. Opt-in via `hbm chat --checkpoints` or
     # enabled=True (most users never use /rollback). Single shared shadow store with real pruning.
     "checkpoints": {
         "enabled": False,
@@ -465,7 +465,7 @@ DEFAULT_CONFIG = {
         # refs moved, enforces max_total_size_mb, deletes legacy-* archives older than retention_days.
         # It NEVER deletes orphans (workdir missing on
         # disk) — a missing workdir may just be an unmounted volume/VPN, and an unattended sweep
-        # must not guess. Orphans: `hbm-agent checkpoints prune` (`--keep-orphans` to skip).
+        # must not guess. Orphans: `hbm checkpoints prune` (`--keep-orphans` to skip).
         "auto_prune": True,
         "retention_days": 7,
         "min_interval_hours": 24,
@@ -735,7 +735,7 @@ DEFAULT_CONFIG = {
         "profile_describer": _aux(60),   # 1-2 sentence profile blurb; short, cheap
         "goal_judge": _aux(60),          # /goal satisfaction + contract drafting; JSON calls
         # Curator skill-usage review can take minutes on reasoning models (umbrellas over hundreds
-        # of skills); route cheaper via `hbm-agent model` → auxiliary → Curator.
+        # of skills); route cheaper via `hbm model` → auxiliary → Curator.
         "curator": _aux(600),
         "monitor": _aux(60),   # important-mail 0-10 scorer; high-volume, small model fine
         # Post-turn self-improvement fork (save memory / patch skill). "auto" = main model replaying
@@ -774,10 +774,10 @@ DEFAULT_CONFIG = {
         # continues, Shift+Enter reported distinctly. False restores the c-j submit fallback for
         # POSIX PTYs whose plain Enter arrives as LF.
         "cli_multiline_shortcuts": True,
-        # Interface bare `hbm-agent`/`hbm-agent chat` launches: "cli" (prompt_toolkit REPL) | "tui" (Ink).
+        # Interface bare `hbm-agent`/`hbm chat` launches: "cli" (prompt_toolkit REPL) | "tui" (Ink).
         # Flags win: `--cli` forces the REPL, `--tui` / HBM_TUI=1 forces the TUI.
         "interface": "cli",
-        # `hbm-agent --tui` auto-resumes the most recent human-facing session (like `hbm-agent -c`).
+        # `hbm-agent --tui` auto-resumes the most recent human-facing session (like `hbm -c`).
         # HBM_TUI_RESUME=<id> always wins.
         "tui_auto_resume_recent": False,
         # Desktop reopens the last chat/page on cold start (also in Settings → Appearance).
@@ -914,7 +914,7 @@ DEFAULT_CONFIG = {
         },
         "copy_shortcut": "auto",  # "auto" (platform default) | ctrl_c | ctrl_shift_c | disabled
         # Petdex animated mascot (github.com/crafter-station/petdex): cosmetic sprite across
-        # CLI/TUI/desktop, managed with `hbm-agent pets`. No effect on prompt caching.
+        # CLI/TUI/desktop, managed with `hbm pets`. No effect on prompt caching.
         "pet": {
             "enabled": False,
             "slug": "",   # active pet slug in get_hbm_home()/pets/; empty → first installed
@@ -1355,7 +1355,7 @@ DEFAULT_CONFIG = {
         # highest-precedence tier — ONLY if the root is in trusted_project_dirs. false = no scan, no
         # untrusted-skills notice.
         "project_discovery": True,
-        # Trusted project roots; managed by `hbm-agent skills trust` / `untrust`.
+        # Trusted project roots; managed by `hbm skills trust` / `untrust`.
         "trusted_project_dirs": [],
         # Skill names pinned as fully loaded in every new session (CLI, TUI, gateway, cron, API).
         # Resolved once when the agent's prompt is first built; missing/disabled names warn and
@@ -1371,7 +1371,7 @@ DEFAULT_CONFIG = {
         # code via terminal() ungated, so it mostly blocks prose with risky keywords. On: a
         # dangerous verdict is a tool error the agent can retry. Hub installs are always scanned.
         "guard_agent_created": False,
-        # Advisory NVIDIA SkillEvaluator Tier 1 scan on `hbm-agent skills install` (alongside the
+        # Advisory NVIDIA SkillEvaluator Tier 1 scan on `hbm skills install` (alongside the
         # enforcing built-in guard), only if `skillevaluator` is on PATH (uv tool install
         # "skillevaluator @ git+https://github.com/NVIDIA/SkillEvaluator.git"). Informational, never
         # blocking; secrets-class findings shown red. No-op without it.
@@ -1390,7 +1390,7 @@ DEFAULT_CONFIG = {
     # Curator — background maintenance of AGENT-CREATED skills (never hub-installed): marks
     # long-unused skills stale, archives (never deletes) obsolete ones, optionally consolidates
     # overlaps via a forked aux-model agent. Inactivity-triggered from session start, no cron
-    # daemon. `hbm-agent curator status` shows the last run.
+    # daemon. `hbm curator status` shows the last run.
     "curator": {
         "enabled": True,
         "interval_hours": 24 * 7,  # hours between runs
@@ -1398,17 +1398,17 @@ DEFAULT_CONFIG = {
         "stale_after_days": 14,  # mark "stale" after this many unused days
         "archive_after_days": 30,  # move to skills/.archive/ (recoverable) after this many
         # LLM consolidation (umbrella-building) pass. OFF = deterministic inactivity prune only, no
-        # aux-model cost. `hbm-agent curator run --consolidate` overrides once.
+        # aux-model cost. `hbm curator run --consolidate` overrides once.
         "consolidate": False,
-        # Also prune bundled built-ins (a suppression list stops `hbm-agent update` restoring them);
+        # Also prune bundled built-ins (a suppression list stops `hbm update` restoring them);
         # hub-installed skills are NEVER pruned. A built-in's clock starts when the curator first
         # sees it, so never a mass-prune on the first run. false = keep all.
         "prune_builtins": True,
-        # TTL purge of skills/.archive/: 0 = never; > 0 lets the explicit `hbm-agent curator purge`
+        # TTL purge of skills/.archive/: 0 = never; > 0 lets the explicit `hbm curator purge`
         # delete older archived skills (never automatic; logged in the ledger).
         "archive_ttl_days": 0,
         # Before every real (non-dry-run) pass, snapshot ~/.hbm/skills/ to
-        # ~/.hbm/skills/.curator_backups/<utc-iso>/skills.tar.gz (`hbm-agent curator rollback`).
+        # ~/.hbm/skills/.curator_backups/<utc-iso>/skills.tar.gz (`hbm curator rollback`).
         "backup": {
             "enabled": True,
             "keep": 5,  # retain last N regular snapshots
@@ -1598,14 +1598,14 @@ DEFAULT_CONFIG = {
     # substitutes it; a bare string is shorthand for append. `replace` wins over `append` if both
     # are given.
     "platform_hints": {},
-    # Plugin system. `enabled`/`disabled` lists are written by `hbm-agent plugins enable|disable` and
+    # Plugin system. `enabled`/`disabled` lists are written by `hbm plugins enable|disable` and
     # deliberately omitted here so an empty default never clobbers a user allow-list.
     "plugins": {
         # Wall-clock cap (seconds) for one in-process Python plugin hook callback; shell hooks keep
         # their own per-entry `timeout`. 0 = no cap (sync call on agent thread). Max 600.
         "hook_callback_timeout": 30,
         # Keep loading external plugins that still import pre-decomposition module paths after the
-        # 2026-09-14 removal date (see COMPAT_MANIFEST.md, `hbm-agent plugins compat`). Stopgap only: the
+        # 2026-09-14 removal date (see COMPAT_MANIFEST.md, `hbm plugins compat`). Stopgap only: the
         # old paths raise ImportError once the compat layer is actually removed.
         "allow_deprecated_imports": False,
     },
@@ -1643,7 +1643,7 @@ DEFAULT_CONFIG = {
         "tirith_fail_open": True,
         "website_blocklist": {"enabled": False, "domains": [], "shared_files": []},
         # IDs of supply-chain advisories the user has read and acted on; acked ones stop the startup
-        # banner. Add via `hbm-agent doctor --ack <id>`; remove by editing the list. Catalog:
+        # banner. Add via `hbm doctor --ack <id>`; remove by editing the list. Catalog:
         # hbm_cli/security_advisories.py.
         "acked_advisories": [],
         # Lazy-install opt-in backend packages from PyPI when a backend that needs them is first
@@ -1731,7 +1731,7 @@ DEFAULT_CONFIG = {
         "require_restart_safe_scope": False,
     },
     # Kanban multi-agent coordination. The dispatcher ticks every N seconds, reclaims stale claims,
-    # promotes dependency-satisfied todos to ready, and fires `hbm-agent -p <assignee> chat -q ...` per
+    # promotes dependency-satisfied todos to ready, and fires `hbm -p <assignee> chat -q ...` per
     # claimable task. Run ONE dispatcher per profile; two on the same kanban.db race for claims.
     "kanban": {
         # Auto-subscribe the originating gateway/TUI session to completion + block events when
@@ -1786,7 +1786,7 @@ DEFAULT_CONFIG = {
         # root profile named "default", so on a shared kanban.db every home can otherwise claim
         # default-assigned cards.
         "dispatch_profiles": None,
-        # Auto-run the decomposer on Triage tasks every tick. False = manual via `hbm-agent kanban
+        # Auto-run the decomposer on Triage tasks every tick. False = manual via `hbm kanban
         # decompose <id>` or the dashboard's Decompose button.
         "auto_decompose": True,
         # Max triage tasks decomposed per tick, bounding the aux-LLM burst from a bulk load. Excess
@@ -1879,7 +1879,7 @@ DEFAULT_CONFIG = {
         "enabled": True,
         "url": "https://hermes-agent.nousresearch.com/docs/api/model-catalog.json",
         # Disk cache TTL in minutes. The gateway refreshes in the background on this cadence; the
-        # CLI refetches on the next /model or `hbm-agent model` once the cache is older. Network
+        # CLI refetches on the next /model or `hbm model` once the cache is older. Network
         # failures silently use the stale cache. Legacy `ttl_hours` is honoured if set.
         "ttl_minutes": 20,
         # Per-provider override URLs for self-hosted curation lists using the same schema, e.g.
@@ -1979,19 +1979,19 @@ DEFAULT_CONFIG = {
         "write_sessions_json": True,
         # One gateway for every profile on this host: the DEFAULT profile's gateway also connects
         # each named profile's bots (their own .env / config.yaml, per-profile secret scope) and
-        # stamps the profile into session keys. Flip with `hbm-agent gateway migrate --multiplex`
-        # (records a rollback manifest; `--standalone` undoes it) or `hbm-agent config set
-        # gateway.multiplex_profiles true` + `hbm-agent gateway restart`. GATEWAY_MULTIPLEX_PROFILES
+        # stamps the profile into session keys. Flip with `hbm gateway migrate --multiplex`
+        # (records a rollback manifest; `--standalone` undoes it) or `hbm config set
+        # gateway.multiplex_profiles true` + `hbm gateway restart`. GATEWAY_MULTIPLEX_PROFILES
         # in the environment overrides. Two profiles configuring the same bot token cannot be
-        # served together — the duplicate adapter is parked; `hbm-agent profile create --clone`
+        # served together — the duplicate adapter is parked; `hbm profile create --clone`
         # therefore leaves messaging channels behind unless --clone-channels is passed.
         "multiplex_profiles": False,
-        # May `hbm-agent update` fold this install onto a multiplexed default gateway by itself?
+        # May `hbm update` fold this install onto a multiplexed default gateway by itself?
         # True (the default) keeps today's behaviour: a multi-profile install whose secondaries run
         # their own gateways is migrated automatically after an update when nothing blocks it.
         # Set to False to stay on per-profile gateways — a durable opt-out that survives updates, so
         # the decision is not re-litigated on every release. Only the AUTOMATIC path reads this:
-        # `hbm-agent gateway migrate --multiplex` is an explicit request and always proceeds.
+        # `hbm gateway migrate --multiplex` is an explicit request and always proceeds.
         "auto_multiplex_migration": True,
         # Route inbound chats of the default profile's bots to another profile
         # (gateway/profile_routing.py): [{profile, platform, chat_id|user_id|guild_id|...}].
@@ -2080,7 +2080,7 @@ DEFAULT_CONFIG = {
         # are never deleted; stale automation sessions whose process died are *closed*, then get a
         # full retention window before removal.
         "auto_prune": True,
-        # Inactive days of ended-session history to keep (= `hbm-agent sessions prune`).
+        # Inactive days of ended-session history to keep (= `hbm sessions prune`).
         # When true, prune ENDED sessions inactive for retention_days once per (roughly) min_interval_hours
         # at CLI/gateway/cron startup. Activity is the latest message timestamp, falling back to creation
         # time for empty sessions. Sessions that are still open, pinned, or mid-turn are never deleted — the
@@ -2107,8 +2107,8 @@ DEFAULT_CONFIG = {
         "min_interval_hours": 24,
 
         # Notice about the compact FTS layout (reclaims ~60%+ of state.db). OPT-IN: legacy indexes
-        # stay until `hbm-agent sessions optimize-storage` runs, since the rebuild is disk-heavy on
-        # large DBs. advise = `hbm-agent update` prints a one-line notice with reclaimable size when a
+        # stay until `hbm sessions optimize-storage` runs, since the rebuild is disk-heavy on
+        # large DBs. advise = `hbm update` prints a one-line notice with reclaimable size when a
         # legacy index is detected; require = shown as a REQUIRED upgrade (tooling may gate on it);
         # off = none.
         "fts_optimize_notice": "advise",
@@ -2125,7 +2125,7 @@ DEFAULT_CONFIG = {
         # once; 0 disables). Max active messages (across the compression lineage) for interactive
         # resume.
         "max_resume_messages": 20000,
-        # Max active messages per session for in-memory export (`hbm-agent sessions export`); checked
+        # Max active messages per session for in-memory export (`hbm sessions export`); checked
         # per session, so full-DB backups of small sessions work.
         "max_export_messages": 20000,
     },
@@ -2153,17 +2153,17 @@ DEFAULT_CONFIG = {
     },
 
     "doctor": {
-        # Per-probe timeout (seconds) for `hbm-agent doctor --live` real-call probes.
+        # Per-probe timeout (seconds) for `hbm doctor --live` real-call probes.
         "live_probe_timeout": 10,
     },
 
     "updates": {
-        # Passive version/banner checks only; explicit `hbm-agent update --check` remains enabled.
+        # Passive version/banner checks only; explicit `hbm update --check` remains enabled.
         "check": True,
         # Pre-update backup. quick = snapshot small critical state (pairing JSONs, cron jobs,
         # config.yaml, .env, auth.json, profile DBs) into <HBM_HOME>/state-snapshots/, skipping
-        # files >1 GiB; restore via ``/snapshot``. full = quick PLUS a ``hbm-agent backup`` zip in
-        # <HBM_HOME>/backups/ (``hbm-agent import`` restores; slow on large homes; ``--backup``
+        # files >1 GiB; restore via ``/snapshot``. full = quick PLUS a ``hbm backup`` zip in
+        # <HBM_HOME>/backups/ (``hbm import`` restores; slow on large homes; ``--backup``
         # forces once). off = none (``--no-backup`` forces once). Legacy booleans: true -> full,
         # false -> off.
         # Pre-update safety backup — ONE consolidated mechanism, three modes: Files over 1 GiB (e.g. a
@@ -2186,9 +2186,9 @@ DEFAULT_CONFIG = {
         # Clean parked branch with unmerged commits: switch = move to the update target, commits
         # stay on the branch (never conflicts). update_in_place = for a maintained custom branch:
         # merge origin/<target> INTO it after leaving a pre-update-<stamp> tag; a conflict stops the
-        # update cleanly. `hbm-agent update --switch-branch` overrides to switch for one run.
+        # update cleanly. `hbm update --switch-branch` overrides to switch for one run.
         "parked_branch_strategy": "switch",
-        # Refresh an installed cua-driver during `hbm-agent update` (best-effort, macOS only). Turn off
+        # Refresh an installed cua-driver during `hbm update` (best-effort, macOS only). Turn off
         # e.g. on non-admin accounts where /Applications isn't writable.
         "refresh_cua_driver": True,
     },
@@ -2214,7 +2214,7 @@ DEFAULT_CONFIG = {
         "servers": {},
     },
     # X (Twitter) Search via xAI's x_search Responses tool. Registers when xAI creds exist
-    # (SuperGrok OAuth or XAI_API_KEY) AND the toolset is enabled in `hbm-agent tools`.
+    # (SuperGrok OAuth or XAI_API_KEY) AND the toolset is enabled in `hbm tools`.
     "x_search": {
         # xAI model for the Responses call; any Grok model with x_search access works.
         "model": "grok-4.5",
@@ -2228,7 +2228,7 @@ DEFAULT_CONFIG = {
     # External secret sources — pull credentials from secret managers at startup instead of storing
     # them in ~/.hbm/.env.
     # Browser credential vault: which login sources browser_vault_list/fill may draw from. The local
-    # encrypted vault (`hbm-agent vault add`, Desktop → Settings → Credential Vault) is always on.
+    # encrypted vault (`hbm vault add`, Desktop → Settings → Credential Vault) is always on.
     # External password managers are unlocked per session with a masked master-password prompt;
     # headless sessions (cron, webhook, API) never prompt and see them as locked.
     "vault": {
@@ -2326,7 +2326,7 @@ DEFAULT_CONFIG = {
     # Egress credential-injection proxy (iron-proxy) for remote terminal sandboxes (Docker today):
     # the sandbox sees opaque tokens and iron-proxy swaps in real credentials at egress, so a
     # compromised sandbox leaks only tokens that work behind the trusted proxy. Configure with
-    # `hbm-agent egress setup`.
+    # `hbm egress setup`.
     "proxy": {
         "enabled": False,  # When false, nothing starts, no docker mounts, no binary installs.
         # Tunnel listener port; sandboxes get HTTPS_PROXY=http://<host>:<port>.
@@ -2410,7 +2410,7 @@ DEFAULT_CONFIG = {
         "anthropic_wire": "chat",
         # Nous free tier: with no other provider configured, HBM AGENT sets up a free Nous identity on
         # first use (inference on nous/welcome + connectors) and offers `/login` (terminal:
-        # `hbm-agent auth upgrade`) to sign in. false turns the free tier off entirely: nothing is set
+        # `hbm auth upgrade`) to sign in. false turns the free tier off entirely: nothing is set
         # up and nothing is used.
         "guest": True,
     },
@@ -2595,7 +2595,7 @@ OPTIONAL_ENV_VARS = {
     "AZURE_FOUNDRY_API_KEY": _prov("Azure Foundry API key for custom Azure endpoints",
         "Azure Foundry API Key", "https://ai.azure.com/", advanced=False),
     "AZURE_FOUNDRY_BASE_URL": _prov(
-        "Azure Foundry base URL (set via 'hbm-agent model' for endpoint-specific config)",
+        "Azure Foundry base URL (set via 'hbm model' for endpoint-specific config)",
         "Azure Foundry base URL", None, password=False),
     # ── Tool API keys ──
     "EXA_API_KEY": _tool("Exa API key for AI-native web search and contents", "Exa API key",

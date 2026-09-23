@@ -1,4 +1,4 @@
-"""``hbm-agent profile`` subcommand parser."""
+"""``hbm profile`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -34,20 +34,20 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
              "multiplexed gateway.")
     profile_create.add_argument(
         "--sync-imports", action="store_true",
-        help="With --clone/--clone-from: also carry over the `hbm-agent import-agent` sync manifest so "
+        help="With --clone/--clone-from: also carry over the `hbm import-agent` sync manifest so "
              "the new profile stays registered against the same Claude Code / Codex trees "
-             "(`hbm-agent -p <name> import-agent --sync`). Never syncs config from the source profile.")
+             "(`hbm -p <name> import-agent --sync`). Never syncs config from the source profile.")
     profile_create.add_argument(
         "--no-alias", action="store_true", help="Skip wrapper script creation")
     profile_create.add_argument(
         "--no-skills", action="store_true",
-        help="Create an empty profile with no bundled skills (opts out of `hbm-agent update` skill sync)",
+        help="Create an empty profile with no bundled skills (opts out of `hbm update` skill sync)",
     )
     profile_create.add_argument(
         "--description", default=None,
         help="One- or two-sentence description of what this profile is good at. "
              "Used by the kanban decomposer to route tasks based on role instead "
-             "of profile name alone. Skip and add later via `hbm-agent profile describe`.")
+             "of profile name alone. Skip and add later via `hbm profile describe`.")
 
     profile_delete = profile_subparsers.add_parser("delete", help="Delete a profile")
     profile_delete.add_argument("profile_name", help="Profile to delete")
@@ -93,7 +93,7 @@ def build_profile_parser(subparsers, *, cmd_profile: Callable) -> None:
     profile_migrate = profile_subparsers.add_parser(
         "migrate-identity",
         help="Retry a renamed profile's session/routing identity migration",
-        description="Re-run the session/routing identity migration that `hbm-agent profile rename` "
+        description="Re-run the session/routing identity migration that `hbm profile rename` "
             "performs automatically. The rename has already happened when this is needed, so pass "
             "the OLD and NEW names: state still keyed by the old profile name (session keys, "
             "profile_name, heartbeats, routing/delivery rows) is rekeyed to the new one. Run it "

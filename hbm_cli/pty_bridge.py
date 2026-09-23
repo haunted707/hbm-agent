@@ -1,4 +1,4 @@
-"""PTY bridge for `hbm-agent dashboard` chat tab.
+"""PTY bridge for `hbm dashboard` chat tab.
 
 Wraps a child process behind a pseudo-terminal so its ANSI output can be streamed to xterm.js and
 keystrokes fed back in; the only caller is the ``/api/pty`` WebSocket endpoint in

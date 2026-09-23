@@ -475,7 +475,7 @@ class TestRequireConfirmedUpdate:
     indeterminate check (old driver, offline, GitHub rate-limited, probe
     timeout) keeps the installed version and returns fast.
 
-    Explicit `hbm-agent computer-use install --upgrade` keeps the old
+    Explicit `hbm computer-use install --upgrade` keeps the old
     fall-through (require_confirmed_update=False): a force-refresh should
     still reinstall when the check can't answer.
     """
@@ -619,7 +619,7 @@ class TestRequireConfirmedUpdate:
         runner.assert_not_called()
 
     def test_explicit_upgrade_still_falls_through_on_indeterminate(self):
-        # `hbm-agent computer-use install --upgrade` (default flag): the old
+        # `hbm computer-use install --upgrade` (default flag): the old
         # behaviour — indeterminate check re-runs the installer.
         ok, runner, _ = self._install(None, require_confirmed=False)
         assert ok is True
@@ -1630,7 +1630,7 @@ class TestWindowsAutostartRepair:
 
 
 class TestCuaVersionSummary:
-    """`hbm-agent computer-use status` prints one line, whatever the binary says.
+    """`hbm computer-use status` prints one line, whatever the binary says.
 
     A binary chosen by HBM_CUA_DRIVER_CMD is under no obligation to answer
     `--version` the way cua-driver does, and its output used to be spliced

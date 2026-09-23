@@ -1,7 +1,7 @@
-"""``hbm-agent logs`` — view and filter HBM AGENT log files.
+"""``hbm logs`` — view and filter HBM AGENT log files.
 
-``hbm-agent logs [name] [-n N] [-f] [--level L] [--session S] [--component C] [--since 1h]``;
-``hbm-agent logs list`` shows the available files.
+``hbm logs [name] [-n N] [-f] [--level L] [--session S] [--component C] [--since 1h]``;
+``hbm logs list`` shows the available files.
 """
 
 import re
@@ -109,7 +109,7 @@ def tail_log(
     log_path = get_hbm_home() / "logs" / filename
     if not log_path.exists():
         print(f"Log file not found: {log_path}")
-        print("(Logs are created when HBM AGENT runs — try 'hbm-agent chat' first)")
+        print("(Logs are created when HBM AGENT runs — try 'hbm chat' first)")
         sys.exit(1)
 
     since_dt = None
@@ -258,4 +258,4 @@ def list_logs() -> None:
             found = True
 
     if not found:
-        print("  (no log files yet — run 'hbm-agent chat' to generate logs)")
+        print("  (no log files yet — run 'hbm chat' to generate logs)")

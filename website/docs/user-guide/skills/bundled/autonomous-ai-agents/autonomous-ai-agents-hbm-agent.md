@@ -63,7 +63,7 @@ Never answer "HBM AGENT can't do that" from memory. HBM AGENT ships far more tha
 
 ```bash
 # Install (shell installer — sets up uv, Python, the venv, and the launcher)
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 

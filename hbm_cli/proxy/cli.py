@@ -1,4 +1,4 @@
-"""CLI handlers for the ``hbm-agent proxy`` subcommand."""
+"""CLI handlers for the ``hbm proxy`` subcommand."""
 
 from __future__ import annotations
 
@@ -22,7 +22,7 @@ def _err(msg: str) -> None:
 def cmd_proxy_start(args: Any) -> int:
     """Run the proxy server in the foreground."""
     if not AIOHTTP_AVAILABLE:
-        _err("hbm-agent proxy requires aiohttp. Run `hbm-agent setup` to install it.")
+        _err("hbm proxy requires aiohttp. Run `hbm setup` to install it.")
         return 1
     provider = getattr(args, "provider", None) or "nous"
     try:
@@ -31,7 +31,7 @@ def cmd_proxy_start(args: Any) -> int:
         _err(f"Error: {exc}")
         return 2
     if not adapter.is_authenticated():
-        auth_hint = getattr(adapter, "auth_hint", f"hbm-agent auth add {adapter.name}")
+        auth_hint = getattr(adapter, "auth_hint", f"hbm auth add {adapter.name}")
         _err(f"Not logged into {adapter.display_name}. Run `{auth_hint}` first.")
         return 2
     host = getattr(args, "host", None) or DEFAULT_HOST
@@ -69,7 +69,7 @@ def cmd_proxy_status(args: Any) -> int:
             continue
         expires = f" (bearer expires {cred.expires_at})" if cred.expires_at else ""
         print(f"  [{name:8s}] {adapter.display_name} — ready{expires}")
-    print("\nStart the proxy with: hbm-agent proxy start [--provider <name>]")
+    print("\nStart the proxy with: hbm proxy start [--provider <name>]")
     return 0
 
 
@@ -91,20 +91,20 @@ _SUBCOMMANDS = {
 
 
 def cmd_proxy(args: Any) -> int:
-    """Dispatch ``hbm-agent proxy <subcommand>``; no/unknown subcommand prints the short help."""
+    """Dispatch ``hbm proxy <subcommand>``; no/unknown subcommand prints the short help."""
     handler = _SUBCOMMANDS.get(getattr(args, "proxy_command", None))
     if handler is not None:
         return handler(args)
     _err(
-        "hbm-agent proxy — local OpenAI-compatible proxy that attaches your\n"
+        "hbm proxy — local OpenAI-compatible proxy that attaches your\n"
         "OAuth-authenticated provider credentials to outbound requests.\n"
         "\n"
         "Subcommands:\n"
-        "  hbm-agent proxy start [--provider nous|xai] [--host 127.0.0.1] [--port 8645]\n"
+        "  hbm proxy start [--provider nous|xai] [--host 127.0.0.1] [--port 8645]\n"
         "      Run the proxy in the foreground.\n"
-        "  hbm-agent proxy status\n"
+        "  hbm proxy status\n"
         "      Show which upstream adapters are ready.\n"
-        "  hbm-agent proxy providers\n"
+        "  hbm proxy providers\n"
         "      List available upstream providers.\n"
     )
     return 0

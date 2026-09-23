@@ -14,14 +14,14 @@ _TTS_SUMMARY_ROWS = {
     "openai": ("OpenAI", ("VOICE_TOOLS_OPENAI_KEY", "OPENAI_API_KEY")),
     "minimax": ("MiniMax", ("MINIMAX_API_KEY",)), "mistral": ("Mistral Voxtral", ("MISTRAL_API_KEY",)),
     "gemini": ("Google Gemini", ("GEMINI_API_KEY", "GOOGLE_API_KEY")),
-    "neutts": ("NeuTTS", "neutts", "run 'hbm-agent setup tts'"),
-    "kittentts": ("KittenTTS", "kittentts", "run 'hbm-agent setup tts'")}
+    "neutts": ("NeuTTS", "neutts", "run 'hbm setup tts'"),
+    "kittentts": ("KittenTTS", "kittentts", "run 'hbm setup tts'")}
 _TTS_SUMMARY_DEFAULT = ("Edge TTS", ())
 _STT_SUMMARY_ROWS = {
     "openai": ("OpenAI", ("VOICE_TOOLS_OPENAI_KEY", "OPENAI_API_KEY")), "groq": ("Groq Whisper", ("GROQ_API_KEY",)),
     "elevenlabs": ("ElevenLabs Scribe", ("ELEVENLABS_API_KEY",)), "xai": ("xAI", ()),
     "deepinfra": ("DeepInfra", ("DEEPINFRA_API_KEY",))}
-_STT_SUMMARY_DEFAULT = ("Local Whisper", "faster_whisper", "run 'hbm-agent tools' → Speech-to-Text")
+_STT_SUMMARY_DEFAULT = ("Local Whisper", "faster_whisper", "run 'hbm tools' → Speech-to-Text")
 
 # Browser "missing" hint keyed by the configured provider; anything else gets the generic hint.
 _BROWSER_MISSING_HINTS = {
@@ -39,15 +39,15 @@ _DONE_BANNER = (
     "└─────────────────────────────────────────────────────────┘")
 # (command, description) rows; the description carries its own alignment padding.
 _EDIT_WIZARD_ROWS = (
-    ("hbm-agent setup", "          Re-run the full wizard"), ("hbm-agent setup model", "    Change model/provider"),
-    ("hbm-agent setup terminal", " Change terminal backend"), ("hbm-agent setup gateway", "  Configure messaging"),
-    ("hbm-agent setup tools", "    Configure tool providers"))
+    ("hbm setup", "          Re-run the full wizard"), ("hbm setup model", "    Change model/provider"),
+    ("hbm setup terminal", " Change terminal backend"), ("hbm setup gateway", "  Configure messaging"),
+    ("hbm setup tools", "    Configure tool providers"))
 _EDIT_CONFIG_ROWS = (
-    ("hbm-agent config", "         View current settings"), ("hbm-agent config edit", "    Open config in your editor"),
-    ("hbm-agent config set <key> <value>", ""))
+    ("hbm config", "         View current settings"), ("hbm config edit", "    Open config in your editor"),
+    ("hbm config set <key> <value>", ""))
 _READY_ROWS = (
-    ("hbm-agent", "        Start chatting"), ("hbm-agent gateway", "      Start messaging gateway"),
-    ("hbm-agent doctor", "       Check for issues"))
+    ("hbm-agent", "        Start chatting"), ("hbm gateway", "      Start messaging gateway"),
+    ("hbm doctor", "       Check for issues"))
 
 
 def _voice_provider_status(kind: str, provider: str, rows: dict, default: tuple) -> tuple:
@@ -94,7 +94,7 @@ def _vision_row(config, feats):
         ok = bool(get_available_vision_backends())
     except Exception:
         ok = False
-    return ("Vision (image analysis)", ok, None if ok else "run 'hbm-agent setup' to configure")
+    return ("Vision (image analysis)", ok, None if ok else "run 'hbm setup' to configure")
 
 
 def _managed_or_provider_row(feature, name: str, managed_label: str, missing_hint: str):
@@ -131,7 +131,7 @@ def _image_gen_row(config, feats):
 
 
 def _video_gen_row(config, feats):
-    # Opt-in via `hbm-agent tools` → Video Generation. Only show the row when a plugin reports
+    # Opt-in via `hbm tools` → Video Generation. Only show the row when a plugin reports
     # available so we don't badger users who don't care about video gen with a "missing" line.
     if feats.video_gen.managed_by_nous:
         return ("Video Generation (FAL via Nous subscription)", True, None)
@@ -161,7 +161,7 @@ def _modal_row(config, feats):
     if _setup.cfg_get(config, "terminal", "backend") == "modal":
         if feats.modal.direct_override:
             return ("Modal Execution (direct Modal)", True, None)
-        return ("Modal Execution", False, "run 'hbm-agent setup terminal'")
+        return ("Modal Execution", False, "run 'hbm setup terminal'")
     if tool_backend_helpers.managed_nous_tools_enabled() and feats.nous_auth_present:
         return ("Modal Execution (optional via Nous subscription)", True, None)
     return None
@@ -172,7 +172,7 @@ def _home_assistant_row(config, feats):
 
 
 def _spotify_row(config, feats):
-    # OAuth via hbm-agent auth spotify — check auth.json, not env vars
+    # OAuth via hbm auth spotify — check auth.json, not env vars
     try:
         from hbm_cli.auth import get_provider_auth_state
         state = get_provider_auth_state("spotify") or {}
@@ -222,8 +222,8 @@ def _print_setup_summary(config: dict, hbm_home):
         print()
         _setup.print_warning("No inference provider is configured — HBM AGENT cannot chat yet.")
         _setup._info("  Finish this one step with either of:",
-              "    hbm-agent model            (pick any provider/model)",
-              "    hbm-agent setup --portal   (Nous Portal OAuth, no API key)")
+              "    hbm model            (pick any provider/model)",
+              "    hbm setup --portal   (Nous Portal OAuth, no API key)")
 
     print()
     _setup.print_header("Tool Availability Summary")
@@ -243,7 +243,7 @@ def _print_setup_summary(config: dict, hbm_home):
     print()
 
     if available_count < len(tool_status):
-        _setup.print_warning("Some tools are disabled. Run 'hbm-agent setup tools' to configure them,")
+        _setup.print_warning("Some tools are disabled. Run 'hbm setup tools' to configure them,")
         _setup.print_warning(f"or edit {_dhh()}/.env directly to add the missing API keys.")
         print()
 

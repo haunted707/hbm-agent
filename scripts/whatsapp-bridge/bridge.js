@@ -102,7 +102,7 @@ const AUDIO_CACHE_DIR = process.env.HBM_AUDIO_CACHE_DIR
 // Self-hash of this script file.  Reported in /health so the Python gateway
 // can detect a running bridge that predates the current bridge.js and
 // restart it instead of silently reusing stale code (stale-bridge trap:
-// `hbm-agent update` updates bridge.js on disk but a long-lived bridge process
+// `hbm update` updates bridge.js on disk but a long-lived bridge process
 // keeps serving the old behavior forever).
 let SCRIPT_HASH = '';
 try {

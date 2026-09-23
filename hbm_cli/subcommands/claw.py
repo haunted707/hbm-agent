@@ -1,4 +1,4 @@
-"""``hbm-agent claw`` subcommand parser."""
+"""``hbm claw`` subcommand parser."""
 
 from __future__ import annotations
 
@@ -38,7 +38,7 @@ def build_claw_parser(subparsers, *, cmd_claw: Callable) -> None:
         "--no-backup", action="store_true",
         help="Skip the pre-migration zip snapshot of ~/.hbm/ (by default a "
         "single restore-point archive is written to ~/.hbm/backups/ "
-        "before apply; restorable with 'hbm-agent import').")
+        "before apply; restorable with 'hbm import').")
     claw_migrate.add_argument(
         "--workspace-target", help="Absolute path to copy workspace instructions into")
     claw_migrate.add_argument(

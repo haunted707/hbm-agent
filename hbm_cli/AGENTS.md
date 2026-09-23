@@ -65,14 +65,14 @@ Do not add a surface-specific goal parser. ACP has no goal command or goal loop 
   `{"description", "prompt", "url", "password": True, "category": provider|tool|messaging|setting}`.
   Non-secret settings go in config.yaml; if internal code needs an env mirror, bridge it in code
   (`gateway_timeout`; `terminal.cwd` → `TERMINAL_CWD`). `MESSAGING_CWD` is removed and `TERMINAL_CWD`
-  in `.env` is deprecated — the loader warns; canonical is `terminal.cwd`. `hbm-agent config
+  in `.env` is deprecated — the loader warns; canonical is `terminal.cwd`. `hbm config
   set/get/unset <NAME>` route any bare name registered in `OPTIONAL_ENV_VARS` / `_EXTRA_ENV_KEYS`
   (or carrying a `setup_hidden_env` platform suffix) to `.env` via `config_env_routing.py` — the
   file the platform setup flows write — never to the top level of config.yaml.
 - **Three loaders — know which you're in:** `load_cli_config()` (CLI, `cli.py`); `load_config()`
-  (`hbm-agent tools/setup`, most subcommands, `hbm_cli/config.py`, merges `DEFAULT_CONFIG`);
+  (`hbm tools/setup`, most subcommands, `hbm_cli/config.py`, merges `DEFAULT_CONFIG`);
   `hbm_cli/config_effective.py::load_user_config_effective()` (gateway runtime via
-  `gateway/run.py::_load_gateway_config`, TUI gateway `_load_cfg`, cron, `hbm-agent send`, doctor,
+  `gateway/run.py::_load_gateway_config`, TUI gateway `_load_cfg`, cron, `hbm send`, doctor,
   `hbm_time`/`hbm_logging`: user file + managed overlay + `${VAR}` expansion + model-key
   canon, NO defaults — for presence-sensitive readers). If the CLI sees a key and the gateway
   doesn't (or vice versa), you're on the wrong loader — check `DEFAULT_CONFIG` coverage. Never
@@ -97,12 +97,12 @@ thinking_verbs, wings), `tool_prefix`, `tool_emojis`, `branding.*` (agent_name, 
 response_label, prompt_symbol). Consumers: `banner.py`, `display.py`, `cli.py`. Key-by-key table
 and YAML template: `website/docs/user-guide/features/skins.md`.
 
-## Update pipeline (`hbm-agent update`) — transactional; every stage guards a real field failure
+## Update pipeline (`hbm update`) — transactional; every stage guards a real field failure
 
 Fleet-update campaign #91277 (Aug 2026). A PR that weakens a stage must answer for the failure class
 it guards. `plan → snapshot → apply → restart-per-kind → verify → report`
 
-- **Plan** (`update_inventory.py`, `hbm-agent update --plan`): read-only inventory — install kind, all
+- **Plan** (`update_inventory.py`, `hbm update --plan`): read-only inventory — install kind, all
   profiles, every live gateway with supervisor + running code version. Deployment kinds are
   first-class: `git` updates in place; `docker`/`nix`/`apt` are NOT in-place-updatable and the
   updater reports the correct external command instead of fighting the deployment model.
@@ -140,7 +140,7 @@ matchers; parser-derived flag sets; never blanket-exclude gateway ancestors, #87
 ## Profiles (multi-instance)
 
 `_apply_profile_override()` in `hbm_cli/main.py` sets `HBM_HOME` before any module import for
-single-profile commands (`hbm-agent -p x <cmd>`), so there `get_hbm_home()` scopes to the active
+single-profile commands (`hbm -p x <cmd>`), so there `get_hbm_home()` scopes to the active
 profile. The multiplex gateway and the Desktop/dashboard `serve` backend instead bind the active
 profile per activity via a contextvar override while `os.environ["HBM_HOME"]` keeps the launch
 profile — a module constant or import-time read there freezes to the launch profile (rules in
@@ -160,7 +160,7 @@ Enumeration is a pure read: never `mkdir` a profile home from a served path (`Se
 cron all go through `mkdir_under_hbm_home` / `_ensure_cron_dir`, which refuse a deleted or
 missing named profile, #94590). Process-global per-profile slots (MCP discovery in `mcp_startup.py`,
 tool registry overlays) key on `hbm_constants.hbm_home_key()`, never a single flag.
-Migration from per-profile gateways: `hbm_cli/gateway_migrate.py` (`hbm-agent gateway migrate
+Migration from per-profile gateways: `hbm_cli/gateway_migrate.py` (`hbm gateway migrate
 --multiplex|--standalone`, table-driven `_PREFLIGHT_CHECKS`, manifest `<default>/gateway_migration.json`);
 `update_cmd_fleet._verify_fleet_after_update` calls `maybe_auto_migrate_after_update` on the success
 path only; `gateway_migrate_guards.py` holds the auto-path-only refusals (table `_AUTO_MIGRATION_GUARDS`:
@@ -168,7 +168,7 @@ other service domain / UNIX user / HBM_HOME outside `profiles/` — notices for 
 blockers for the hook) and the `gateway.auto_multiplex_migration` opt-out (#109954). Blockers reuse `GatewayRunner._adapter_credential_fingerprint` and `platform_binds_port`;
 "has a `/p/<profile>/` ingress" is the adapter class attribute `serves_profile_prefix` — set it on a
 new HTTP-inbound adapter when it answers the prefix, never extend a list here.
-`hbm-agent gateway restart` for a gateway HBM AGENT did not install (custom launchd agent / unit running
+`hbm gateway restart` for a gateway HBM AGENT did not install (custom launchd agent / unit running
 `gateway run --external-supervisor`): `gateway_supervised_restart.py` — the gateway's SELF-declared
 supervisor (control-socket `identify` answering anything but `manual`, OR the argv marker) decides; hand back via SIGUSR1 and wait
 for a fresh supervised PID, never stop + foreground `run_gateway` (that stamps the CLI's PID and wedges
@@ -208,7 +208,7 @@ what happens when the server had already completed the transfer — the desktop 
 DELETE means "not on this machine"), the gateway passes `False` (a supersede must not discard a
 transfer the user actually approved). `scope` is entered only around the precondition and persist
 blocks, never across a `yield` or a network wait, because `run_in_executor` does not carry
-contextvars. `upgrade_guest` (`hbm-agent auth upgrade`), the CLI `/login` handler and the desktop
+contextvars. `upgrade_guest` (`hbm auth upgrade`), the CLI `/login` handler and the desktop
 promotion poller are renderers over it; a surface that needs the cancel check and the save to be
 atomic passes `persist_guard`. The desktop's plain "connect another Nous account" device-code login
 is a separate path (`_nous_plain_poller`) and must stay one.

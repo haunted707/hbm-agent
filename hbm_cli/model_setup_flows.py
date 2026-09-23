@@ -1,4 +1,4 @@
-"""Per-provider model-selection wizard flows for ``hbm-agent setup`` / ``hbm-agent model``.
+"""Per-provider model-selection wizard flows for ``hbm setup`` / ``hbm model``.
 
 main / config / auth / models helpers are imported lazily inside bodies: avoids the main.py import
 cycle and lets tests patch ``hbm_cli.config.load_config`` etc. at call time. The shared skeleton
@@ -108,7 +108,7 @@ def _model_flow_moa(config, current_model=""):
     moa = normalize_moa_config(config.get("moa") if isinstance(config, dict) else {})
     presets = moa.get("presets") or {}
     if not presets:
-        print("No MoA presets configured. Run `hbm-agent moa configure <name>` first.")
+        print("No MoA presets configured. Run `hbm moa configure <name>` first.")
         return
 
     names = list(presets.keys())
@@ -292,7 +292,7 @@ def _model_flow_nous(config, current_model="", args=None):
     from hbm_cli.model_switch_providers import _free_tier_nous_row
     tier_row = _free_tier_nous_row({"name": "Nous Portal", "models": []})
     if tier_row is None:
-        print("The Nous free tier is off for this install; sign in with `hbm-agent auth upgrade` to use Nous models.")
+        print("The Nous free tier is off for this install; sign in with `hbm auth upgrade` to use Nous models.")
         return
     if tier_row["models"]:
         # Free-tier identity: the welcome host serves the single pinned model; no Portal catalog,
@@ -365,7 +365,7 @@ def _model_flow_openai_codex(config, current_model=""):
         PROVIDER_REGISTRY["openai-codex"], recheck=lambda: get_codex_auth_status().get("logged_in")):
         return
 
-    # Prefer the credential pool (where `hbm-agent auth` stores device_code tokens),
+    # Prefer the credential pool (where `hbm auth` stores device_code tokens),
     # fall back to legacy provider state.
     _codex_token = None
     with contextlib.suppress(Exception):
@@ -397,7 +397,7 @@ def _model_flow_xai_oauth(_config, current_model="", *, args=None):
         return
 
     # ``resolve_xai_oauth_runtime_credentials`` only reads the auth.json singleton, but
-    # credentials may live only in the pool (``hbm-agent auth add xai-oauth``) — fall back to
+    # credentials may live only in the pool (``hbm auth add xai-oauth``) — fall back to
     # the default base URL so the picker still completes.
     base_url = DEFAULT_XAI_OAUTH_BASE_URL
     with contextlib.suppress(Exception):

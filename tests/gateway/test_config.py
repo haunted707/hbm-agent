@@ -309,7 +309,7 @@ class TestLoadGatewayConfig:
 
     def test_multiplex_profiles_from_nested_gateway_section(self, tmp_path, monkeypatch):
         """``gateway.multiplex_profiles: true`` (the nested form written by
-        ``hbm-agent config set gateway.multiplex_profiles true``) must enable
+        ``hbm config set gateway.multiplex_profiles true``) must enable
         multiplexing when loaded via load_gateway_config().
 
         Regression: load_gateway_config() only surfaced the *top-level*

@@ -1,4 +1,4 @@
-"""CLI handlers for ``hbm-agent secrets bitwarden ...``."""
+"""CLI handlers for ``hbm secrets bitwarden ...``."""
 
 from __future__ import annotations
 
@@ -16,7 +16,7 @@ from rich.panel import Panel
 from rich.table import Table
 
 # The Bitwarden backend pulls in ``cryptography`` at import time; on Windows that mapped native
-# module makes the ``hbm-agent update`` self-lock preflight defer. This module is registered
+# module makes the ``hbm update`` self-lock preflight defer. This module is registered
 # parse-time from ``hbm_cli.main``, so the backend import stays lazy (nothing touches ``bw``
 # until a handler runs) and ``_BWS_VERSION`` is duplicated here for the ``install --help`` text.
 # ``agent.secret_sources.bitwarden._BWS_VERSION`` is the source of truth; bump both together.
@@ -182,7 +182,7 @@ def cmd_setup(args: argparse.Namespace) -> int:
                 f"  [red]Non-interactive mode (no TTY) requires all setup flags.[/red]\n"
                 f"  Missing: {', '.join(missing)}\n\n"
                 "  Usage:\n"
-                "    hbm-agent secrets bitwarden setup \\\n"
+                "    hbm secrets bitwarden setup \\\n"
                 "      --access-token '0.xxx' \\\n"
                 "      --server-url 'https://vault.bitwarden.com' \\\n"
                 "      --project-id 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'")
@@ -227,9 +227,9 @@ def cmd_setup(args: argparse.Namespace) -> int:
     console.print()
     console.print("[green]✓ Bitwarden Secrets Manager is enabled.[/green]  "
                   "Secrets will be pulled at the start of every HBM AGENT process.")
-    console.print("  Status:  [cyan]hbm-agent secrets bitwarden status[/cyan]\n"
-                  "  Refresh: [cyan]hbm-agent secrets bitwarden sync[/cyan]\n"
-                  "  Disable: [cyan]hbm-agent secrets bitwarden disable[/cyan]")
+    console.print("  Status:  [cyan]hbm secrets bitwarden status[/cyan]\n"
+                  "  Refresh: [cyan]hbm secrets bitwarden sync[/cyan]\n"
+                  "  Disable: [cyan]hbm secrets bitwarden disable[/cyan]")
     return 0
 
 
@@ -272,7 +272,7 @@ def cmd_status(args: argparse.Namespace) -> int:
     for message in validation_messages:
         console.print(message)
     if not enabled:
-        console.print("\n  Run [cyan]hbm-agent secrets bitwarden setup[/cyan] to enable.")
+        console.print("\n  Run [cyan]hbm secrets bitwarden setup[/cyan] to enable.")
         return 0
     if not token:
         console.print(f"\n  [yellow]Enabled but {token_env} is not set — HBM AGENT will skip BSM "
@@ -314,7 +314,7 @@ def cmd_token(args: argparse.Namespace) -> int:
             console.print(
                 f"[yellow]Warning: configured project {project_id} is not visible "
                 "to this machine account.  Grant it access in the Bitwarden web "
-                "app or re-run `hbm-agent secrets bitwarden setup` to pick a different project.[/yellow]")
+                "app or re-run `hbm secrets bitwarden setup` to pick a different project.[/yellow]")
         return True
 
     return rotate_token(
@@ -330,7 +330,7 @@ def cmd_token(args: argparse.Namespace) -> int:
         save=save_env_value, env_path=get_env_path, clear_caches=bw.clear_caches,
         disabled_note=None if bw_cfg.get("enabled") else (
             "[yellow]Note: the Bitwarden integration is currently disabled — "
-            "run `hbm-agent secrets bitwarden setup` (or set "
+            "run `hbm secrets bitwarden setup` (or set "
             "secrets.bitwarden.enabled: true) to turn it on.[/yellow]"
         ))
 
@@ -434,7 +434,7 @@ _PROJECT_LIST_HINTS = (
     (("invalid_client", "400 bad request"),
      "  [yellow]'invalid_client' from the US identity endpoint usually "
      "means the token is for a different Bitwarden region.  Re-run "
-     "[cyan]hbm-agent secrets bitwarden setup[/cyan] and pick EU or "
+     "[cyan]hbm secrets bitwarden setup[/cyan] and pick EU or "
      "self-hosted at the region prompt, or set [cyan]secrets.bitwarden."
      "server_url[/cyan] in config.yaml.[/yellow]"),
     (("authorization", "invalid"),

@@ -96,7 +96,7 @@ def _profile_to_dict(info) -> Dict[str, Any]:
 def _profile_setup_command(name: str) -> str:
     """Return the shell command used to configure a profile in the CLI."""
     _resolve_profile_dir(name)
-    return "hbm-agent setup" if name == "default" else f"{name} setup"
+    return "hbm setup" if name == "default" else f"{name} setup"
 
 
 def _write_profile_model(profile_dir: Path, provider: str, model: str, validate_in: Optional[Path] = None) -> None:
@@ -735,7 +735,7 @@ async def create_profile_endpoint(body: ProfileCreate):
 
 @router.get("/api/profiles/active")
 async def get_active_profile_endpoint():
-    """``active`` is the sticky default written by ``hbm-agent profile use`` (what new CLI
+    """``active`` is the sticky default written by ``hbm profile use`` (what new CLI
     invocations pick up); ``current`` is the profile this running dashboard is scoped to."""
     from hbm_cli import profiles as profiles_mod
 
@@ -754,7 +754,7 @@ async def get_active_profile_endpoint():
 
 @router.post("/api/profiles/active")
 async def set_active_profile_endpoint(body: ProfileActiveUpdate):
-    """Set the sticky active profile (mirrors ``hbm-agent profile use``); does not retarget the
+    """Set the sticky active profile (mirrors ``hbm profile use``); does not retarget the
     running dashboard, only subsequent CLI commands and gateways."""
     from hbm_cli import profiles as profiles_mod
     with _profile_errors("POST /api/profiles/active failed"):
@@ -906,7 +906,7 @@ async def update_profile_model_endpoint(name: str, body: ProfileModelUpdate):
 
 @router.post("/api/profiles/{name}/describe-auto")
 async def describe_profile_auto_endpoint(name: str, body: ProfileDescribeAuto):
-    """Auto-generate a profile's description via the auxiliary LLM (mirrors ``hbm-agent profile
+    """Auto-generate a profile's description via the auxiliary LLM (mirrors ``hbm profile
     describe <name> --auto``). A failed generation is ``ok: false`` with a reason rather than
     an HTTP error so the UI can surface it inline and let the operator retry."""
     # Resolution stays on the loop: it owns the 400/404 mapping the 500 fallback would flatten.

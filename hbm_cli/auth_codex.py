@@ -32,10 +32,10 @@ if TYPE_CHECKING:  # annotation-only; the runtime import would be a cycle
 logger = logging.getLogger("hbm_cli.auth")
 
 _MISSING_ACCESS_TOKEN_MSG = (
-    "Codex auth is missing access_token. Run `hbm-agent auth` to re-authenticate.")
+    "Codex auth is missing access_token. Run `hbm auth` to re-authenticate.")
 _MISSING_REFRESH_TOKEN_MSG = (
-    "Codex auth is missing refresh_token. Run `hbm-agent auth` to re-authenticate.")
-_NO_CREDENTIALS_MSG = "No Codex credentials stored. Run `hbm-agent auth` to authenticate."
+    "Codex auth is missing refresh_token. Run `hbm auth` to re-authenticate.")
+_NO_CREDENTIALS_MSG = "No Codex credentials stored. Run `hbm auth` to authenticate."
 
 
 def _parse_retry_after_seconds(headers: Any) -> Optional[int]:
@@ -91,7 +91,7 @@ def _read_codex_tokens(*, _lock: bool = True) -> Dict[str, Any]:
     tokens = state.get("tokens")
     if not isinstance(tokens, dict):
         raise _codex_err(
-            "Codex auth state is missing tokens. Run `hbm-agent auth` to re-authenticate.",
+            "Codex auth state is missing tokens. Run `hbm auth` to re-authenticate.",
             "codex_auth_invalid_shape", relogin=True)
     if not _nonempty_str(tokens.get("access_token")):
         raise _codex_err(_MISSING_ACCESS_TOKEN_MSG, "codex_auth_missing_access_token", relogin=True)
@@ -106,8 +106,8 @@ def _sync_codex_pool_entries(
     previous_singleton_tokens: Optional[Dict[str, str]] = None) -> None:
     """Mirror a fresh Codex re-auth into the credential_pool OAuth entries.
 
-    ``device_code`` (the singleton-seeded entry from ``hbm-agent setup`` / the model picker) is always
-    synced. ``manual:device_code`` (``hbm-agent auth add openai-codex``) is synced only when its
+    ``device_code`` (the singleton-seeded entry from ``hbm setup`` / the model picker) is always
+    synced. ``manual:device_code`` (``hbm auth add openai-codex``) is synced only when its
     access_token equals the PREVIOUS singleton token — a legacy alias of the singleton; an entry
     with its own token material is an independent account and must be left alone. ``manual:api_key``
     and any other source are independent credentials and are never overwritten by a re-auth.
@@ -326,7 +326,7 @@ def _codex_refresh_failure_error(response: "httpx.Response") -> AuthError:
             "Codex refresh token was already consumed by another client "
             "(e.g. Codex CLI or VS Code extension). "
             "Run `codex` in your terminal to generate fresh tokens, "
-            "then run `hbm-agent auth` to re-authenticate.")
+            "then run `hbm auth` to re-authenticate.")
     # A 401/403 from the token endpoint always means the refresh token is invalid/expired —
     # force relogin even if the body error code wasn't one of the known strings.
     relogin_required = (
@@ -740,7 +740,7 @@ def _codex_login_rate_limited_error(response: "httpx.Response", *, during: str =
     """AuthError for a 429 from OpenAI's device-auth endpoints (throttle, not credential fault)."""
     # Upstream rate-limit / usage-quota exhaustion on the token endpoint. The stored refresh token is still
     # valid here — re-authenticating cannot lift a quota cap. Classify distinctly from auth failures so
-    # callers surface a "retry later" notice instead of a misleading "run hbm-agent auth" prompt (see issue
+    # callers surface a "retry later" notice instead of a misleading "run hbm auth" prompt (see issue
     # #32790).
     retry_after = _parse_retry_after_seconds(getattr(response, "headers", None))
     wait_hint = (

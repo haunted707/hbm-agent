@@ -223,7 +223,7 @@ def resolve_plugin_load_order(manifests: Mapping[str, "PluginManifest"]) -> List
                 logger.warning(
                     "Plugin %s requires plugin '%s' which is not enabled/"
                     "installed; loading anyway (probe availability at runtime "
-                    "via ctx.has_plugin). Run `hbm-agent plugins enable %s` if it is installed.",
+                    "via ctx.has_plugin). Run `hbm plugins enable %s` if it is installed.",
                     k, dep_id, dep_id,
                 )
             elif resolved == k:
@@ -336,7 +336,7 @@ class PluginManifest:
     # <category>.provider; own discovery, general scanner skips) | ``platform`` (gateway adapter; bundled
     # auto-load, user-installed gated as untrusted code).
     kind: str = "standalone"
-    # Path-derived registry key used by plugins.enabled/disabled and `hbm-agent plugins list`: ``disk-cleanup``
+    # Path-derived registry key used by plugins.enabled/disabled and `hbm plugins list`: ``disk-cleanup``
     # for a flat plugin, ``image_gen/openai`` for a category plugin. Empty -> name.
     key: str = ""
     # HBM AGENT version requirement (``">=0.19"``, comma-separated clauses allowed). Unsatisfied plugins are

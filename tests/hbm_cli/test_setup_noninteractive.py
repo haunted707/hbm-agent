@@ -78,5 +78,5 @@ class TestNonInteractiveSetup:
         assert exc.value.code == 1
         mock_setup.assert_not_called()
         out = capsys.readouterr().out
-        assert "hbm-agent config set model.provider custom" in out
+        assert "hbm config set model.provider custom" in out
 

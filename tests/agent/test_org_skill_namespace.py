@@ -239,7 +239,7 @@ class TestOrgPullIsWiredIn:
             / "main_platform_setup.py"
         ).read_text(encoding="utf-8")
         assert "maybe_pull_org_skills" in main_src, (
-            "`hbm-agent sync pull` must also refresh the org mirror."
+            "`hbm sync pull` must also refresh the org mirror."
         )
 
     def test_sync_status_exposes_org_state(self):
@@ -273,7 +273,7 @@ class TestOrgPullIsWiredIn:
 
 
 class TestSkillSyncIsOneCommand:
-    """Every Skill Sync verb lives under `hbm-agent sync` for launch.
+    """Every Skill Sync verb lives under `hbm sync` for launch.
 
     The surface is deliberately encapsulated: one command to learn, one to
     document, and top-level `sync` stays free of skill-management verbs that
@@ -291,7 +291,7 @@ class TestSkillSyncIsOneCommand:
     def test_propose_is_a_sync_subcommand(self):
         sync_src = self._src("hbm_cli", "subcommands", "sync.py")
         assert '"propose"' in sync_src, (
-            "`propose` must be a `hbm-agent sync` subcommand."
+            "`propose` must be a `hbm sync` subcommand."
         )
 
     def test_propose_is_not_under_skills(self):
@@ -303,10 +303,10 @@ class TestSkillSyncIsOneCommand:
 
     def test_sync_usage_lists_propose(self):
         main_src = self._src("hbm_cli", "main_platform_setup.py")
-        usage_start = main_src.index("usage: hbm-agent sync ")
+        usage_start = main_src.index("usage: hbm sync ")
         usage_block = main_src[usage_start : usage_start + 1400]
         assert "propose" in usage_block, (
-            "`hbm-agent sync` usage must list the propose verb."
+            "`hbm sync` usage must list the propose verb."
         )
 
 

@@ -77,7 +77,7 @@ class TestApplyProfileOverrideHbmHomeGuard:
         HBM_HOME to .../profiles/coder.
 
         Bug scenario from #22502: systemd sets HBM_HOME to the hbm root
-        and the user switches to a profile via `hbm-agent profile use`.
+        and the user switches to a profile via `hbm profile use`.
         Before the fix, the guard returned early and active_profile was ignored.
         """
         hbm_root = tmp_path / ".hbm"

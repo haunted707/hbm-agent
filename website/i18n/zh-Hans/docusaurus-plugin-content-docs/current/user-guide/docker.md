@@ -21,7 +21,7 @@ Docker 与 HBM AGENT 的交集有两种截然不同的方式：
 mkdir -p ~/.hbm
 docker run -it --rm \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent setup
+  nousresearch/hbm setup
 ```
 
 这将进入设置向导，向导会提示你输入 API 密钥并将其写入 `~/.hbm/.env`。你只需执行一次。强烈建议此时为 gateway 配置一个聊天系统。
@@ -36,7 +36,7 @@ docker run -d \
   --restart unless-stopped \
   -v ~/.hbm:/opt/data \
   -p 8642:8642 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 端口 8642 暴露 gateway 的 [OpenAI 兼容 API 服务器](./features/api-server.md)和健康检查端点。如果你只使用聊天平台（Telegram、Discord 等），该端口是可选的；但如果你希望 dashboard 或外部工具访问 gateway，则必须开放。
@@ -53,7 +53,7 @@ docker run -d \
   -e API_SERVER_HOST=0.0.0.0 \
   -e API_SERVER_KEY="$(openssl rand -hex 32)" \
   -e API_SERVER_CORS_ORIGINS='*' \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 在面向互联网的机器上开放任何端口都存在安全风险。除非你了解相关风险，否则不应这样做。
@@ -70,7 +70,7 @@ docker run -d \
   -p 8642:8642 \
   -p 9119:9119 \
   -e HBM_DASHBOARD=1 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 Dashboard 由 s6 监管：若进程崩溃，`s6-supervise` 会在短暂退避后自动重启。Dashboard 的 stdout/stderr 会直接转发到 `docker logs <container>`；gateway 的主输出现在写入每个 profile 的 s6 日志文件，见下方的 per-profile 日志说明。
@@ -255,7 +255,7 @@ docker run -d \
   --restart unless-stopped \
   --memory=4g --cpus=2 \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ## Dockerfile 说明
@@ -321,7 +321,7 @@ docker run -d \
   --name hbm \
   --restart unless-stopped \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 或使用 Docker Compose：
@@ -490,7 +490,7 @@ docker run -d \
   --name hbm \
   -v ~/.hbm:/opt/data \
   -p 8642:8642 \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ```yaml
@@ -509,7 +509,7 @@ docker run -d \
   --name hbm \
   --network host \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ```yaml
@@ -575,7 +575,7 @@ docker run -d \
   --name hbm \
   --shm-size=1g \
   -v ~/.hbm:/opt/data \
-  nousresearch/hbm-agent gateway run
+  nousresearch/hbm gateway run
 ```
 
 ### 网络问题后 gateway 无法重连

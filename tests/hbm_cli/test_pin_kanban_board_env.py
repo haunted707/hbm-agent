@@ -3,7 +3,7 @@
 Regression coverage for #20074: a chat session must export the active kanban
 board into `HBM_KANBAN_BOARD` at boot so subprocess shell-outs (e.g.
 `hbm kanban …`) inherit the same board the in-process kanban tools resolve.
-Without this, a concurrent `hbm-agent kanban boards switch` from another session
+Without this, a concurrent `hbm kanban boards switch` from another session
 can flip the global current-board file mid-turn and silently divert the
 shell calls to a different DB.
 """

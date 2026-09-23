@@ -1,6 +1,6 @@
-"""Quiet ``hbm-agent chat -Q`` helpers: bind this session's key and resume nested notifies.
+"""Quiet ``hbm chat -Q`` helpers: bind this session's key and resume nested notifies.
 
-Bot Mode delivers a local DM as ``hbm-agent -p <bot> chat -Q --query-file``. Interactive
+Bot Mode delivers a local DM as ``hbm -p <bot> chat -Q --query-file``. Interactive
 chat binds ``set_current_session_key(self.session_id)`` around the turn; the quiet
 path did not, so a nested ``message_agent`` notify inherited the dispatcher's
 ``HBM_SESSION_KEY`` and never woke the recipient. Quiet also printed and exited

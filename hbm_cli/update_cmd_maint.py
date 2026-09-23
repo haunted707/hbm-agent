@@ -1,4 +1,4 @@
-"""Post-update maintenance for ``hbm-agent update``: pre-update backup snapshot, state-db verify/restore, curator/FTS notices, FHS path guard, completion summary, stale-module purge.
+"""Post-update maintenance for ``hbm update``: pre-update backup snapshot, state-db verify/restore, curator/FTS notices, FHS path guard, completion summary, stale-module purge.
 
 Split out of ``update_cmd.py``, which re-imports every name so ``hbm_cli.update_cmd.<name>``
 still resolves/monkeypatches. Origin helpers are imported lazily per function (no cycle;
@@ -64,7 +64,7 @@ def _sqlite_partial_completion_lines(sqlite_version: str) -> list[str]:
         f"⚠ Update partially complete — your Python's SQLite ({sqlite_version}) has a known "
         "corruption bug. HBM AGENT works, but sessions could be damaged.",
         f"  Fix: run the installer again ({_REINSTALL_ONE_LINER[bool(_m()._is_windows())]}) "
-        "which installs a safe Python, then run `hbm-agent doctor` to confirm.",
+        "which installs a safe Python, then run `hbm doctor` to confirm.",
     ]
 
 
@@ -170,8 +170,8 @@ def _print_curator_first_run_notice() -> None:
         f"~{days}d after installation; only agent-created skills are in "
         f"scope and nothing is ever auto-deleted (archive is recoverable)."
     )
-    print("  Preview now:  hbm-agent curator run --dry-run")
-    print("  Pause it:     hbm-agent curator pause")
+    print("  Preview now:  hbm curator run --dry-run")
+    print("  Pause it:     hbm curator pause")
     print("  Docs:         https://hermes-agent.nousresearch.com/docs/user-guide/features/curator")
 
 
@@ -242,11 +242,11 @@ def _print_fts_optimize_available_notice() -> None:
         print()
         print("◆ Session database optimization incomplete")
         print(
-            "  A previous `hbm-agent sessions optimize-storage` run was "
+            "  A previous `hbm sessions optimize-storage` run was "
             "interrupted. Search still works; re-run the command to resume "
             "and finish reclaiming disk:"
         )
-        print("    hbm-agent sessions optimize-storage")
+        print("    hbm sessions optimize-storage")
         return
 
     est_reclaim = size_gb * 0.6
@@ -266,7 +266,7 @@ def _print_fts_optimize_available_notice() -> None:
             f"typically frees ~60% of state.db — about {est_reclaim:.1f} GB "
             f"of your current {size_gb:.1f} GB."
         )
-    print("  Run when convenient:  hbm-agent sessions optimize-storage")
+    print("  Run when convenient:  hbm sessions optimize-storage")
     print(
         "  It runs in the foreground with a progress bar, is safe to "
         "interrupt/re-run, and never changes your conversations."
@@ -297,7 +297,7 @@ def _print_curator_recent_run_notice() -> None:
         print(f"ℹ Skill curator — last run {_format_time_ago(last_run_at)}")
         for line in summary.splitlines():
             print(f"  {line}")
-        print("  (This message shows once per curator run. View anytime: hbm-agent curator status)")
+        print("  (This message shows once per curator run. View anytime: hbm curator status)")
 
     with suppress(Exception):
         state["last_run_summary_shown_at"] = last_run_at
@@ -373,7 +373,7 @@ def _finish_dashboard_update_cleanup(
     print()
     print("⚠ A web dashboard/serve process was stopped during update and could not be auto-restarted.")
     print("  Re-launch it when you want the web UI back:")
-    print("    hbm-agent dashboard --port <port>")
+    print("    hbm dashboard --port <port>")
 
 
 def _print_update_completion(message: str) -> None:
@@ -509,7 +509,7 @@ def _restore_state_db_from_snapshot(state_path: Path, snap_state: Path) -> bool:
     if holders:
         print(
             f"  ✗ Auto-restore refused: process(es) {holders} still hold "
-            "state.db or its WAL open. Stop them (hbm-agent gateway stop), "
+            "state.db or its WAL open. Stop them (hbm gateway stop), "
             "then restore manually with /snapshot restore."
         )
         return False
@@ -592,7 +592,7 @@ def _print_bundled_skills_sync_report() -> None:
         print(f"  ↑ {len(result['updated'])} updated: {', '.join(result['updated'])}")
     if result.get("user_modified"):
         print(f"  ~ {len(result['user_modified'])} user-modified (kept)")
-        print("    → see them: hbm-agent skills list-modified  (diff/reset to resume updates)")
+        print("    → see them: hbm skills list-modified  (diff/reset to resume updates)")
     if result.get("cleaned"):
         print(f"  − {len(result['cleaned'])} removed from manifest")
     if result.get("relocated"):
@@ -639,7 +639,7 @@ def _ensure_fhs_path_guard() -> None:
             # already parked the unit in a failed state (transient CHDIR / OOM / filesystem race after our
             # drain + exit-75), a plain `systemctl restart` can wedge against the RestartSec backoff and
             # leave the unit dead. Clearing the failed state first makes the restart idempotent. Mirrors the
-            # recovery path in `hbm-agent gateway restart` (`systemd_restart()`) as of PR #20949.
+            # recovery path in `hbm gateway restart` (`systemd_restart()`) as of PR #20949.
             capture_output=True,
             text=True, encoding="utf-8", errors="replace",
             timeout=10,
@@ -681,7 +681,7 @@ def _ensure_fhs_path_guard() -> None:
 def _ensure_acp_launcher() -> None:
     r"""Self-heal a ``hbm-agent-acp`` launcher next to ``hbm-agent`` (mirrors install.sh): ACP hosts
     resolve it on the login-shell PATH but the console script lives in the venv. The shim
-    delegates to the sibling ``hbm-agent acp``, correct for every layout.
+    delegates to the sibling ``hbm acp``, correct for every layout.
 
     No-op on Windows (install.ps1 stages launchers into ``$HbmHome\bin``, never
     ``venv\Scripts`` which would shadow the user's python; launcher repair lives in
@@ -706,7 +706,7 @@ def _ensure_acp_launcher() -> None:
                 continue
             shim = (
                 "#!/usr/bin/env bash\n"
-                "# HBM AGENT — ACP launcher (written by `hbm-agent update`).\n"
+                "# HBM AGENT — ACP launcher (written by `hbm update`).\n"
                 "# ACP hosts (Zed, JetBrains, Buzz) resolve the agent by this\n"
                 "# command name on the login-shell PATH.\n"
                 f'exec "{hbm_cmd}" acp "$@"\n'
@@ -808,7 +808,7 @@ def _run_quick_snapshots() -> Optional[str]:
 
 
 def _run_full_backup() -> None:
-    """Zip HBM_HOME under ``backups/`` (restorable via ``hbm-agent import``). Never raises."""
+    """Zip HBM_HOME under ``backups/`` (restorable via ``hbm import``). Never raises."""
     try:
         from hbm_cli.backup import create_pre_update_backup
     except Exception as exc:
@@ -851,7 +851,7 @@ def _run_full_backup() -> None:
         display_path = str(out_path)
 
     print(f"  Saved:    {display_path} ({format_bytes(size_bytes)}, {elapsed:.1f}s)")
-    print(f"  Restore:  hbm-agent import {out_path}")
+    print(f"  Restore:  hbm import {out_path}")
     print("  Disable:  set updates.pre_update_backup: quick (or off) in config.yaml")
     print()
 
@@ -861,7 +861,7 @@ def _run_pre_update_backup(args) -> Optional[str]:
 
     ``off`` — nothing. ``quick`` (default) — snapshot of critical small files under
     ``state-snapshots/``, files over 1 GiB skipped so a bloated state.db can't stall the update.
-    ``full`` — quick snapshot PLUS a zip of HBM_HOME under ``backups/`` (``hbm-agent import``).
+    ``full`` — quick snapshot PLUS a zip of HBM_HOME under ``backups/`` (``hbm import``).
 
     Explicit user opt-out is honored fully. See #34600.
     """

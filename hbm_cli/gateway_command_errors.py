@@ -1,4 +1,4 @@
-"""User-facing copy for ``hbm-agent gateway start/stop/restart`` failures on systemd hosts.
+"""User-facing copy for ``hbm gateway start/stop/restart`` failures on systemd hosts.
 
 ``hbm_cli/gateway.py`` is a facade; this sibling owns the small exception -> guidance table so
 the most common Linux service failures (``systemctl`` exited non-zero, or there is no ``systemctl``
@@ -21,13 +21,13 @@ _JOURNAL_HINT = 'journalctl --user -u hbm-gateway --since "5 min ago"'
 
 _SYSTEMCTL_FAILED_LINES = (
     "Could not {verb} the gateway service; systemd reported an error.",
-    "See why with `hbm-agent gateway status --deep` or `{journal}`.",
-    "To reinstall the service run `hbm-agent gateway install --force`.",
+    "See why with `hbm gateway status --deep` or `{journal}`.",
+    "To reinstall the service run `hbm gateway install --force`.",
 )
 
 _NO_SYSTEMCTL_LINES = (
     "This system has no systemd, so HBM AGENT cannot install a background service here.",
-    "Run the gateway directly with `hbm-agent gateway run` (keep it alive with tmux or screen).",
+    "Run the gateway directly with `hbm gateway run` (keep it alive with tmux or screen).",
 )
 
 

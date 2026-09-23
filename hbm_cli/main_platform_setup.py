@@ -27,7 +27,7 @@ def _yes_no(prompt: str) -> bool:
 
 
 def _whatsapp_choose_mode(get_env_value, save_env_value):
-    """Step 1 of ``hbm-agent whatsapp``: ``"bot"`` / ``"self-chat"``, or None when cancelled."""
+    """Step 1 of ``hbm whatsapp``: ``"bot"`` / ``"self-chat"``, or None when cancelled."""
     current_mode = get_env_value("WHATSAPP_MODE") or ""
     if current_mode:
         mode_label = "separate bot number" if current_mode == "bot" else "personal number (self-chat)"
@@ -67,7 +67,7 @@ def _whatsapp_choose_mode(get_env_value, save_env_value):
 
 
 def _whatsapp_allowed_users(wa_mode: str, get_env_value, save_env_value) -> None:
-    """Step 3 of ``hbm-agent whatsapp``: show / set WHATSAPP_ALLOWED_USERS."""
+    """Step 3 of ``hbm whatsapp``: show / set WHATSAPP_ALLOWED_USERS."""
     current_users = get_env_value("WHATSAPP_ALLOWED_USERS") or ""
     if current_users:
         print(f"✓ Allowed users: {current_users}")
@@ -95,7 +95,7 @@ def _whatsapp_allowed_users(wa_mode: str, get_env_value, save_env_value) -> None
 
 
 def _whatsapp_install_bridge(bridge_dir) -> bool:
-    """Step 4 of ``hbm-agent whatsapp``: ``npm install`` the bridge when needed. False = stop."""
+    """Step 4 of ``hbm whatsapp``: ``npm install`` the bridge when needed. False = stop."""
     from hbm_constants import find_node_executable, with_hbm_node_path
     if (bridge_dir / "node_modules").exists():
         print("✓ Bridge dependencies already installed")
@@ -136,7 +136,7 @@ def cmd_whatsapp(args):
 
     # WHATSAPP_ENABLED=true is deliberately NOT written here: an aborted wizard (Ctrl+C, failed npm
     # install, missed QR scan) would leave .env claiming WhatsApp is ready with no creds.json, and
-    # every `hbm-agent gateway` would pay a 30s bridge timeout + indefinite retries. Set only after
+    # every `hbm gateway` would pay a 30s bridge timeout + indefinite retries. Set only after
     # pairing succeeds; prior successful pairings stay enabled.
     print()
     if (get_env_value("WHATSAPP_ENABLED") or "").lower() == "true":
@@ -166,7 +166,7 @@ def cmd_whatsapp(args):
             # Older installs may have lost WHATSAPP_ENABLED; a kept pairing re-asserts it.
             if (get_env_value("WHATSAPP_ENABLED") or "").lower() != "true":
                 save_env_value("WHATSAPP_ENABLED", "true")
-            _say("\n✓ WhatsApp is configured and paired!", "  Start the gateway with: hbm-agent gateway")
+            _say("\n✓ WhatsApp is configured and paired!", "  Start the gateway with: hbm gateway")
             return
 
     # QR code pairing
@@ -183,28 +183,28 @@ def cmd_whatsapp(args):
 
     print()
     if not (session_dir / "creds.json").exists():
-        print("⚠ Pairing may not have completed. Run 'hbm-agent whatsapp' to try again.")
+        print("⚠ Pairing may not have completed. Run 'hbm whatsapp' to try again.")
         return
     # Only enable WhatsApp now that pairing actually succeeded (see above).
     save_env_value("WHATSAPP_ENABLED", "true")
     _say("✓ WhatsApp paired successfully!", "")
     if wa_mode == "bot":
-        _say("  Next steps:", "    1. Start the gateway:  hbm-agent gateway",
+        _say("  Next steps:", "    1. Start the gateway:  hbm gateway",
              "    2. Send a message to the bot's WhatsApp number",
              "    3. The agent will reply automatically", "",
              "  Tip: Agent responses are prefixed with '☤ HBM AGENT'")
     else:
-        _say("  Next steps:", "    1. Start the gateway:  hbm-agent gateway",
+        _say("  Next steps:", "    1. Start the gateway:  hbm gateway",
              "    2. Open WhatsApp → Message Yourself",
              "    3. Type a message — the agent will reply", "",
              "  Tip: Agent responses are prefixed with '☤ HBM AGENT'",
              "  so you can tell them apart from your own messages.")
-    _say("", "  Or install as a service: hbm-agent gateway install")
+    _say("", "  Or install as a service: hbm gateway install")
 
 
 def cmd_whatsapp_cloud(args):
     """Set up WhatsApp Business Cloud API (official Meta integration) — complementary to the
-    ``hbm-agent whatsapp`` Baileys bridge wizard. See ``hbm_cli/setup_whatsapp_cloud.py``."""
+    ``hbm whatsapp`` Baileys bridge wizard. See ``hbm_cli/setup_whatsapp_cloud.py``."""
     from hbm_cli.main import _require_tty
     _require_tty("whatsapp-cloud")
     from hbm_cli.setup_whatsapp_cloud import run_whatsapp_cloud_setup
@@ -212,7 +212,7 @@ def cmd_whatsapp_cloud(args):
 
 
 _SYNC_USAGE = (
-    "usage: hbm-agent sync "
+    "usage: hbm sync "
     "<status|pull|push|now|enable|disable|device|propose>\n"
     "\n"
     "Your skills, across your devices:\n"
@@ -290,7 +290,7 @@ def _sync_status(ssc) -> int:
         if modified:
             _err(f"  {len(modified)} with local edits not yet shared: "
                  f"{', '.join(modified)}\n"
-                 f"  Share them back with `hbm-agent sync propose <skill>`. "
+                 f"  Share them back with `hbm sync propose <skill>`. "
                  f"Org updates will not overwrite them.")
     elif status.get("logged_in"):
         _err("\nOrg skills: not applicable — this account isn't a member of a shared organisation.")
@@ -329,9 +329,9 @@ def _sync_pull(ssc, identity):
 # gated (identity-checked) sync subcommands: name -> (ssc, identity) -> result
 _SYNC_GATED = {
     "pull": _sync_pull,
-    "push": lambda ssc, identity: ssc.push_skills(identity=identity, message="hbm-agent sync push"),
+    "push": lambda ssc, identity: ssc.push_skills(identity=identity, message="hbm sync push"),
     "now": lambda ssc, identity: {"pull": ssc.pull_skills(identity=identity),
-                                  "push": ssc.push_skills(identity=identity, message="hbm-agent sync now")}}
+                                  "push": ssc.push_skills(identity=identity, message="hbm sync now")}}
 
 
 def cmd_sync(args):
@@ -379,17 +379,17 @@ def cmd_sync(args):
 
 
 def cmd_slack(args):
-    """``hbm-agent slack <subcommand>``; ``manifest`` prints or writes a Slack app manifest with
+    """``hbm slack <subcommand>``; ``manifest`` prints or writes a Slack app manifest with
     every gateway command registered as a first-class slash."""
     sub = getattr(args, "slack_command", None)
     if sub in {None, ""}:
-        _err("usage: hbm-agent slack <subcommand>\n"
+        _err("usage: hbm slack <subcommand>\n"
              "\n"
              "subcommands:\n"
              "  manifest   Generate a Slack app manifest with every gateway\n"
              "             command registered as a native slash\n"
              "\n"
-             "Run `hbm-agent slack manifest -h` for details.")
+             "Run `hbm slack manifest -h` for details.")
         return 1
 
     if sub == "manifest":

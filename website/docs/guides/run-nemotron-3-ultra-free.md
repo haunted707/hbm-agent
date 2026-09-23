@@ -49,7 +49,7 @@ Prefer the terminal?
 On macOS/Linux/WSL2/Android, run
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -57,7 +57,7 @@ cd hbm-agent
 On Windows, run
 
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 Prefer to review first? Read `scripts/install.sh` in the repository, inspect it, then run it.

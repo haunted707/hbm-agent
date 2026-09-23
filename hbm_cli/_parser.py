@@ -69,46 +69,46 @@ def _inherited_flag(parser, *args, **kwargs):
 _EPILOGUE = """
 Examples:
     hbm                        Start interactive chat
-    hbm-agent chat -q "Hello"        Single query mode
+    hbm chat -q "Hello"        Single query mode
     hbm-agent --tui                  Launch the modern TUI (or set display.interface: tui)
     hbm-agent --cli                  Force the classic REPL (overrides display.interface: tui)
-    hbm-agent -c                     Resume the most recent session
-    hbm-agent -c "my project"        Resume a session by name (latest in lineage)
+    hbm -c                     Resume the most recent session
+    hbm -c "my project"        Resume a session by name (latest in lineage)
     hbm-agent --resume <session_id>  Resume a specific session by ID
     hbm-agent --resume latest        Resume the most recent session (same as -c)
     hbm-agent --tui --resume latest --in ./dir   Resume ./dir's latest session in the TUI
-    hbm-agent setup                  Run setup wizard
-    hbm-agent logout                 Clear stored authentication
-    hbm-agent auth add <provider>    Add a pooled credential
-    hbm-agent auth list              List pooled credentials
-    hbm-agent auth remove <p> <t>    Remove pooled credential by index, id, or label
-    hbm-agent auth reset <p> [t]     Clear exhaustion status for a provider, or one credential
-    hbm-agent auth priority <p> <t> <n>  Move a pooled credential to priority n (0 = tried first)
-    hbm-agent auth refresh <p> [t]   Refresh a pooled OAuth credential and clear its cooldown
-    hbm-agent model                  Select default model
-    hbm-agent fallback [list]        Show fallback provider chain
-    hbm-agent fallback add           Add a fallback provider (same picker as `hbm-agent model`)
-    hbm-agent fallback remove        Remove a fallback provider from the chain
-    hbm-agent config                 View configuration
-    hbm-agent config edit            Edit config in $EDITOR
-    hbm-agent config set model gpt-4 Set a config value
-    hbm-agent gateway                Run messaging gateway
-    hbm-agent -s hbm-agent-dev,github-auth
-    hbm-agent -w                     Start in isolated git worktree
-    hbm-agent gateway install        Install gateway background service
-    hbm-agent sessions list          List past sessions
-    hbm-agent sessions browse        Interactive session picker
-    hbm-agent sessions rename ID T   Rename/title a session
-    hbm-agent logs                   View agent.log (last 50 lines)
-    hbm-agent logs -f                Follow agent.log in real time
-    hbm-agent logs errors            View errors.log
-    hbm-agent logs --since 1h        Lines from the last hour
-    hbm-agent debug share             Upload debug report for support
-    hbm-agent console                Open the safe HBM AGENT command console
-    hbm-agent update                 Update to latest version
-    hbm-agent dashboard              Start web UI dashboard (port 9119)
-    hbm-agent dashboard --stop       Stop running dashboard processes
-    hbm-agent dashboard --status     List running dashboard processes
+    hbm setup                  Run setup wizard
+    hbm logout                 Clear stored authentication
+    hbm auth add <provider>    Add a pooled credential
+    hbm auth list              List pooled credentials
+    hbm auth remove <p> <t>    Remove pooled credential by index, id, or label
+    hbm auth reset <p> [t]     Clear exhaustion status for a provider, or one credential
+    hbm auth priority <p> <t> <n>  Move a pooled credential to priority n (0 = tried first)
+    hbm auth refresh <p> [t]   Refresh a pooled OAuth credential and clear its cooldown
+    hbm model                  Select default model
+    hbm fallback [list]        Show fallback provider chain
+    hbm fallback add           Add a fallback provider (same picker as `hbm model`)
+    hbm fallback remove        Remove a fallback provider from the chain
+    hbm config                 View configuration
+    hbm config edit            Edit config in $EDITOR
+    hbm config set model gpt-4 Set a config value
+    hbm gateway                Run messaging gateway
+    hbm -s hbm-agent-dev,github-auth
+    hbm -w                     Start in isolated git worktree
+    hbm gateway install        Install gateway background service
+    hbm sessions list          List past sessions
+    hbm sessions browse        Interactive session picker
+    hbm sessions rename ID T   Rename/title a session
+    hbm logs                   View agent.log (last 50 lines)
+    hbm logs -f                Follow agent.log in real time
+    hbm logs errors            View errors.log
+    hbm logs --since 1h        Lines from the last hour
+    hbm debug share             Upload debug report for support
+    hbm console                Open the safe HBM AGENT command console
+    hbm update                 Update to latest version
+    hbm dashboard              Start web UI dashboard (port 9119)
+    hbm dashboard --stop       Stop running dashboard processes
+    hbm dashboard --status     List running dashboard processes
 
 For more help on a command:
     hbm <command> --help
@@ -138,7 +138,7 @@ def _add_top_level_flags(parser: argparse.ArgumentParser) -> None:
     inherited(parser, "--provider", default=None, help=(
         "Provider override for this invocation (e.g. openrouter, anthropic). "
         "Applies to -z/--oneshot and --tui. The persistent provider lives in config.yaml "
-        "under model.provider — use `hbm-agent setup` or edit the file to change it."))
+        "under model.provider — use `hbm setup` or edit the file to change it."))
     inherited(parser, "--reasoning", default=None, metavar="LEVEL", help=(
         "Reasoning effort for this invocation: none, minimal, low, medium, "
         "high, xhigh, max, or ultra. Overrides agent.reasoning_effort in "
@@ -189,7 +189,7 @@ def _build_chat_parser(subparsers) -> argparse.ArgumentParser:
     """The ``chat`` subparser (also the implicit default command).
 
     Flags ALSO declared on the top-level parser use ``default=argparse.SUPPRESS``: for
-    ``hbm-agent -m foo chat`` argparse first sets ``args.model`` from the top-level parser, then
+    ``hbm -m foo chat`` argparse first sets ``args.model`` from the top-level parser, then
     dispatches to the chat subparser, which shares the namespace and ``dest`` — a plain ``None``
     default would silently clobber the top-level value. SUPPRESS keeps the subparser action a no-op
     unless the flag is actually passed after the subcommand (tests/hbm_cli/
@@ -300,7 +300,7 @@ class HbmArgumentParser(argparse.ArgumentParser):
 
     def _check_value(self, action, value):
         if isinstance(action, argparse._SubParsersAction) and value not in action.choices:
-            # ``self.prog`` is "hbm" at the top level and "hbm-agent gateway" for a nested group
+            # ``self.prog`` is "hbm" at the top level and "hbm gateway" for a nested group
             # (argparse hands add_parser() the parent's class), so the copy stays correct for both.
             lines = [f"{self.prog}: '{value}' is not a `{self.prog}` command."]
             close = difflib.get_close_matches(str(value), list(action.choices), n=3, cutoff=0.6)

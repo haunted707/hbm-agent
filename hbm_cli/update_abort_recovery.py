@@ -216,7 +216,7 @@ def _recover_gateway_restart_after_abort(
 
 
 def _warn_stale_serve_runtimes(rows) -> None:
-    """Name the serve/dashboard processes still on pre-update code: ``hbm-agent serve`` hosts
+    """Name the serve/dashboard processes still on pre-update code: ``hbm serve`` hosts
     ``tui_gateway.server``, and an un-restarted unit keeps the pre-pull ``sys.modules`` graph so
     every chat turn fails with an ``ImportError`` no gateway row explains."""
     if not rows:
@@ -230,7 +230,7 @@ def _warn_stale_serve_runtimes(rows) -> None:
             f" (profile {row.get('profile') or 'default'}, {row.get('supervisor') or 'unknown'})")
     print(
         "    Restart them before using HBM AGENT again, e.g. `systemctl --user restart hbm-serve.service`"
-        " or by relaunching `hbm-agent serve` / the Desktop app.")
+        " or by relaunching `hbm serve` / the Desktop app.")
 
 
 def _owed_stale_serve_rows(rows) -> list[dict]:

@@ -83,7 +83,7 @@ Packaging/repository/signing problems for this option should be reported to the 
 HBM AGENT now ships a Termux-aware installer path:
 
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```

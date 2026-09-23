@@ -831,7 +831,7 @@ class CLISessionMixin:
         return ""
 
     def _write_terminal_breadcrumb(self) -> None:
-        """Record this terminal's live session for bare ``hbm-agent -c``. Called whenever
+        """Record this terminal's live session for bare ``hbm -c``. Called whenever
         ``self.session_id`` is (re)assigned so a later bare ``-c`` in THIS terminal resumes
         this conversation's live tip. Best-effort; no-op without a terminal identity."""
         with contextlib.suppress(Exception):
@@ -1159,7 +1159,7 @@ class CLISessionMixin:
         profile_flag = "" if _active_profile in ("default", "custom") else f" -p {_active_profile}"
         print(f"  hbm-agent --resume {self.session_id}{profile_flag}")
         if session_title:
-            print(f"  hbm-agent -c \"{session_title}\"{profile_flag}")
+            print(f"  hbm -c \"{session_title}\"{profile_flag}")
         print()
         print(f"Session:        {self.session_id}")
         if session_title:

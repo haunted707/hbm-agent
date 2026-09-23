@@ -31,7 +31,7 @@ For a command-line only install without HBM AGENT Desktop, run:
 
 #### Linux / macOS / WSL2 / Android (Termux)
 ```bash
-git clone https://github.com/haunted707/hbm-agent hbm-agent
+git clone https://github.com/haunted707/hbm hbm-agent
 cd hbm-agent
 ./scripts/install.sh
 ```
@@ -40,7 +40,7 @@ cd hbm-agent
 
 Run in powershell:
 ```powershell
-git clone https://github.com/haunted707/hbm-agent hbm-agent; cd hbm-agent; .\scripts\install.ps1
+git clone https://github.com/haunted707/hbm hbm-agent; cd hbm-agent; .\scripts\install.ps1
 ```
 
 If you want to install & run HBM AGENT Desktop after a command-line only install, simply run
@@ -139,14 +139,14 @@ Running HBM AGENT as a dedicated unprivileged user (e.g. a `hbm` systemd service
 
 2. **As the unprivileged service user**, run the regular installer. It will detect the missing sudo, skip `--with-deps`, and install Chromium into the user's local Playwright cache:
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh
    ```
 
    If you want to skip the Playwright step entirely — for example because you're running headless and don't need browser automation — pass `--skip-browser`:
    ```bash
-   git clone https://github.com/haunted707/hbm-agent hbm-agent
+   git clone https://github.com/haunted707/hbm hbm-agent
    cd hbm-agent
    ./scripts/install.sh --skip-browser
    ```

@@ -1,4 +1,4 @@
-"""ACP tool-call helpers for mapping hbm-agent tools to ACP ToolKind and building content."""
+"""ACP tool-call helpers for mapping hbm tools to ACP ToolKind and building content."""
 
 from __future__ import annotations
 

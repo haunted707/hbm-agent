@@ -159,7 +159,7 @@ def _check_sensitive_path(filepath: str, task_id: str = "default") -> str | None
         return (
             f"Refusing to write to HBM AGENT config file: {filepath}\n"
             "Agent cannot modify security-sensitive configuration. "
-            "Edit ~/.hbm/config.yaml directly or use 'hbm-agent config' instead.")
+            "Edit ~/.hbm/config.yaml directly or use 'hbm config' instead.")
     return None
 
 

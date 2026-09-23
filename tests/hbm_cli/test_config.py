@@ -1928,7 +1928,7 @@ class TestConfigCommandFailClosedSurface:
 
 
 def test_gateway_multiplex_keys_are_recognized_config_keys():
-    """``hbm-agent config set gateway.multiplex_profiles true`` used to warn 'not a recognized config
+    """``hbm config set gateway.multiplex_profiles true`` used to warn 'not a recognized config
     key' although gateway/config.py reads it; the key (and profile_routes) live in DEFAULT_CONFIG."""
     from hbm_cli.config import _validate_config_key
     from hbm_cli.config_defaults import DEFAULT_CONFIG

@@ -1,4 +1,4 @@
-"""Autostash handling for ``hbm-agent update``: stash before the pull, restore/park/discard afterwards, warn about orphans.
+"""Autostash handling for ``hbm update``: stash before the pull, restore/park/discard afterwards, warn about orphans.
 
 Split out of ``update_cmd.py``; names are re-imported there so ``hbm_cli.update_cmd.<name>`` still resolves/monkeypatches.
 Origin helpers are imported lazily per function (no cycle; test patches on the origin stay effective).
@@ -80,7 +80,7 @@ def _stash_local_changes_if_needed(git_cmd: list[str], cwd: Path) -> Optional[st
             # No entry created: changes NOT saved — bail before touching HEAD.
             print("✗ Could not stash local changes — update aborted.")
             _print_first_line(push.stderr)
-            print("  Commit, stash, or clean up your local changes manually, then re-run `hbm-agent update`.")
+            print("  Commit, stash, or clean up your local changes manually, then re-run `hbm update`.")
             raise subprocess.CalledProcessError(push.returncode, push.args, output=push.stdout, stderr=push.stderr)
         # Non-zero but entry created: push saved everything yet couldn't delete some untracked files
         # (e.g. root-owned dir). Not a failure — continue.

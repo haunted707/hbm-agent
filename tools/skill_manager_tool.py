@@ -301,12 +301,12 @@ def _skill_not_found_error(name: str, suffix: str = "") -> str:
         other_profile, other_path = others[0]
         base += (
             f" A skill by that name exists in profile '{other_profile}' ({other_path}). To edit "
-            f"it, switch profiles (`hbm-agent -p {other_profile}`) or edit the file directly "
+            f"it, switch profiles (`hbm -p {other_profile}`) or edit the file directly "
             f"(file tools / terminal).")
     elif others:
         names = ", ".join(f"'{p}'" for p, _ in others)
         base += (
-            f" Skills by that name exist in other profiles: {names}. Switch profiles (`hbm-agent -p "
+            f" Skills by that name exist in other profiles: {names}. Switch profiles (`hbm -p "
             f"<name>`) to edit there, or edit the files directly (file tools / terminal).")
     else:
         base += " Use skills_list() to see available skills."
@@ -527,7 +527,7 @@ def _delete_skill(name: str, absorbed_into: Optional[str] = None) -> Dict[str, A
     skills_root = _containing_skills_root(skill_dir)
     if unsafe := _validate_delete_target(skill_dir):  # defense-in-depth before rmtree
         return _err(unsafe)
-    # Curator consolidations must be RECOVERABLE (`hbm-agent curator restore`): archive instead
+    # Curator consolidations must be RECOVERABLE (`hbm curator restore`): archive instead
     # of rmtree. Foreground deletes keep hard-delete semantics.
     absorbed_note = f" Content absorbed into '{absorbed_target}'." if absorbed_target else ""
     if _is_background_review():
@@ -745,12 +745,12 @@ def _record_success(action, name, result, *, file_path, absorbed_into, task_id,
         clear_skills_system_prompt_cache(clear_snapshot=True)
     # Curator telemetry: only the background review fork marks a skill agent-created
     # (foreground creates belong to the user). A recoverable curator archive keeps its
-    # record as STATE_ARCHIVED (`hbm-agent curator status`/`restore`); only a hard delete forgets.
+    # record as STATE_ARCHIVED (`hbm curator status`/`restore`); only a hard delete forgets.
     with suppress(Exception):
         from tools.skill_usage import bump_patch, forget, record_created
         # During the curator consolidation pass, a verified consolidation must be RECOVERABLE: archival into
         # ~/.hbm/skills/.archive/ is documented as the maximum destructive action the curator may take,
-        # and `hbm-agent curator restore` promises the skill can be brought back. Route through the recoverable
+        # and `hbm curator restore` promises the skill can be brought back. Route through the recoverable
         # archive primitive instead of permanent rmtree so a misjudged consolidation can be undone (#29912).
         # Foreground, user-directed deletes keep their existing hard-delete semantics.
         from tools.skill_provenance import is_background_review

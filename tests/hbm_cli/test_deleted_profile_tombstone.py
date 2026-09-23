@@ -1,8 +1,8 @@
 """Deleted named profiles must stay gone until explicitly recreated.
 
 A live serve/logging process can mkdir ``profiles/<name>/logs`` after
-``hbm-agent profile delete`` removes the tree. That empty shell then
-reappears in ``hbm-agent profile list`` and Desktop Bot Mode. These tests
+``hbm profile delete`` removes the tree. That empty shell then
+reappears in ``hbm profile list`` and Desktop Bot Mode. These tests
 lock the tombstone + no-mkdir contract without depending on Desktop.
 """
 
@@ -261,7 +261,7 @@ class TestNamedProfileHome:
 
     def test_tombstone_dir_marks_profiles_root(self, tmp_path):
         # A profiles/.deleted directory is only ever created by
-        # `hbm-agent profile delete` — its presence alone anchors recognition,
+        # `hbm profile delete` — its presence alone anchors recognition,
         # so tombstones are honored even when root markers are missing.
         profiles_dir = tmp_path / "opt" / "profiles"
         (profiles_dir / ".deleted").mkdir(parents=True)

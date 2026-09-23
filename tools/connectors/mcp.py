@@ -24,7 +24,7 @@ _OUTCOME_STATES = {
     "error": TargetState.failed, "failed": TargetState.failed,
 }
 
-UNAVAILABLE_HINT = "hbm-agent mcp install {name} / hbm-agent mcp login {name}"
+UNAVAILABLE_HINT = "hbm mcp install {name} / hbm mcp login {name}"
 
 NOTE = (
     "Settled once; do not re-ask for any target the user skipped or that timed out — continue "

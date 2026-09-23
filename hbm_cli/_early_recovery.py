@@ -32,9 +32,9 @@ LAZY_REFRESH_REPAIR_PACKAGES: dict[str, str] = {
     "rich": "rich", "cryptography": "cryptography", "jwt": "PyJWT",
 }
 
-# ``hbm-agent update`` renames the live ``hbm*.exe`` shims aside (``hbm.exe.old.<unix-ms>``) so
+# ``hbm update`` renames the live ``hbm*.exe`` shims aside (``hbm.exe.old.<unix-ms>``) so
 # uv can write replacements. Putting them BACK is the safety-critical direction: losing that rename
-# leaves no ``hbm-agent`` on PATH, and the command that would repair it IS ``hbm-agent update``. The
+# leaves no ``hbm-agent`` on PATH, and the command that would repair it IS ``hbm update``. The
 # updater, the early-recovery installer and the startup orphan sweep all restore through this one
 # stdlib-only helper so the retry ladder and the recovery wording cannot drift apart again.
 # --- Windows entry-point shim quarantine ----------------------------------- They used to be separate
@@ -96,7 +96,7 @@ _UPDATE_RETRY_RECOVERED = False
 
 
 def _should_skip_external_secret_sources() -> bool:
-    """True inside any ``hbm-agent update`` process (and its import probes).
+    """True inside any ``hbm update`` process (and its import probes).
 
     Every dotenv load in the process — ``hbm_cli.main``, ``run_agent``, ``cli`` — consults
     this, so the updater never resolves external secret sources: on Windows they map
@@ -327,7 +327,7 @@ def _run_installer(tool: str, cmd: list[str], root: Path, env: dict | None = Non
 def _run_repair_install(specs: list[str], project_root: Path) -> bool:
     """``uv pip`` (or stdlib ``pip``) force-reinstall of the given specs. Never raises.
 
-    Streams nothing to stdout (``hbm-agent acp`` speaks JSON-RPC on stdout). uv is preferred when the
+    Streams nothing to stdout (``hbm acp`` speaks JSON-RPC on stdout). uv is preferred when the
     base interpreter is externally managed; without uv, pip runs with the PEP 668 override.
     """
     externally_managed = _base_interpreter_is_externally_managed()
@@ -362,7 +362,7 @@ def recover_if_needed(project_root: Path | None = None, argv: list[str] | None =
     """Repair wiped core packages so ``hbm_cli.main`` can import at all.
 
     Fast path (no marker present) is two ``lstat`` calls. Only acts when a recovery marker from a
-    prior ``hbm-agent update`` exists AND an import probe confirms a core package is actually broken.
+    prior ``hbm update`` exists AND an import probe confirms a core package is actually broken.
     Never raises: on any failure the import of main.py proceeds and surfaces the real error.
     """
     global _UPDATE_RETRY_RECOVERED
@@ -385,7 +385,7 @@ def recover_if_needed(project_root: Path | None = None, argv: list[str] | None =
         # WHOLE dependency set is replaced while nothing pins venv .pyd files yet (deferring to
         # main()'s post-import recovery re-locks it on Windows). A live marker owner is another
         # updater inside the marker-to-install window — never race it. A dead owner MUST be
-        # recovered even when this launch is itself `hbm-agent update`: CLI and Desktop retries keep
+        # recovered even when this launch is itself `hbm update`: CLI and Desktop retries keep
         # that argv, and skipping solely on argv recreates the self-lock loop.
         # Bounded retries: a persistently failing install must not hammer every launch, so attempts past the
         # ceiling are left for main.py's post-import recovery path (which can safely probe-import after this
@@ -466,7 +466,7 @@ def _complete_pending_core_install(root: Path, core_marker: Path) -> bool:
     Never raises: any failure leaves the marker for the post-import path and returns ``False``.
     Returns ``True`` only after the install succeeds.
 
-    ``recover_if_needed`` invokes this when ``.update-incomplete`` exists — a prior ``hbm-agent update`` (or
+    ``recover_if_needed`` invokes this when ``.update-incomplete`` exists — a prior ``hbm update`` (or
     the self-lock preflight, #83569) left the dependency sync deliberately unfinished. Completing it here
     matters on Windows: the deferral exists precisely because the process that wrote the marker had a native
     venv extension mapped; this process, running before ``hbm_cli.main``'s third-party imports, maps
@@ -485,7 +485,7 @@ def _complete_pending_core_install(root: Path, core_marker: Path) -> bool:
         if not _claim_recovery_lock(root):
             return False
         try:
-            print("⚠ A previous `hbm-agent update` was interrupted mid-install — "
+            print("⚠ A previous `hbm update` was interrupted mid-install — "
                   "finishing dependency installation now (before any native "
                   "extensions load)...", file=sys.stderr)
             ir.run_core_install(root)

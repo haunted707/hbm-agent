@@ -1,4 +1,4 @@
-"""MCP picker — interactive `hbm-agent mcp picker` (also the default `hbm-agent mcp`)."""
+"""MCP picker — interactive `hbm mcp picker` (also the default `hbm mcp`)."""
 
 from __future__ import annotations
 
@@ -159,7 +159,7 @@ def _handle_row(row: _Row) -> None:
 
 
 def _print_rows_text(rows: List[_Row]) -> None:
-    """Plain-text catalog dump: `hbm-agent mcp catalog` output and the non-curses fallback."""
+    """Plain-text catalog dump: `hbm mcp catalog` output and the non-curses fallback."""
     print()
     if not rows:
         _say("  No MCPs in the catalog or configured.", Colors.DIM)
@@ -173,24 +173,24 @@ def _print_rows_text(rows: List[_Row]) -> None:
     for row in rows:
         print(f"  {_format_row(row)}")
     print()
-    _say("  Install: hbm-agent mcp install <name>    Picker: hbm-agent mcp", Colors.DIM)
+    _say("  Install: hbm mcp install <name>    Picker: hbm mcp", Colors.DIM)
     # Manifest-version warnings: the user's HBM AGENT is too old to install everything listed.
     future = [d for d in catalog_diagnostics() if d[1] == "future_manifest"]
     if future:
         print()
         for name, _, _msg in future:
-            _say(f"  ⚠ '{name}' requires a newer HBM AGENT — run `hbm-agent update` to install this entry.", Colors.YELLOW)
+            _say(f"  ⚠ '{name}' requires a newer HBM AGENT — run `hbm update` to install this entry.", Colors.YELLOW)
         print()
     print()
 
 
 def show_catalog() -> None:
-    """`hbm-agent mcp catalog` — print the curated list + custom servers, no interaction."""
+    """`hbm mcp catalog` — print the curated list + custom servers, no interaction."""
     _print_rows_text(_build_rows())
 
 
 def run_picker() -> None:
-    """`hbm-agent mcp picker` (and default `hbm-agent mcp`) — interactive selector; re-renders after each
+    """`hbm mcp picker` (and default `hbm mcp`) — interactive selector; re-renders after each
     action until ESC/q."""
     while True:
         rows = _build_rows()
@@ -207,13 +207,13 @@ def run_picker() -> None:
 
 
 def install_by_name(identifier: str) -> int:
-    """`hbm-agent mcp install <name>` — non-interactive entry-point."""
+    """`hbm mcp install <name>` — non-interactive entry-point."""
     from hbm_cli.mcp_catalog import get_entry
 
     entry = get_entry(identifier)
     if entry is None:
         _say(
-            f"  ✗ '{identifier}' is not in the catalog. Run `hbm-agent mcp catalog` to see available entries.",
+            f"  ✗ '{identifier}' is not in the catalog. Run `hbm mcp catalog` to see available entries.",
             Colors.RED,
         )
         return 1

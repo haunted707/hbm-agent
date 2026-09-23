@@ -368,7 +368,7 @@ def test_update_hook_refuses_to_cross_service_user_or_home_boundary(
 
 def test_update_hook_still_migrates_same_user_same_scope_profiles_under_the_default_tree(fleet, capsys, monkeypatch):
     """The guard is a boundary check, not a kill switch: one user, one service domain, everything under
-    profiles/ (the shape `hbm-agent profile create` produces) still auto-migrates."""
+    profiles/ (the shape `hbm profile create` produces) still auto-migrates."""
     fleet.services["default"] = ("systemd", False)
     monkeypatch.setattr(gm, "_gateway_identity", lambda home, pid, service: (1000, home), raising=False)
 

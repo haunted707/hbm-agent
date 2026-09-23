@@ -139,7 +139,7 @@ def _generate_deepinfra_tts(text: str, output_path: str, tts_config: Dict[str, A
     delegate to the OpenAI-compatible handler."""
     api_key = _origin()._resolve_provider_key("DEEPINFRA_API_KEY", "deepinfra")
     if not api_key:
-        raise ValueError("DEEPINFRA_API_KEY not set. Run `hbm-agent setup` to configure, or set the env var directly.")
+        raise ValueError("DEEPINFRA_API_KEY not set. Run `hbm setup` to configure, or set the env var directly.")
     di_config = _section(tts_config, "deepinfra")
     from hbm_cli.models import deepinfra_base_url, deepinfra_model_ids
     model = di_config.get("model")

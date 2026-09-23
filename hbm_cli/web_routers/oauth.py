@@ -532,7 +532,7 @@ def _oauth_provider_disconnect_hint(provider: Dict[str, Any], status: Dict[str, 
     """Return the manual disconnect path when the API cannot clear this provider."""
     # "anthropic" is flow == "external" (no in-dashboard login) but HBM AGENT still
     # OWNS its credential (the PKCE file ~/.hbm/.anthropic_oauth.json and its
-    # credential-pool entry, written by `hbm-agent auth add anthropic`), so it is
+    # credential-pool entry, written by `hbm auth add anthropic`), so it is
     # excluded from the "external providers can't be auto-disconnected" rule.
     if provider.get("flow") == "external" and provider.get("id") != "anthropic":
         if _oauth_provider_disconnect_command(provider):
@@ -547,7 +547,7 @@ def _oauth_provider_disconnect_hint(provider: Dict[str, Any], status: Dict[str, 
 def _build_oauth_catalog() -> list[Dict[str, Any]]:
     """Accounts-tab provider list: ``_OAUTH_PROVIDER_CATALOG`` cards first (curated
     order, win on metadata), then every other accounts-tab ``provider_catalog()`` entry
-    in ``hbm-agent model`` order, so plugin-added OAuth/external providers appear automatically."""
+    in ``hbm model`` order, so plugin-added OAuth/external providers appear automatically."""
     rows: list[Dict[str, Any]] = []
     seen: set[str] = set()
     for entry in _OAUTH_PROVIDER_CATALOG:
@@ -562,7 +562,7 @@ def _build_oauth_catalog() -> list[Dict[str, Any]]:
             seen.add(d.slug)
             rows.append({
                 "id": d.slug, "name": d.label, "flow": "external",
-                "cli_command": f"hbm-agent auth add {d.slug}", "docs_url": d.signup_url or "", "status_fn": None,
+                "cli_command": f"hbm auth add {d.slug}", "docs_url": d.signup_url or "", "status_fn": None,
             })
     except Exception:
         pass

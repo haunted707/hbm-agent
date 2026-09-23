@@ -150,7 +150,7 @@ def _record_update_step(step: str, ok: bool, detail: str = "") -> None:
 
 
 # A fetch whose transport dead-stalls (HTTP/2 to GitHub on some networks, a black-holed proxy)
-# otherwise leaves `hbm-agent update` on "Fetching updates..." forever (#93759, #95777). Five
+# otherwise leaves `hbm update` on "Fetching updates..." forever (#93759, #95777). Five
 # minutes is generous for a scoped single-branch fetch and still ends in a real error.
 NETWORK_GIT_TIMEOUT_SECONDS = 300
 
@@ -392,7 +392,7 @@ def _format_concurrent_instances_message(matches: list[tuple[int, str]], scripts
         "  Windows blocks REPLACE on a running executable.",
         "",
         "  Close HBM AGENT Desktop, exit any open `hbm-agent` REPLs, and",
-        "  stop the gateway (`hbm-agent gateway stop`) before retrying.",
+        "  stop the gateway (`hbm gateway stop`) before retrying.",
         ""]
     if matches:
         pid_args = " ".join(f"/PID {pid}" for pid, _ in matches)
@@ -402,7 +402,7 @@ def _format_concurrent_instances_message(matches: list[tuple[int, str]], scripts
             f"      taskkill {pid_args} /F",
             ""]
     lines += [
-        "  Override with `hbm-agent update --force` if you've already",
+        "  Override with `hbm update --force` if you've already",
         "  confirmed those processes will not write to the venv."]
     return "\n".join(lines)
 
@@ -481,7 +481,7 @@ def _run_logged_subprocess(cmd, *, cwd=None, env=None):
 
 
 def _cmd_update_check(branch: str = "main", *, branch_explicit: bool = False):
-    """``hbm-agent update --check``: fetch and report without installing. ``branch_explicit`` is
+    """``hbm update --check``: fetch and report without installing. ``branch_explicit`` is
     True iff --branch was passed (Docker installs print a notice instead of dropping the flag)."""
     # Same marker-first admission gate as the apply path, so --check never reports git
     # state for an install whose real update mechanism is an image pull.
@@ -629,7 +629,7 @@ def _repair_venv_on_current_checkout(
     healthy_after, detail_after = _venv_core_imports_healthy()
     if not healthy_after:
         print(f"⚠ Venv still unhealthy after repair: {detail_after}")
-        print("  Close all HBM AGENT windows/gateways and re-run: hbm-agent update")
+        print("  Close all HBM AGENT windows/gateways and re-run: hbm update")
         return False
     print("✓ Dependencies repaired!")
     # The hand-off child never reaches the commits-pulled Node/web/Desktop
@@ -781,7 +781,7 @@ def _rollback_if_pulled_syntax_error(git_cmd, pre_pull_sha) -> None:
         rollback_result = _git_run(git_cmd, ["reset", "--hard", pre_pull_sha])
         if rollback_result.returncode == 0:
             print("  ✓ Rollback complete — your install is unchanged.")
-            print("  Try ``hbm-agent update`` again later once a fix lands.")
+            print("  Try ``hbm update`` again later once a fix lands.")
         else:
             print("  ✗ Rollback failed. Recover manually with:")
             print(f"    cd {_m().PROJECT_ROOT} && git reset --hard {pre_pull_sha}")
@@ -803,7 +803,7 @@ def _pull_updates(
     # Pre-pull SHA for auto-rollback (stray conflict markers once bricked every updater).
     # Capture the pre-pull SHA so we can auto-roll-back if the new code has a syntax error in a
     # critical-path file (PR #28452 incident: orphan merge-conflict markers in hbm_cli/config.py bricked
-    # every user who ran ``hbm-agent update`` for the 7 minutes between the bad commit and the fix landing).
+    # every user who ran ``hbm update`` for the 7 minutes between the bad commit and the fix landing).
     pre_pull_sha = _capture_head_sha(git_cmd, _m().PROJECT_ROOT)
     try:
         # merge --ff-only the already-fetched ref instead of `git pull`, which would do a
@@ -962,7 +962,7 @@ def _prepare_checkout_for_update(
 
 @dataclass
 class _UpdateOptions:
-    """Resolved ``hbm-agent update`` inputs (flags, config, pre-update snapshots)."""
+    """Resolved ``hbm update`` inputs (flags, config, pre-update snapshots)."""
 
     active_lazy_features: object
     active_tool_dependencies: object
@@ -1108,7 +1108,7 @@ def _verify_head_after_pull(
     # Verify HEAD actually moved (issue #79678). ``merge --ff-only`` succeeding only means the merge
     # completed, not that the update applied: a checkout that is pinned to a raw SHA (detached HEAD) can
     # report "N new commit(s)" against origin yet still sit on the old commit afterward (the branch-switch
-    # step re-detaches to the SHA). Before this guard, ``hbm-agent update`` printed "✓ Code updated!" and
+    # step re-detaches to the SHA). Before this guard, ``hbm update`` printed "✓ Code updated!" and
     # reinstalled deps + rebuilt the desktop app against the stale tree — no error, no warning, ``hbm-agent
     # doctor`` healthy. Compare pre-pull and post-pull HEAD; if they match, surface the no-op instead of
     # claiming success.
@@ -1121,7 +1121,7 @@ def _verify_head_after_pull(
             f"origin/{branch} advanced but the working tree stayed put.")
         print(
             "  Reattach to the branch and retry: "
-            f"git -C {_m().PROJECT_ROOT} checkout {branch} && hbm-agent update")
+            f"git -C {_m().PROJECT_ROOT} checkout {branch} && hbm update")
         _m()._resume_windows_gateways_after_update(_windows_gateway_resume)
         sys.exit(1)
 
@@ -1135,7 +1135,7 @@ def _verify_head_after_pull(
             f"'{post_pull_branch}' — not claiming success.")
         print(
             "  Switch to the target branch and retry: "
-            f"git -C {_m().PROJECT_ROOT} checkout {branch} && hbm-agent update")
+            f"git -C {_m().PROJECT_ROOT} checkout {branch} && hbm update")
         _m()._resume_windows_gateways_after_update(_windows_gateway_resume)
         sys.exit(1)
     return post_pull_sha
@@ -1164,9 +1164,9 @@ def _handle_update_called_process_error(
             _print_called_process_error_tail(e)
             print()
             print("  HBM AGENT may not start until the dependencies are installed. Fix the error above")
-            print("  (usually network or disk space), then run `hbm-agent update` again.")
+            print("  (usually network or disk space), then run `hbm update` again.")
             if _m()._is_windows():
-                print("  If `hbm-agent update` itself will not start, retry through the venv interpreter:")
+                print("  If `hbm update` itself will not start, retry through the venv interpreter:")
                 print(
                     '    venv\\Scripts\\python.exe -c '
                     '"from hbm_cli.main import main; main()" update --yes')
@@ -1337,7 +1337,7 @@ def _cmd_update_impl(args, gateway_mode: bool):
         import atexit as _atexit
         _atexit.register(_m()._resume_windows_gateways_after_update, _windows_gateway_resume)
 
-    # Any venv python still running (typically the Desktop `hbm-agent serve` backend) keeps .pyd
+    # Any venv python still running (typically the Desktop `hbm serve` backend) keeps .pyd
     # locked and would corrupt the sync; refuse rather than race (the app respawns a killed
     # backend). NOT bypassed by --force (desktop updater, shim guard only); --force-venv is.
     if _m()._is_windows() and not getattr(args, "force_venv", False):

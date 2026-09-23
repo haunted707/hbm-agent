@@ -284,7 +284,7 @@ def _render_json(findings: list[Finding], total_components: int) -> str:
 
 
 def cmd_security_audit(args: argparse.Namespace) -> int:
-    """Implementation of `hbm-agent security audit`."""
+    """Implementation of `hbm security audit`."""
     home = Path(get_hbm_home())
     output_json = bool(getattr(args, "json", False))
     fail_on = (getattr(args, "fail_on", None) or "critical").upper()

@@ -1,4 +1,4 @@
-"""Skills configuration for HBM AGENT. `hbm-agent skills` enters this module."""
+"""Skills configuration for HBM AGENT. `hbm skills` enters this module."""
 from typing import List, Optional, Set
 
 from hbm_cli.config import cfg_get, load_config, save_config
@@ -111,7 +111,7 @@ def _toggle_by_category(skills: List[dict], disabled: Set[str]) -> Set[str]:
 
 
 def skills_command(args=None):
-    """Entry point for `hbm-agent skills`."""
+    """Entry point for `hbm skills`."""
     from hbm_cli.curses_ui import curses_checklist
     config = load_config()
     skills = _list_all_skills()

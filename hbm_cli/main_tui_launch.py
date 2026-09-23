@@ -370,10 +370,10 @@ def _find_bundled_tui(hbm_cli_dir: Path | None = None) -> Path | None:
 
 def _restore_tui_workspace(tui_dir: Path) -> bool:
     """Best-effort ``git restore`` of a missing ``ui-tui/`` (Windows AV/NTFS filters can delete
-    tracked files after ``hbm-agent update``); True when the directory exists afterwards.
+    tracked files after ``hbm update``); True when the directory exists afterwards.
 
     On Windows an antivirus / NTFS filter driver can leave tracked ``ui-tui/`` files deleted in the working
-    tree after ``hbm-agent update`` (HEAD stays intact; the files just vanish — see issue #49145). Those files
+    tree after ``hbm update`` (HEAD stays intact; the files just vanish — see issue #49145). Those files
     are tracked, so ``git restore`` puts them back deterministically. Best-effort: returns False (rather
     than raising) when git is unavailable, this isn't a checkout, or the restore leaves the directory still
     missing — the caller then prints the manual-recovery message.
@@ -410,12 +410,12 @@ def _ensure_tui_workspace(tui_dir: Path) -> None:
     print(
         "Error: the TUI workspace is missing from this HBM AGENT checkout.\n"
         f"Expected directory: {tui_dir}\n"
-        "This usually means `hbm-agent update` left tracked ui-tui files deleted.\n"
+        "This usually means `hbm update` left tracked ui-tui files deleted.\n"
         "Recovery:\n"
         "  1. From the HBM AGENT checkout, run `git restore -- ui-tui`\n"
         "  2. Run `npm install --silent --no-fund --no-audit --progress=false`\n"
         "  3. Retry `hbm --tui`\n"
-        "If the checkout is still inconsistent, run `hbm-agent update --force`.",
+        "If the checkout is still inconsistent, run `hbm update --force`.",
         file=sys.stderr)
     sys.exit(1)
 
@@ -456,7 +456,7 @@ def _tui_node_bin(bin: str) -> str:
     if not path:
         print(
             f"Node.js is required for the TUI but `{bin}` was not found. Install it from "
-            "https://nodejs.org (run `hbm-agent doctor` for the install hint for your OS), then "
+            "https://nodejs.org (run `hbm doctor` for the install hint for your OS), then "
             "retry `hbm-agent --tui`. To keep working now, run `hbm-agent --cli`."
         )
         sys.exit(1)
@@ -815,7 +815,7 @@ def _launch_tui(
                 from cli import _cleanup_worktree
                 _cleanup_worktree(wt_info)
 
-    # Exit code 42 = TUI requested an update. Relaunch as `hbm-agent update`;
+    # Exit code 42 = TUI requested an update. Relaunch as `hbm update`;
     # preserve_inherited=False keeps --tui and other flags out of the subcommand.
     if code == 42:
         from hbm_cli.relaunch import relaunch
@@ -827,11 +827,11 @@ def _launch_tui(
 
 def _pin_kanban_board_env() -> None:
     """Pin the active kanban board into ``HBM_KANBAN_BOARD`` so in-process tools and shelled-out
-    ``hbm-agent kanban`` calls agree even if a concurrent ``boards switch`` flips the file mid-turn.
+    ``hbm kanban`` calls agree even if a concurrent ``boards switch`` flips the file mid-turn.
 
-    Without this, in-process tools (``kanban_*``) and shelled-out CLI calls (``hbm-agent kanban …``) resolve
+    Without this, in-process tools (``kanban_*``) and shelled-out CLI calls (``hbm kanban …``) resolve
     the board on different paths: the env-pin if set, otherwise the global ``<root>/kanban/current`` file. A
-    concurrent ``hbm-agent kanban boards switch`` from another session can flip the file mid-turn, so the same
+    concurrent ``hbm kanban boards switch`` from another session can flip the file mid-turn, so the same
     chat sees its tool calls hit board A while its shell calls hit board B (#20074). Pinning at chat boot
     mirrors what the dispatcher already does for spawned workers.
     """
@@ -855,7 +855,7 @@ def _resolve_use_tui(args) -> bool:
     ``HBM_TUI=1`` → TUI; ``display.interface`` config; default classic.
 
     The TTY gate is load-bearing: ambient preferences must never hijack a piped
-    ``hbm-agent chat -q`` (kanban workers, cron) — the Ink no-TTY bail-out exits 0 and
+    ``hbm chat -q`` (kanban workers, cron) — the Ink no-TTY bail-out exits 0 and
     the worker dies with a protocol violation. Explicit ``--tui`` still bails out.
     """
     if getattr(args, "cli", False):

@@ -41,7 +41,7 @@ try:
     from fastapi.responses import JSONResponse
 except ImportError:
     # First try lazy-installing the dashboard extras. Only the user actually
-    # running `hbm-agent dashboard` needs fastapi+uvicorn; lazy install keeps
+    # running `hbm dashboard` needs fastapi+uvicorn; lazy install keeps
     # them out of every other install path. After install, re-import.
     try:
         from tools.lazy_deps import ensure as _lazy_ensure
@@ -77,7 +77,7 @@ from hbm_cli.web_server_lifecycle import (  # noqa: E402
 def _start_desktop_cron_ticker(stop_event: "threading.Event", interval: int = 60) -> None:
     """Tick the cron scheduler from inside the desktop dashboard backend.
 
-    The desktop spawns a ``hbm-agent dashboard`` backend, not a gateway, so without
+    The desktop spawns a ``hbm dashboard`` backend, not a gateway, so without
     this a cron created in the app would never fire (no live adapters; delivery
     falls back to the per-platform send path). The primary backend outlives the
     per-profile pool (reaped after ~10 idle minutes), so it ticks EVERY local
@@ -150,7 +150,7 @@ async def _lifespan(app: "FastAPI"):
     app.state.chat_argv_lock = asyncio.Lock()
 
     # Bring state.db schema current BEFORE the first session-list poll
-    # (#79531/#80037): a store left behind by `hbm-agent update` otherwise 500s
+    # (#79531/#80037): a store left behind by `hbm update` otherwise 500s
     # every poll while the read-probe heal loses to sibling lock contention.
     # Daemon thread so a locked store never delays the socket (Desktop
     # ready-probe times out at 10s, GH-73083).
@@ -166,7 +166,7 @@ async def _lifespan(app: "FastAPI"):
     _warm_gateway_module()
 
     # Snapshot the checkout revision so lazy-import paths (model picker) can
-    # refuse with "restart required" after `hbm-agent update` replaced the code
+    # refuse with "restart required" after `hbm update` replaced the code
     # (#86207); the update flow does not reliably restart the dashboard.
     from gateway.code_skew import record_boot_fingerprint
 
@@ -850,7 +850,7 @@ _LAST_GATEWAY_RESTART: Optional[Tuple[float, subprocess.Popen, Tuple[str, ...]]]
 
 
 def _spawn_gateway_restart(profile: Optional[str] = None) -> Tuple[subprocess.Popen, bool]:
-    """Spawn ``hbm-agent gateway restart``, reusing an in-flight or recent restart.
+    """Spawn ``hbm gateway restart``, reusing an in-flight or recent restart.
 
     Concurrent children race each other on the kill-and-start path, so a live
     child is reused; requests within ``GATEWAY_RESTART_COOLDOWN_SECONDS`` for the
@@ -1041,7 +1041,7 @@ def _no_auth_provider_message(host: str) -> str:
         "    (hash with: python -c \"from "
         "plugins.dashboard_auth.basic import hash_password; "
         "print(hash_password('your-password'))\")\n"
-        "  • OAuth: run `hbm-agent dashboard register` (Nous Portal) or "
+        "  • OAuth: run `hbm dashboard register` (Nous Portal) or "
         "install a DashboardAuthProvider plugin.\n"
         "There is no unauthenticated public-dashboard option. For "
         "local-only use, bind 127.0.0.1 and leave dashboard.public_url "
@@ -1064,7 +1064,7 @@ def _no_auth_provider_message(host: str) -> str:
                 "plugins.disabled but dashboard.basic_auth is "
                 "configured.\n"
                 "Remove 'basic' from plugins.disabled (or run "
-                "`hbm-agent plugins enable basic`), then restart the "
+                "`hbm plugins enable basic`), then restart the "
                 "dashboard.\n\n"
             ) + fix_hint
     except Exception:
@@ -1237,7 +1237,7 @@ def _on_server_started(
     # ledger + spawner provably dead); anything alive or unprovable is untouched.
     _best_effort("orphan MCP helper reap", _reap_mcp_helpers)
 
-    # No-op for standalone `hbm-agent serve` (no HBM_PARENT_PID).
+    # No-op for standalone `hbm serve` (no HBM_PARENT_PID).
     _start_parent_death_watchdog()
     # SSH-isolated backends are detached from any parent on purpose (#91668); their liveness signal
     # is "does a client still hold a WebSocket" (#101626).
@@ -1254,7 +1254,7 @@ def _on_server_started(
 
     # Positive process identity in the machine spawn ledger (+ Windows
     # kill-on-close job). Registered AFTER the bind so the entry carries the
-    # ACTUAL port — what lets `hbm-agent update` relaunch a manually-started serve
+    # ACTUAL port — what lets `hbm update` relaunch a manually-started serve
     # on its real endpoint (#63206).
     def _register_identity() -> None:
         from hbm_cli.process_identity import attach_self_to_kill_on_close_job, register_self

@@ -69,7 +69,7 @@ def generate_bash(parser: argparse.ArgumentParser) -> str:
     cases_str = "\n".join(cases)
     return f"""# HBM AGENT bash completion
 # Add to ~/.bashrc:
-#   eval "$(hbm-agent completion bash)"
+#   eval "$(hbm completion bash)"
 
 _hbm_profiles() {{
     local profiles_dir="$HOME/.hbm/profiles"
@@ -155,7 +155,7 @@ def generate_zsh(parser: argparse.ArgumentParser) -> str:
     return f"""#compdef hbm-agent
 # HBM AGENT zsh completion
 # Add to ~/.zshrc:
-#   eval "$(hbm-agent completion zsh)"
+#   eval "$(hbm completion zsh)"
 
 _hbm_profiles() {{
     local -a profiles
@@ -203,7 +203,7 @@ def generate_fish(parser: argparse.ArgumentParser) -> str:
     lines: list[str] = [
         "# HBM AGENT fish completion",
         "# Add to your config:",
-        "#   hbm-agent completion fish | source",
+        "#   hbm completion fish | source",
         "",
         "# Helper: list available profiles",
         "function __hbm_profiles",
@@ -216,16 +216,16 @@ def generate_fish(parser: argparse.ArgumentParser) -> str:
         "end",
         "",
         "# Disable file completion by default",
-        "complete -c hbm-agent -f",
+        "complete -c hbm -f",
         "",
         "# Complete profile names after -p / --profile",
-        "complete -c hbm-agent -f -s p -l profile"
+        "complete -c hbm -f -s p -l profile"
         " -d 'Profile name' -xa '(__hbm_profiles)'",
         "",
         "# Top-level subcommands"]
     for cmd, info in subcommands:
         lines.append(
-            f"complete -c hbm-agent -f "
+            f"complete -c hbm -f "
             f"-n 'not __fish_seen_subcommand_from {top_cmds_str}' "
             f"-a {cmd} -d '{_clean(info.get('help', ''))}'")
     lines += ["", "# Subcommand completions"]
@@ -235,13 +235,13 @@ def generate_fish(parser: argparse.ArgumentParser) -> str:
         lines.append(f"# {cmd}")
         for sc, sinfo in sorted(info["subcommands"].items()):
             lines.append(
-                f"complete -c hbm-agent -f "
+                f"complete -c hbm -f "
                 f"-n '__fish_seen_subcommand_from {cmd}' "
                 f"-a {sc} -d '{_clean(sinfo.get('help', ''))}'")
         if cmd == "profile":  # profile names for the actions that take one
             for action in sorted(_PROFILE_NAME_ACTIONS):
                 lines.append(
-                    f"complete -c hbm-agent -f "
+                    f"complete -c hbm -f "
                     f"-n '__fish_seen_subcommand_from {action}; "
                     f"and __fish_seen_subcommand_from profile' "
                     f"-a '(__hbm_profiles)' -d 'Profile name'")

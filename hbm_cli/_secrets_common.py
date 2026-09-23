@@ -1,4 +1,4 @@
-"""Helpers shared by the Bitwarden and 1Password ``hbm-agent secrets`` CLIs.
+"""Helpers shared by the Bitwarden and 1Password ``hbm secrets`` CLIs.
 
 Import-light on purpose: ``hbm_cli.secrets_cli`` must stay free of the Bitwarden backend
 (``cryptography``) at import time, so nothing here touches a secret-source backend.
@@ -60,7 +60,7 @@ def require_enabled(console: Console, cfg: dict, product: str, command: str) -> 
     if cfg.get("enabled"):
         return True
     console.print(f"[yellow]{product} integration is disabled.  Run "
-                  f"`hbm-agent secrets {command} setup` first.[/yellow]")
+                  f"`hbm secrets {command} setup` first.[/yellow]")
     return False
 
 

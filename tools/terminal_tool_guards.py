@@ -186,14 +186,14 @@ def gateway_lifecycle_block(
 ) -> Optional[str]:
     """Refuse gateway lifecycle commands issued from inside the supervised gateway.
 
-    ``systemctl``/``launchctl``/``hbm-agent gateway restart|stop|uninstall``
+    ``systemctl``/``launchctl``/``hbm gateway restart|stop|uninstall``
     targeting hbm-gateway would SIGTERM the gateway — and this very
     subprocess — before completing, so the service may never come back.
     Applies unconditionally (``force=True`` cannot bypass it). Gated on the
     SUPERVISED-gateway probe, not the raw ``_HBM_GATEWAY`` marker: that
     marker leaks into every process that merely imports gateway.run (hbm-agent
     serve, CLI, web server), which must still be able to restart the gateway;
-    an unsupervised foreground ``hbm-agent gateway run`` has no KeepAlive to turn
+    an unsupervised foreground ``hbm gateway run`` has no KeepAlive to turn
     a self-restart into a respawn loop, so it passes too.
     Returns the JSON error string when blocked, else None.
     """
@@ -236,7 +236,7 @@ def gateway_lifecycle_block(
             "Blocked: command or referenced script cannot restart, stop, or "
             "uninstall the gateway from inside the gateway process. The gateway would "
             "kill this command before it could complete (SIGTERM propagates "
-            "to child processes). Run `hbm-agent gateway restart` from a "
+            "to child processes). Run `hbm gateway restart` from a "
             "separate shell outside the running gateway.",
             "error",
         )

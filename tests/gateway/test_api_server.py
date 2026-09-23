@@ -2708,7 +2708,7 @@ class TestModelRoutesAgentCreation:
 class TestStoredSessionModelFilter:
     """A session row that persisted the advertised virtual model must read as
     "no stored model" — replaying "hbm-agent" upstream 400s. Found live
-    (Aug 2026): the first cross-gateway `hbm-agent peer dm` against a fresh
+    (Aug 2026): the first cross-gateway `hbm peer dm` against a fresh
     api_server failed every turn with "hbm-agent is not a valid model ID".
     """
 

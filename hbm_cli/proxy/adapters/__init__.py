@@ -6,7 +6,7 @@ from hbm_cli.proxy.adapters.base import UpstreamAdapter
 from hbm_cli.proxy.adapters.nous_portal import NousPortalAdapter
 from hbm_cli.proxy.adapters.xai import XAIGrokAdapter
 
-# Keyed by the ``hbm-agent proxy start --provider <name>`` value.
+# Keyed by the ``hbm proxy start --provider <name>`` value.
 ADAPTERS: Dict[str, Type[UpstreamAdapter]] = {"nous": NousPortalAdapter, "xai": XAIGrokAdapter}
 
 
